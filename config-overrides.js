@@ -25,11 +25,11 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = function override(config, env) {
   config.resolve = {
+    ...config.resolve,
     fallback: {
+      ...config.resolve.fallback,
       stream: require.resolve('stream-browserify'),
     },
-    // NOTE: I added this; missing in Substrate template and causes missing module errors;
-    extensions: [...config.resolve.extensions, '.ts', '.js'],
   };
 
   config.plugins.push(new NodePolyfillPlugin());
