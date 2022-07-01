@@ -158,11 +158,6 @@ const SubstrateContextProvider = (props: any) => {
   );
 };
 
-// prop typechecking
-SubstrateContextProvider.propTypes = {
-  socket: PropTypes.string,
-};
-
 const useSubstrate = () => useContext(SubstrateContext);
 const useSubstrateState = () => useContext(SubstrateContext).state;
 
