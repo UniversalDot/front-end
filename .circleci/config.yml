@@ -51,6 +51,9 @@ jobs:
      machine:
        enabled: true
      steps:
+       - add_ssh_keys:
+           fingerprints:
+              - "b4:2b:92:46:1a:f9:f1:b9:b5:46:f8:01:4a:92:f7:bb"
        - attach_workspace:
            at: "./"
        - run:
@@ -79,7 +82,7 @@ jobs:
 
 workflows:
   version: 2
-  test_deploy:
+  build_deploy:
     jobs:
       - build:
           filters: *filter-non-gh-pages
