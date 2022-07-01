@@ -36,8 +36,9 @@
 // Leave commented out configs above for a certain period as an archive of what we tried earlier that didn't work in build mode;
 // node-polyfill-webpack-plugin - this depency is installed because it contains process, buffer, util and other sub-dependencies, so we don't add them as deps separately;
 
+// Works on MacOs:
 const webpack = require('webpack');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+// const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = function override(config) {
   config.resolve.fallback = {
@@ -64,3 +65,31 @@ module.exports = function override(config) {
 
   return config;
 };
+
+// Works on Windows:
+// const webpack = require('webpack');
+// const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+
+// module.exports = function override(config) {
+//   config.resolve.fallback = {
+//     process: require.resolve('process/browser'),
+//     zlib: require.resolve('browserify-zlib'),
+//     stream: require.resolve('stream-browserify'),
+//     util: require.resolve('util'),
+//     buffer: require.resolve('buffer'),
+//     asset: require.resolve('assert'),
+//   };
+
+//   // Option 1 that works - use either one;
+//   // config.plugins.push(
+//   //   new webpack.ProvidePlugin({
+//   //     process: 'process/browser.js',
+//   //     Buffer: ['buffer', 'Buffer'],
+//   //   })
+//   // );
+
+//   // Option 2 that works - use either one;
+//   config.plugins.push(new NodePolyfillPlugin());
+
+//   return config;
+// };
