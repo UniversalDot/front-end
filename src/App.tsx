@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 // routes
 import Router from './routes';
 // theme
@@ -9,9 +10,34 @@ import { ProgressBarStyle } from './components/ProgressBar';
 import NotistackProvider from './components/NotistackProvider';
 import MotionLazyContainer from './components/animate/MotionLazyContainer';
 
+// universaldot imports
+import { useProfile, useUser } from './hooks/universaldot';
+import { useSubstrateState } from './substrate-lib';
 // ----------------------------------------------------------------------
 
 export default function App() {
+  const { getProfile } = useProfile();
+  const { keyring } = useSubstrateState();
+  const { setKeyringOptions } = useUser();
+
+  useEffect(() => {
+    getProfile();
+  }, [getProfile]);
+
+  // @TODO: this should go in component where we choose an account and on click we set it as currently selected account;
+  useEffect(() => {
+    // Get the list of accounts we possess the private key for.
+    if (keyring) {
+      const keyringOptions = keyring?.getPairs()?.map((account: any) => ({
+        key: account.address,
+        value: account.address,
+        text: account.meta.name.toUpperCase(),
+      }));
+      setKeyringOptions(keyringOptions);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyring]);
+
   return (
     <MotionLazyContainer>
       <ThemeProvider>
