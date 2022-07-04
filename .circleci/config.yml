@@ -44,7 +44,7 @@ jobs:
           # relative to working_directory
           root: "./"
           paths:
-            - "./domains/universaldot.me/public_html/test"
+            - "./"
 
 
   deploy:
@@ -67,7 +67,6 @@ jobs:
             cd domains/universaldot.me/public_html/test
             yarn build
             serve -s build
-            
      resource_class: large
 
   # deploy:
