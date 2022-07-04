@@ -2,7 +2,7 @@
 import { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from '../../redux/store';
 import { web3FromSource } from '@polkadot/extension-dapp';
-import { useSubstrate } from '../../substrate-lib';
+import { useSubstrateState } from '../../substrate-lib';
 import {
   setTasks,
   setTaskTitle,
@@ -28,7 +28,7 @@ import {
 
 const useTasks = () => {
   const dispatch = useDispatch();
-  const { api, keyring, keyringState } = useSubstrate();
+  const { api, keyring, keyringState } = useSubstrateState();
   const [unsub, setUnsub] = useState<Function | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
