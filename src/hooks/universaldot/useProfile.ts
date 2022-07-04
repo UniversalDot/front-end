@@ -61,8 +61,6 @@ const useProfile = () => {
       setLoading({ type: loadingTypes.PROFILE, value: false });
       setStatusMessage('');
 
-      console.log('profile query result', result.toHuman())
-
       const setAllData = (profileData: { interests: string; name: any; }) => {
         dispatch(setProfile(profileData));
         populateFormInterests(profileData?.interests?.split(','));
