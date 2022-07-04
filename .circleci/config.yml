@@ -55,7 +55,7 @@ jobs:
            fingerprints:
               - "b4:2b:92:46:1a:f9:f1:b9:b5:46:f8:01:4a:92:f7:bb"
        - attach_workspace:
-           at: "./"
+           at: "domains/universaldot.me/public_html/test"
        - run:
            name: Deploy Over SSH
            command: |
