@@ -57,10 +57,13 @@ jobs:
               - "b4:2b:92:46:1a:f9:f1:b9:b5:46:f8:01:4a:92:f7:bb"
        - attach_workspace:
            at: "./"
+       # Install rsync. It will be used to upload our code to server
+       - run: sudo apt-get install rsync
        - run:
            name: Deploy Over SSH
            command: |
             echo "Deploying to test.universaldot.me"
+            ssh-keyscan -H 185.224.137.168 >> ~/.ssh/known_hosts
             ssh -oStrictHostKeyChecking=no -p 65002 u787324618@185.224.137.168
             cd domains/universaldot.me/public_html/test
             yarn build
