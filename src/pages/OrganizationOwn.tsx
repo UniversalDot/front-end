@@ -4,7 +4,8 @@ import { Container, Typography } from '@mui/material';
 import useSettings from '../hooks/useSettings';
 // components
 import Page from '../components/Page';
-
+// universaldot
+import Organizations from 'src/components/universaldot/Organizations';
 // ----------------------------------------------------------------------
 
 export default function OrganizationOwn() {
@@ -16,7 +17,7 @@ export default function OrganizationOwn() {
         <Typography variant="h3" component="h1" paragraph>
           My organization
         </Typography>
-        <Typography>Content...</Typography>
+        <Organizations type="own" />
       </Container>
     </Page>
   );
