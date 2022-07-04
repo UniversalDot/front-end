@@ -60,7 +60,7 @@ jobs:
            name: Deploy Over SSH
            command: |
             echo "Deploying to test.universaldot.me"
-            ssh -p 65002 u787324618@185.224.137.168
+            ssh -oStrictHostKeyChecking=no -p 65002 u787324618@185.224.137.168
             cd domains/universaldot.me/public_html/test
             yarn build
      resource_class: large
