@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSubstrate } from '../../../substrate-lib';
+import { useSubstrateState } from '../../substrate-lib';
 
 // Events to be filtered from feed
 const FILTERED_EVENTS = [
@@ -11,7 +11,7 @@ const eventName = (ev: any) => `${ev.section}:${ev.method}`;
 const eventParams = (ev: any) => JSON.stringify(ev.data);
 
 const Events = () => {
-  const { api } = useSubstrate();
+  const { api } = useSubstrateState();
   const [eventFeed, setEventFeed] = useState<any>([]);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const Events = () => {
       <button onClick={(_) => setEventFeed([])} />
       <div>
         {eventFeed.map((event: any, index: number) => (
-          <div key={`e${index}`}>event here</div>
+          <div key={`e${index}`}>{event.summary + ' ' + event.content}</div>
         ))}
       </div>
     </div>
@@ -72,4 +72,4 @@ const Events = () => {
 
 Events.displayName = 'Events';
 
-export { Events };
+export default Events;

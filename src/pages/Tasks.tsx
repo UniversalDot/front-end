@@ -4,6 +4,8 @@ import { Container, Typography } from '@mui/material';
 import useSettings from '../hooks/useSettings';
 // components
 import Page from '../components/Page';
+// universaldot
+import Timeline from '../components/universaldot/Timeline';
 
 // ----------------------------------------------------------------------
 
@@ -16,7 +18,7 @@ export default function Tasks() {
         <Typography variant="h3" component="h1" paragraph>
           Tasks
         </Typography>
-        <Typography>Content...</Typography>
+        <Timeline />
       </Container>
     </Page>
   );

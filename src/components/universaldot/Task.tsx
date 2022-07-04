@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useTasks } from '../../../hooks/universaldot';
-import { taskCallables } from '../../../types';
+import { useTasks } from '../../hooks/universaldot';
+import { taskCallables } from '../../types';
 
 const Task = ({ id, optionsOnClick }: any) => {
   const { getTask } = useTasks();
@@ -70,4 +70,4 @@ const Task = ({ id, optionsOnClick }: any) => {
 
 Task.displayName = 'Task';
 
-export { Task };
+export default Task;

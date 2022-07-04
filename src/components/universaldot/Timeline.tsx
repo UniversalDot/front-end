@@ -1,8 +1,8 @@
 /* eslint-disable multiline-ternary */
 import { useEffect, useMemo } from 'react';
-import { Task } from '../task';
-import { Events } from '../events';
-import { useTasks, useLoader } from '../../../hooks/universaldot';
+import Task from './Task';
+import Events from './Events';
+import { useTasks, useLoader } from '../../hooks/universaldot';
 
 const Timeline = () => {
   const {
@@ -34,19 +34,19 @@ const Timeline = () => {
       return <div>No tasks at the moment...</div>;
     }
 
-    return allTasksReceived.map((taskId, i) => (
+    return allTasksReceived.map((taskId: any, i: number) => (
       <Task id={taskId} optionsOnClick={handleOptionsOnClick} key={`task#${i}`} />
     ));
   }, [allTasksReceived, taskAction]);
 
   return (
-    <>
+    <div>
       <div>{loadingTasks || actionLoading ? 'loading' : tasks}</div>
       <Events />
-    </>
+    </div>
   );
 };
 
 Timeline.displayName = 'Timeline';
 
-export { Timeline };
+export default Timeline;

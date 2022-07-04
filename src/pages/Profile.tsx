@@ -4,6 +4,10 @@ import { Container, Typography } from '@mui/material';
 import useSettings from '../hooks/useSettings';
 // components
 import Page from '../components/Page';
+// universaldot
+import UserQuickInfo from 'src/components/universaldot/UserQuickInfo';
+import Funds from 'src/components/universaldot/Funds';
+import ProfileConfiguration from 'src/components/universaldot/ProfileConfiguration';
 
 // ----------------------------------------------------------------------
 
@@ -16,7 +20,9 @@ export default function Profile() {
         <Typography variant="h3" component="h1" paragraph>
           Profile
         </Typography>
-        <Typography>Content...</Typography>
+        <UserQuickInfo />
+        <Funds />
+        <ProfileConfiguration />
       </Container>
     </Page>
   );
