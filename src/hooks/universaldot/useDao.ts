@@ -2,7 +2,7 @@
 /* eslint-disable indent */
 import { useCallback, useState } from 'react';
 import { web3FromSource } from '@polkadot/extension-dapp';
-import { useSubstrate } from '../../substrate-lib';
+import { useSubstrateState } from '../../substrate-lib';
 // import {} from '../store/slices/daoSlice';
 import { useUser } from './useUser';
 import { useStatus } from './useStatus';
@@ -31,7 +31,7 @@ import { useSelector, useDispatch } from '../../redux/store';
 
 const useDao = () => {
   const dispatch = useDispatch();
-  const { api, keyring, keyringState } = useSubstrate();
+  const { api, keyring, keyringState } = useSubstrateState();
   const [unsub, setUnsub] = useState<Function | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
