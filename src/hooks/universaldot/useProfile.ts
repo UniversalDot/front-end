@@ -41,6 +41,9 @@ const useProfile = () => {
     state => state.profile?.data?.reputation
   );
   const reputation = reputationPoints?.toString() || 'N/A';
+  const balance = useSelector(
+    state => state.profile?.data?.balance || 'N/A'
+  );
 
   const populateFormInterests = useCallback(
     interestsArray => {
@@ -240,6 +243,7 @@ const useProfile = () => {
     setUsername,
     username,
     reputation,
+    balance
   };
 };
 
