@@ -2041,7 +2041,7 @@
     "@babel/runtime" "^7.18.6"
     "@polkadot/util" "^9.7.2"
 
-"@polkadot/types@^7.10.1", "@polkadot/types@^7.15.1", "@polkadot/types@7.15.1":
+"@polkadot/types@^7.15.1":
   "integrity" "sha512-KawZVS+eLR1D6O7c/P5cSUwr6biM9Qd2KwKtJIO8l1Mrxp7r+y2tQnXSSXVAd6XPdb3wVMhnIID+NW3W99TAnQ=="
   "resolved" "https://registry.npmjs.org/@polkadot/types/-/types-7.15.1.tgz"
   "version" "7.15.1"
@@ -2055,7 +2055,7 @@
     "@polkadot/util-crypto" "^8.7.1"
     "rxjs" "^7.5.5"
 
-"@polkadot/types@8.11.3":
+"@polkadot/types@^8.11.3", "@polkadot/types@8.11.3":
   "integrity" "sha512-EOj9MKs6F7ZU8/7cO2r+4KbgYidn86GN4AiRJIfDVpSevrlWDR1KElrHaCLgcPUqs/5YT5EG4R0fcgjxk9DKvA=="
   "resolved" "https://registry.npmjs.org/@polkadot/types/-/types-8.11.3.tgz"
   "version" "8.11.3"
@@ -2067,6 +2067,20 @@
     "@polkadot/types-create" "8.11.3"
     "@polkadot/util" "^9.7.2"
     "@polkadot/util-crypto" "^9.7.2"
+    "rxjs" "^7.5.5"
+
+"@polkadot/types@7.15.1":
+  "integrity" "sha512-KawZVS+eLR1D6O7c/P5cSUwr6biM9Qd2KwKtJIO8l1Mrxp7r+y2tQnXSSXVAd6XPdb3wVMhnIID+NW3W99TAnQ=="
+  "resolved" "https://registry.npmjs.org/@polkadot/types/-/types-7.15.1.tgz"
+  "version" "7.15.1"
+  dependencies:
+    "@babel/runtime" "^7.17.8"
+    "@polkadot/keyring" "^8.7.1"
+    "@polkadot/types-augment" "7.15.1"
+    "@polkadot/types-codec" "7.15.1"
+    "@polkadot/types-create" "7.15.1"
+    "@polkadot/util" "^8.7.1"
+    "@polkadot/util-crypto" "^8.7.1"
     "rxjs" "^7.5.5"
 
 "@polkadot/ui-keyring@^1.1.1":
@@ -2128,7 +2142,7 @@
     "ed2curve" "^0.3.0"
     "tweetnacl" "^1.0.3"
 
-"@polkadot/util@*", "@polkadot/util@^8.4.1", "@polkadot/util@^8.7.1", "@polkadot/util@8.7.1":
+"@polkadot/util@*", "@polkadot/util@^8.7.1", "@polkadot/util@8.7.1":
   "integrity" "sha512-XjY1bTo7V6OvOCe4yn8H2vifeuBciCy0gq0k5P1tlGUQLI/Yt0hvDmxcA0FEPtqg8CL+rYRG7WXGPVNjkrNvyQ=="
   "resolved" "https://registry.npmjs.org/@polkadot/util/-/util-8.7.1.tgz"
   "version" "8.7.1"
