@@ -3,7 +3,7 @@
 
 import type { Bytes, Struct, Text, u32, u64 } from '@polkadot/types-codec';
 import type { AccountId } from '@polkadot/types/interfaces/runtime';
-import type { VoteStage } from 'universaldot-typegen/interfaces/voting';
+import type { VoteStage } from 'universaldot-frontend/interfaces/voting';
 
 /** @name ProposalContents */
 export interface ProposalContents extends Bytes {}
