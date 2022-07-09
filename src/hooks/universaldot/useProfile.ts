@@ -6,8 +6,6 @@ import { useSubstrateState } from '../../substrate-lib';
 
 import {
   setProfile,
-  setFormInterests,
-  setUsername as setUsernameAction,
 } from '../../redux/slices/profileSlice';
 import { useUser } from './useUser';
 import { useStatus } from './useStatus';
@@ -21,6 +19,7 @@ import {
   loadingTypes,
 } from '../../types';
 // import { useToast } from './useToast';
+import { ProfileDataSubstrate } from '../../@types/universaldot';
 
 const useProfile = () => {
   const dispatch = useDispatch();
@@ -35,44 +34,25 @@ const useProfile = () => {
   // const { toast } = useToast();
 
   const profileData = useSelector(state => state.profile.data);
-  const interests = useSelector(state => state.profile.form.interests);
-  const username = useSelector(state => state.profile.form.username);
-  const reputationPoints = useSelector(
-    state => state.profile?.data?.reputation
-  );
-  const reputation = reputationPoints?.toString() || 'N/A';
-  const balance = useSelector(
-    state => state.profile?.data?.balance || 'N/A'
-  );
-
-  const populateFormInterests = useCallback(
-    interestsArray => {
-      dispatch(setFormInterests(interestsArray));
-    },
-    [dispatch]
-  );
-
-  const setUsername = useCallback(
-    username => {
-      dispatch(setUsernameAction(username));
-    },
-    [dispatch]
-  );
 
   const queryResponseHandler = useCallback(
     result => {
       setLoading({ type: loadingTypes.PROFILE, value: false });
       setStatusMessage('');
 
-      const setAllData = (profileData: { interests: string; name: any; }) => {
-        dispatch(setProfile(profileData));
-        populateFormInterests(profileData?.interests?.split(','));
-        setUsername(profileData?.name);
+      const setAllData = (profileData: ProfileDataSubstrate) => {
+        const modifiedProfileData = {
+          ...profileData,
+          interests: profileData?.interests?.split(','),
+          reputation: profileData?.reputation?.toString() || 'N/A',
+          balance: profileData?.balance || 'N/A'
+        }
+        dispatch(setProfile(modifiedProfileData));
       };
 
       result.isNone ? dispatch(setProfile(null)) : setAllData(result.toHuman());
     },
-    [dispatch, setStatusMessage, setLoading, populateFormInterests, setUsername]
+    [dispatch, setStatusMessage, setLoading]
   );
 
   // TODO: figure out how to make it simpler to check when API is availabile so it doesn't crash;
@@ -103,7 +83,7 @@ const useProfile = () => {
     setLoading,
   ]);
 
-  const signedTransaction = async (actionType: string) => {
+  const signedTransaction = async (actionType: string, payload: { username: string, interests: string[] }) => {
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -172,8 +152,8 @@ const useProfile = () => {
       { name: 'interests', optional: false, type: 'Bytes' },
     ];
     const inputParamsForTransformed = () => [
-      { type: 'Bytes', value: username },
-      { type: 'Bytes', value: interests.join() },
+      { type: 'Bytes', value: payload.username },
+      { type: 'Bytes', value: payload.interests.join() },
     ];
 
     const transformed = transformParams(
@@ -206,7 +186,7 @@ const useProfile = () => {
     setUnsub(() => unsub);
   };
 
-  const profileAction = async (actionType: string) => {
+  const profileAction = async (actionType: string, payload: { username: string, interests: string[] }) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
@@ -227,23 +207,15 @@ const useProfile = () => {
 
     setStatus(statusTypes.INIT);
     setActionLoading(true);
-    populateFormInterests([]);
-    setUsername('');
-    signedTransaction(actionType);
+    signedTransaction(actionType, payload);
   };
 
   return {
     getProfile,
     profileData,
-    populateFormInterests,
-    interests,
     profileAction,
     actionLoading,
     setActionLoading,
-    setUsername,
-    username,
-    reputation,
-    balance
   };
 };
 

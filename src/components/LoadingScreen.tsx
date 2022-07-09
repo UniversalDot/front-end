@@ -19,6 +19,7 @@ const RootStyle = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: theme.palette.background.default,
+  opacity: '0.7',
 }));
 
 // ----------------------------------------------------------------------
@@ -48,6 +49,7 @@ export default function LoadingScreen({ isDashboard, ...other }: Props) {
             }}
           >
             <Logo disabledLink sx={{ width: 64, height: 64 }} />
+            Please wait...
           </m.div>
 
           <Box
