@@ -22,7 +22,6 @@ import {
   Configuration,
 } from '../components/universaldot/Profile';
 // universaldot
-import ProfileConfiguration from 'src/components/universaldot/ProfileConfiguration';
 import { useProfile } from '../hooks/universaldot';
 
 // ----------------------------------------------------------------------
@@ -50,14 +49,14 @@ export default function Profile() {
 
   const { currentTab, onChangeTab } = useTabs('profile');
 
-  const { username, balance, reputation } = useProfile();
+  const { profileData } = useProfile();
 
   // @TODO
   const myProfile: MyProfile = {
     id: _mock.id(1),
-    username: username,
-    balance: balance,
-    reputation: reputation,
+    username: profileData?.name || 'N/A',
+    balance: profileData?.balance || 'N/A',
+    reputation: profileData?.reputation || 'N/A',
     cover: _mock.image.cover(1),
     position: 'UI/UX Designer at DesignerHub',
     quote:
@@ -91,7 +90,10 @@ export default function Profile() {
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <HeaderBreadcrumbs
           heading="Profile"
-          links={[{ name: 'Profile', href: PATH_UNIVERSALDOT.profile.root }, { name: username }]}
+          links={[
+            { name: 'Profile', href: PATH_UNIVERSALDOT.profile.root },
+            { name: profileData?.name || 'N/A' },
+          ]}
         />
         <Card
           sx={{

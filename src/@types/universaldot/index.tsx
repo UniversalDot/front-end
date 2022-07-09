@@ -16,3 +16,23 @@ export type MyProfile = {
   linkedinLink: string;
   twitterLink: string;
 };
+
+export type ProfileState = {
+  data: ProfileDataAdapted;
+};
+
+export type ProfileDataSubstrate = {
+  balance: string;
+  interests: string;
+  name: string;
+  owner: string;
+  reputation: string;
+} | null;
+
+export type ProfileDataAdapted = {
+  balance: string;
+  interests: string[];
+  name: string;
+  owner: string;
+  reputation: string;
+} | null;

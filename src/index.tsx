@@ -25,17 +25,17 @@ import App from './App';
 ReactDOM.render(
   <HelmetProvider>
     <ReduxProvider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <SettingsProvider>
-          <CollapseDrawerProvider>
-            <BrowserRouter>
-              <SubstrateContextProvider>
-                <App />
-              </SubstrateContextProvider>
-            </BrowserRouter>
-          </CollapseDrawerProvider>
-        </SettingsProvider>
-      </PersistGate>
+      {/* <PersistGate loading={null} persistor={persistor}> */}
+      <SettingsProvider>
+        <CollapseDrawerProvider>
+          <BrowserRouter>
+            <SubstrateContextProvider>
+              <App />
+            </SubstrateContextProvider>
+          </BrowserRouter>
+        </CollapseDrawerProvider>
+      </SettingsProvider>
+      {/* </PersistGate> */}
     </ReduxProvider>
   </HelmetProvider>,
   document.getElementById('root')

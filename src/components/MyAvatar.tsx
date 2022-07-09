@@ -8,18 +8,18 @@ import Avatar, { Props as AvatarProps } from './Avatar';
 // ----------------------------------------------------------------------
 
 export default function MyAvatar({ ...other }: AvatarProps) {
-  const { username } = useProfile();
+  const { profileData } = useProfile();
 
   return (
     <Avatar
       src="@TODO"
-      alt={username}
+      alt={profileData?.name || 'N/A'}
       // src={user?.photoURL}
       // color={user?.photoURL ? 'default' : createAvatar(user?.displayName).color}
       color="default"
       {...other}
     >
-      {createAvatar(username).name}
+      {createAvatar(profileData?.name || 'N/A').name}
     </Avatar>
   );
 }

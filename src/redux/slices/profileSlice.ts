@@ -1,10 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState: any = {
-  form: {
-    interests: [],
-    username: '',
-  },
+import { ProfileState } from '../../@types/universaldot';
+
+const initialState: ProfileState = {
   data: null,
 };
 
@@ -15,22 +13,10 @@ const profileSlice = createSlice({
     setProfile(state, action) {
       state.data = action.payload;
     },
-    setFormInterests(state, action) {
-      state.form = {
-        ...state.form,
-        interests: action.payload,
-      };
-    },
-    setUsername(state, action) {
-      state.form = {
-        ...state.form,
-        username: action.payload,
-      };
-    },
   },
 });
 
-export const { setProfile, setFormInterests, setUsername } =
+export const { setProfile } =
   profileSlice.actions;
 
 export default profileSlice.reducer;

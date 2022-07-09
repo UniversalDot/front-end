@@ -16,6 +16,8 @@ const rootPersistConfig = {
   storage,
   keyPrefix: 'redux-',
   whitelist: [],
+  // NOTE: added by me
+  timeout: 2000, //Set the timeout function to 2 seconds
 };
 
 const rootReducer = combineReducers({
