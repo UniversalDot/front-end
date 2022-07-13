@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // @mui
 import {
   Box,
@@ -41,6 +41,8 @@ export default function ConfigurationProfile({ myProfile }: Props) {
   const [usernameEditEnabled, setUsernameEditEnabled] = useState(false);
 
   const [localUsername, setLocalUsername] = useState('');
+  const [localAvailableHours, setLocalAvailableHours] = useState<string>('');
+  const [localOtherInformation, setLocalOtherInformation] = useState<string>('');
   const [localInterests, setLocalInterests] = useState<string[]>([]);
 
   const { profileData, profileAction, actionLoading } = useProfile();
@@ -64,6 +66,23 @@ export default function ConfigurationProfile({ myProfile }: Props) {
 
   const onUsernameChange = (username: string) => {
     setLocalUsername(username);
+  };
+
+  const onAvailableHoursChange = (hours: string) => {
+    const ok = new RegExp(/^[1-9]\d*$/g);
+    if (ok.test(hours)) {
+      setLocalAvailableHours(hours);
+    }
+  };
+
+  const onAvailableHoursBackspace = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.code === 'Backspace' && localAvailableHours.length === 1) {
+      setLocalAvailableHours('');
+    }
+  };
+
+  const onOtherInformationChange = (text: string) => {
+    setLocalOtherInformation(text);
   };
 
   useEffect(() => {
@@ -202,6 +221,29 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                         readOnly={!usernameEditEnabled && Boolean(profileData)}
                       />
                     </FormControl>
+                    <FormControl variant="outlined">
+                      <InputLabel htmlFor="outlined-available-hours">
+                        Available hours per week
+                      </InputLabel>
+                      <OutlinedInput
+                        id="outlined-available-hours"
+                        type={'text'}
+                        value={localAvailableHours}
+                        onChange={(event) => onAvailableHoursChange(event.target.value)}
+                        onKeyDown={onAvailableHoursBackspace}
+                        label="Available hours per week"
+                      />
+                    </FormControl>
+                    <FormControl variant="outlined">
+                      <InputLabel htmlFor="outlined-other-info">Other information</InputLabel>
+                      <OutlinedInput
+                        id="outlined-other-info"
+                        type={'text'}
+                        value={localOtherInformation}
+                        onChange={(event) => onOtherInformationChange(event.target.value)}
+                        label="Other information"
+                      />
+                    </FormControl>
                   </Box>
                   {profileData && (
                     <Box>
@@ -257,7 +299,7 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                         </InputAdornment>
                       }
                       label="Username"
-                      onKeyDown={(event) => onEnter(event)}
+                      onKeyDown={onEnter}
                     />
                   </FormControl>
                   <Paper sx={{ p: 2 }} variant="outlined">
@@ -282,7 +324,7 @@ export default function ConfigurationProfile({ myProfile }: Props) {
             </Box>
           )}
 
-          <CardActions>
+          <CardActions sx={{ padding: '24px 0 0 0' }}>
             <LoadingButton
               variant="contained"
               loading={actionLoading || showLoader}
@@ -297,10 +339,14 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                   {
                     username: localUsername,
                     interests: localInterests,
+                    availableHoursPerWeek: localAvailableHours,
+                    otherInformation: localOtherInformation,
                   }
                 );
                 setOneInterest('');
                 setLocalUsername('');
+                setLocalAvailableHours('');
+                setLocalOtherInformation('');
                 setLocalInterests([]);
               }}
             >
@@ -314,6 +360,8 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                   profileAction(profileCallables.REMOVE_PROFILE, {
                     username: localUsername,
                     interests: localInterests,
+                    availableHoursPerWeek: localAvailableHours,
+                    otherInformation: localOtherInformation,
                   })
                 }
               >

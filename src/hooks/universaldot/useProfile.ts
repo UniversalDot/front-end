@@ -37,6 +37,9 @@ const useProfile = () => {
 
   const queryResponseHandler = useCallback(
     result => {
+
+      console.log('result getprofile orig', result)
+      console.log('result getprofile', result.toHuman())
       setLoading({ type: loadingTypes.PROFILE, value: false });
       setStatusMessage('');
 
@@ -64,6 +67,7 @@ const useProfile = () => {
       selectedKeyring.value
       && api?.query?.[pallets.PROFILE]?.[profileCallables.PROFILES]
     ) {
+      console.log('api query', api.query)
       const query = async () => {
         const unsub = await api.query[pallets.PROFILE][
           profileCallables.PROFILES
@@ -83,7 +87,7 @@ const useProfile = () => {
     setLoading,
   ]);
 
-  const signedTransaction = async (actionType: string, payload: { username: string, interests: string[] }) => {
+  const signedTransaction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }) => {
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -150,10 +154,14 @@ const useProfile = () => {
     const paramFieldsForTransformed = () => [
       { name: 'username', optional: false, type: 'Bytes' },
       { name: 'interests', optional: false, type: 'Bytes' },
+      { name: 'available_hours_per_week', optional: false, type: 'Bytes' },
+      { name: 'additional_information', optional: false, type: 'Bytes' },
     ];
     const inputParamsForTransformed = () => [
       { type: 'Bytes', value: payload.username },
       { type: 'Bytes', value: payload.interests.join() },
+      { type: 'Bytes', value: payload.availableHoursPerWeek },
+      { type: 'Bytes', value: payload.otherInformation },
     ];
 
     const transformed = transformParams(
@@ -162,6 +170,8 @@ const useProfile = () => {
     );
 
     let txExecute;
+
+    console.log('transformed inputs', transformed)
 
     if (actionType === profileCallables.CREATE_PROFILE) {
       txExecute = api.tx[pallets.PROFILE][profileCallables.CREATE_PROFILE](
@@ -186,7 +196,7 @@ const useProfile = () => {
     setUnsub(() => unsub);
   };
 
-  const profileAction = async (actionType: string, payload: { username: string, interests: string[] }) => {
+  const profileAction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
