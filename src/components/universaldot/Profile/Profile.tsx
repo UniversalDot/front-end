@@ -7,6 +7,7 @@ import ProfileAbout from './ProfileAbout';
 import ProfileSocialInfo from './ProfileSocialInfo';
 // universaldot
 import Widget from 'src/components/universaldot/Profile/Widget';
+import { useSimilarities } from 'src/components/universaldot/Profile/useSimilarities';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -14,6 +15,9 @@ type Props = {
 };
 
 export default function Profile({ myProfile }: Props) {
+  const similarities = useSimilarities(['interest1', 'interest2'], 'task-description');
+  console.log({ similarities });
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} md={4}>
