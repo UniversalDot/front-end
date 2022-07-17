@@ -9,9 +9,10 @@ import ScrollToTop from './components/ScrollToTop';
 import { ProgressBarStyle } from './components/ProgressBar';
 import NotistackProvider from './components/NotistackProvider';
 import MotionLazyContainer from './components/animate/MotionLazyContainer';
+import LoadingScreen from './components/LoadingScreen';
 
 // universaldot imports
-import { useProfile, useUser } from './hooks/universaldot';
+import { useProfile, useUser, useLoader } from './hooks/universaldot';
 import { useSubstrateState } from './substrate-lib';
 // ----------------------------------------------------------------------
 
@@ -19,6 +20,8 @@ export default function App() {
   const { getProfile } = useProfile();
   const { keyring } = useSubstrateState();
   const { setKeyringOptions } = useUser();
+
+  const { loadingProfile, message } = useLoader();
 
   useEffect(() => {
     getProfile();
@@ -45,6 +48,7 @@ export default function App() {
           <NotistackProvider>
             <ProgressBarStyle />
             <ScrollToTop />
+            <LoadingScreen show={loadingProfile} message={message} />
             <Router />
           </NotistackProvider>
         </ThemeSettings>

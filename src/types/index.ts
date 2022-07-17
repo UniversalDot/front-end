@@ -26,11 +26,11 @@ export const pallets = {
   DAO: 'dao',
 };
 
-export const profileCallables = {
-  PROFILES: 'profiles',
-  CREATE_PROFILE: 'createProfile',
-  UPDATE_PROFILE: 'updateProfile',
-  REMOVE_PROFILE: 'removeProfile',
+export enum ProfileCallables {
+  PROFILES = 'profiles',
+  CREATE_PROFILE = 'createProfile',
+  UPDATE_PROFILE = 'updateProfile',
+  REMOVE_PROFILE = 'removeProfile',
 };
 
 export const taskCallables = {

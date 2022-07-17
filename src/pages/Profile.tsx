@@ -54,9 +54,6 @@ export default function Profile() {
   // @TODO
   const myProfile: MyProfile = {
     id: _mock.id(1),
-    username: profileData?.name || 'N/A',
-    balance: profileData?.balance || 'N/A',
-    reputation: profileData?.reputation || 'N/A',
     cover: _mock.image.cover(1),
     position: 'UI/UX Designer at DesignerHub',
     quote:
@@ -81,7 +78,7 @@ export default function Profile() {
     {
       value: 'configuration',
       icon: <Iconify icon={'eva:heart-fill'} width={20} height={20} />,
-      component: <Configuration myProfile={myProfile} />,
+      component: <Configuration />,
     },
   ];
 

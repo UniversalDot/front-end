@@ -16,28 +16,24 @@ import {
   Tooltip,
   IconButton,
   Button,
+  LinearProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../../Iconify';
-// @types
-import { MyProfile } from '../../../@types/universaldot';
 // universaldot
-import { useProfile, useStatus, useLoader } from '../../../hooks/universaldot';
-import { profileCallables, statusTypes } from '../../../types';
+import { useProfile, useLoader } from '../../../hooks/universaldot';
+import { ProfileCallables } from '../../../types';
 import difference from 'lodash/difference';
-import LoadingScreen from '../../LoadingScreen';
+import { useSnackbar } from 'notistack';
+
 // ----------------------------------------------------------------------
 
-type Props = {
-  myProfile: MyProfile;
-};
-
-export default function ConfigurationProfile({ myProfile }: Props) {
+export default function ConfigurationProfile() {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [oneInterest, setOneInterest] = useState('');
-  const [showLoader, setShowLoader] = useState(false);
+  const [interest, setInterest] = useState('');
   const [usernameEditEnabled, setUsernameEditEnabled] = useState(false);
 
   const [localUsername, setLocalUsername] = useState('');
@@ -45,24 +41,31 @@ export default function ConfigurationProfile({ myProfile }: Props) {
   const [localOtherInformation, setLocalOtherInformation] = useState<string>('');
   const [localInterests, setLocalInterests] = useState<string[]>([]);
 
-  const { profileData, profileAction, actionLoading } = useProfile();
-  const { status, setStatus } = useStatus();
+  const { profileData, profileAction } = useProfile();
   const { loadingProfile } = useLoader();
 
   const differencesExist: boolean = useMemo(() => {
-    if (profileData && profileData.name && profileData.interests) {
-      const differences = difference(localInterests, profileData?.interests);
+    if (
+      profileData &&
+      profileData.name &&
+      profileData.interests &&
+      profileData.availableHoursPerWeek &&
+      profileData.additionalInformation
+    ) {
+      const interestsDifferences = difference(localInterests, profileData?.interests);
       if (
-        profileData?.name !== localUsername ||
-        differences.length > 0 ||
-        localInterests.length !== profileData?.interests.length
+        localUsername !== profileData?.name ||
+        interestsDifferences.length > 0 ||
+        localInterests.length !== profileData?.interests.length ||
+        localAvailableHours !== profileData?.availableHoursPerWeek ||
+        localOtherInformation !== profileData?.additionalInformation
       ) {
         return true;
       } else return false;
     } else {
       return false;
     }
-  }, [profileData, localUsername, localInterests]);
+  }, [profileData, localUsername, localInterests, localAvailableHours, localOtherInformation]);
 
   const onUsernameChange = (username: string) => {
     setLocalUsername(username);
@@ -92,32 +95,29 @@ export default function ConfigurationProfile({ myProfile }: Props) {
     if (profileData?.interests) {
       setLocalInterests(profileData.interests);
     }
+    if (profileData?.availableHoursPerWeek) {
+      setLocalAvailableHours(profileData.availableHoursPerWeek);
+    }
+    if (profileData?.additionalInformation) {
+      setLocalOtherInformation(profileData.additionalInformation);
+    }
+
+    if (!profileData) {
+      resetLocalState();
+    }
   }, [profileData]);
 
-  useEffect(() => {
-    if (!!status && status === statusTypes.INIT) {
-      setShowLoader(true);
-    }
-
-    if (!!status && status === statusTypes.IN_BLOCK) {
-      setShowLoader(false);
-      setTimeout(() => {
-        setStatus('');
-      }, 5000);
-    }
-  }, [status, setStatus]);
-
   const handleAddInterest = () => {
-    if (oneInterest.length > 3) {
-      setLocalInterests([...localInterests, oneInterest]);
-      setOneInterest('');
+    if (interest.length > 3) {
+      setLocalInterests([...localInterests, interest]);
+      setInterest('');
     }
   };
 
   const onEnter = (e: any) => {
-    if (e.keyCode === 13 && oneInterest.length > 3) {
-      setLocalInterests([...localInterests, oneInterest]);
-      setOneInterest('');
+    if (e.keyCode === 13 && interest.length > 3) {
+      setLocalInterests([...localInterests, interest]);
+      setInterest('');
     }
   };
 
@@ -125,39 +125,83 @@ export default function ConfigurationProfile({ myProfile }: Props) {
     setLocalInterests(localInterests.filter((interestItem: any) => interestItem !== interest));
   };
 
+  const resetLocalState = () => {
+    setInterest('');
+    setLocalUsername('');
+    setLocalAvailableHours('');
+    setLocalOtherInformation('');
+    setLocalInterests([]);
+  };
+
+  const onActionButtonClick = (actionType: ProfileCallables) => {
+    if (
+      actionType === ProfileCallables.CREATE_PROFILE ||
+      actionType === ProfileCallables.UPDATE_PROFILE
+    ) {
+      profileAction(
+        actionType,
+        {
+          username: localUsername,
+          interests: localInterests,
+          availableHoursPerWeek: localAvailableHours,
+          otherInformation: localOtherInformation,
+        },
+        enqueueSnackbar
+      );
+      resetLocalState();
+    }
+
+    if (actionType === ProfileCallables.REMOVE_PROFILE) {
+      profileAction(
+        actionType,
+        {
+          username: localUsername,
+          interests: localInterests,
+          availableHoursPerWeek: localAvailableHours,
+          otherInformation: localOtherInformation,
+        },
+        enqueueSnackbar
+      );
+    }
+  };
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} md={12}>
-        {showLoader && <LoadingScreen />}
         <Card sx={{ p: 3 }}>
-          {showLoader && <div>Loading... todo...</div>}
-          {!showLoader && (
-            <div>
-              {profileData ? (
-                <Typography variant="h4" gutterBottom>
-                  Your profile
-                </Typography>
-              ) : (
-                <Typography variant="h4" gutterBottom>
-                  Create your profile
-                </Typography>
-              )}
-            </div>
+          {loadingProfile && (
+            <Stack sx={{ width: '100%', color: 'grey.500' }} spacing={2}>
+              <LinearProgress />
+            </Stack>
           )}
-          {!showLoader && (
-            <div>
-              {profileData ? (
-                <Typography paragraph gutterBottom>
-                  You can update or remove your profile in this panel
-                </Typography>
-              ) : (
-                <Typography paragraph gutterBottom>
-                  To create your profile add your username and some interests
-                </Typography>
-              )}
-            </div>
+          {!loadingProfile && (
+            <Box>
+              <Box>
+                {profileData ? (
+                  <Typography variant="h4" gutterBottom>
+                    Your profile
+                  </Typography>
+                ) : (
+                  <Typography variant="h4" gutterBottom>
+                    Create your profile
+                  </Typography>
+                )}
+              </Box>
+              <Box>
+                {profileData ? (
+                  <Typography paragraph gutterBottom>
+                    You can update or remove your profile in this panel
+                  </Typography>
+                ) : (
+                  <Typography paragraph gutterBottom>
+                    To create your profile add your username and some interests
+                  </Typography>
+                )}
+              </Box>
+            </Box>
           )}
-          {(!showLoader || !loadingProfile) && (
+
+          {!loadingProfile && (
             <Box
               sx={{
                 display: 'grid',
@@ -288,8 +332,8 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                     <OutlinedInput
                       id="outlined-adornment-interest"
                       type={'text'}
-                      value={oneInterest}
-                      onChange={(event) => setOneInterest(event.target.value)}
+                      value={interest}
+                      onChange={(event) => setInterest(event.target.value)}
                       endAdornment={
                         <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
                           <Iconify
@@ -329,28 +373,17 @@ export default function ConfigurationProfile({ myProfile }: Props) {
           <CardActions sx={{ padding: '24px 0 0 0' }}>
             <LoadingButton
               variant="contained"
-              loading={actionLoading || showLoader}
+              loading={loadingProfile}
               disabled={
                 (profileData && !differencesExist) ||
                 (!profileData && localInterests.length === 0) ||
                 !localUsername
               }
-              onClick={() => {
-                profileAction(
-                  profileData ? profileCallables.UPDATE_PROFILE : profileCallables.CREATE_PROFILE,
-                  {
-                    username: localUsername,
-                    interests: localInterests,
-                    availableHoursPerWeek: localAvailableHours,
-                    otherInformation: localOtherInformation,
-                  }
-                );
-                setOneInterest('');
-                setLocalUsername('');
-                setLocalAvailableHours('');
-                setLocalOtherInformation('');
-                setLocalInterests([]);
-              }}
+              onClick={() =>
+                onActionButtonClick(
+                  profileData ? ProfileCallables.UPDATE_PROFILE : ProfileCallables.CREATE_PROFILE
+                )
+              }
             >
               {profileData ? 'Save changes' : 'Create profile'}
             </LoadingButton>
@@ -358,14 +391,8 @@ export default function ConfigurationProfile({ myProfile }: Props) {
               <Button
                 variant="contained"
                 color="error"
-                onClick={() =>
-                  profileAction(profileCallables.REMOVE_PROFILE, {
-                    username: localUsername,
-                    interests: localInterests,
-                    availableHoursPerWeek: localAvailableHours,
-                    otherInformation: localOtherInformation,
-                  })
-                }
+                onClick={() => onActionButtonClick(ProfileCallables.REMOVE_PROFILE)}
+                disabled={loadingProfile}
               >
                 Delete profile
               </Button>

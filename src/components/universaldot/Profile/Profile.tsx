@@ -2,10 +2,10 @@
 import { Grid, Stack } from '@mui/material';
 // @types
 import { MyProfile } from '../../../@types/universaldot';
-//
+// universaldot
 import ProfileAbout from './ProfileAbout';
 import ProfileSocialInfo from './ProfileSocialInfo';
-// universaldot
+import { useProfile } from '../../../hooks/universaldot';
 import Widget from 'src/components/universaldot/Profile/Widget';
 // ----------------------------------------------------------------------
 
@@ -14,6 +14,7 @@ type Props = {
 };
 
 export default function Profile({ myProfile }: Props) {
+  const { profileData } = useProfile();
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} md={4}>
@@ -26,10 +27,18 @@ export default function Profile({ myProfile }: Props) {
       <Grid item xs={12} md={8}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Widget title="Reputation points" total={myProfile.reputation} icon={<div></div>} />
+            <Widget
+              title="Reputation points"
+              total={profileData?.reputation || 'N/A'}
+              icon={<div />}
+            />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Widget title="Cryptocurrency" total={`₿${myProfile.balance}`} icon={<div></div>} />
+            <Widget
+              title="Cryptocurrency"
+              total={`₿${profileData?.balance || 'N/A'}`}
+              icon={<div />}
+            />
           </Grid>
         </Grid>
       </Grid>

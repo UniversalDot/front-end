@@ -8,40 +8,29 @@ import {
   setProfile,
 } from '../../redux/slices/profileSlice';
 import { useUser } from './useUser';
-import { useStatus } from './useStatus';
 import { useLoader } from './useLoader';
 import { useUtils } from './useUtils';
 import {
-  statusTypes,
   pallets,
-  profileCallables,
-  toastTypes,
+  ProfileCallables,
   loadingTypes,
 } from '../../types';
-// import { useToast } from './useToast';
 import { ProfileDataSubstrate } from '../../@types/universaldot';
 
 const useProfile = () => {
   const dispatch = useDispatch();
   const { api, keyring, keyringState } = useSubstrateState();
   const [unsub, setUnsub] = useState<Function | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
 
   const { selectedKeyring } = useUser();
-  const { setStatus, setStatusMessage } = useStatus();
   const { setLoading } = useLoader();
   const { transformParams } = useUtils();
-  // const { toast } = useToast();
 
   const profileData = useSelector(state => state.profile.data);
 
   const queryResponseHandler = useCallback(
     result => {
-
-      console.log('result getprofile orig', result)
-      console.log('result getprofile', result.toHuman())
-      setLoading({ type: loadingTypes.PROFILE, value: false });
-      setStatusMessage('');
+      setLoading({ type: loadingTypes.PROFILE, value: false, message: '' });
 
       const setAllData = (profileData: ProfileDataSubstrate) => {
         const modifiedProfileData = {
@@ -55,22 +44,20 @@ const useProfile = () => {
 
       result.isNone ? dispatch(setProfile(null)) : setAllData(result.toHuman());
     },
-    [dispatch, setStatusMessage, setLoading]
+    [dispatch, setLoading]
   );
 
-  // TODO: figure out how to make it simpler to check when API is availabile so it doesn't crash;
+  // @TODO: figure out how to make it simpler to check when API is availabile so it doesn't crash;
   const getProfile = useCallback(() => {
-    setLoading({ type: loadingTypes.PROFILE, value: true });
-    setStatusMessage('Loading account / profile...');
+    setLoading({ type: loadingTypes.PROFILE, value: true, message: 'Loading account / profile...' });
 
     if (
       selectedKeyring.value
-      && api?.query?.[pallets.PROFILE]?.[profileCallables.PROFILES]
+      && api?.query?.[pallets.PROFILE]?.[ProfileCallables.PROFILES]
     ) {
-      console.log('api query', api.query)
       const query = async () => {
         const unsub = await api.query[pallets.PROFILE][
-          profileCallables.PROFILES
+          ProfileCallables.PROFILES
         ](selectedKeyring.value, queryResponseHandler);
         const cb = () => unsub;
         cb();
@@ -81,13 +68,12 @@ const useProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    api?.query?.[pallets.PROFILE]?.[profileCallables.PROFILES],
+    api?.query?.[pallets.PROFILE]?.[ProfileCallables.PROFILES],
     selectedKeyring.value,
-    setStatusMessage,
     setLoading,
   ]);
 
-  const signedTransaction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }) => {
+  const signedTransaction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }, enqueueSnackbar: Function) => {
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -113,44 +99,30 @@ const useProfile = () => {
     };
 
     const transactionResponseHandler = ({ status }: any) => {
-      const callStatus = status;
+      if (status?.isInBlock) {
+        setLoading({ type: loadingTypes.PROFILE, value: false, message: '' });
 
-      if (callStatus?.isFinalized) {
-        setStatus(statusTypes.FINALIZED);
-        setTimeout(() => {
-          setStatus('');
-        }, 5000);
+        if (actionType === ProfileCallables.CREATE_PROFILE) {
+          enqueueSnackbar('Profile created successfully!')
+        }
+
+        if (actionType === ProfileCallables.UPDATE_PROFILE) {
+          enqueueSnackbar('Profile updated successfully!')
+        }
+
+        if (actionType === ProfileCallables.REMOVE_PROFILE) {
+          enqueueSnackbar('Profile removed successfully!')
+        }
       }
-      if (callStatus?.isInBlock) {
-        setStatus(statusTypes.IN_BLOCK);
-      }
-
-      // @TODO: transfer to new toast from template;
-      // if (callStatus?.isInBlock) {
-      //   if (actionType === profileCallables.CREATE_PROFILE) {
-      //     toast('Profile created successfully!', toastTypes.SUCCESS);
-      //   }
-
-      //   if (actionType === profileCallables.UPDATE_PROFILE) {
-      //     toast('Profile updated successfully!', toastTypes.SUCCESS);
-      //   }
-
-      //   if (actionType === profileCallables.REMOVE_PROFILE) {
-      //     toast('Profile deleted successfully.', toastTypes.SUCCESS);
-      //   }
-      // }
-
-      setActionLoading(false);
     };
 
     const transactionErrorHandler = (err: any) => {
-      setStatus(statusTypes.ERROR);
-      setStatusMessage(err.toString());
+      console.log('err handler message', err)
     };
 
     const fromAcct = await getFromAcct();
 
-    // TODO: verify if correct;
+    // @TODO: verify if correct;
     const paramFieldsForTransformed = () => [
       { name: 'username', optional: false, type: 'Bytes' },
       { name: 'interests', optional: false, type: 'Bytes' },
@@ -171,20 +143,18 @@ const useProfile = () => {
 
     let txExecute;
 
-    console.log('transformed inputs', transformed)
-
-    if (actionType === profileCallables.CREATE_PROFILE) {
-      txExecute = api.tx[pallets.PROFILE][profileCallables.CREATE_PROFILE](
+    if (actionType === ProfileCallables.CREATE_PROFILE) {
+      txExecute = api.tx[pallets.PROFILE][ProfileCallables.CREATE_PROFILE](
         ...transformed
       );
     }
 
-    if (actionType === profileCallables.REMOVE_PROFILE) {
-      txExecute = api.tx[pallets.PROFILE][profileCallables.REMOVE_PROFILE]();
+    if (actionType === ProfileCallables.REMOVE_PROFILE) {
+      txExecute = api.tx[pallets.PROFILE][ProfileCallables.REMOVE_PROFILE]();
     }
 
-    if (actionType === profileCallables.UPDATE_PROFILE) {
-      txExecute = api.tx[pallets.PROFILE][profileCallables.UPDATE_PROFILE](
+    if (actionType === ProfileCallables.UPDATE_PROFILE) {
+      txExecute = api.tx[pallets.PROFILE][ProfileCallables.UPDATE_PROFILE](
         ...transformed
       );
     }
@@ -196,36 +166,32 @@ const useProfile = () => {
     setUnsub(() => unsub);
   };
 
-  const profileAction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }) => {
+  const profileAction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }, enqueueSnackbar: Function) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
     }
 
-    // @TODO: transfer to new toast from template;
-    // if (actionType === profileCallables.CREATE_PROFILE) {
-    //   toast('Creating profile...', toastTypes.INFO);
-    // }
+    if (actionType === ProfileCallables.CREATE_PROFILE) {
+      enqueueSnackbar('Creating profile...')
+    }
 
-    // if (actionType === profileCallables.UPDATE_PROFILE) {
-    //   toast('Updating profile...', toastTypes.INFO);
-    // }
+    if (actionType === ProfileCallables.UPDATE_PROFILE) {
+      enqueueSnackbar('Updating profile...')
+    }
 
-    // if (actionType === profileCallables.REMOVE_PROFILE) {
-    //   toast('Deleting profile...', toastTypes.INFO);
-    // }
+    if (actionType === ProfileCallables.REMOVE_PROFILE) {
+      enqueueSnackbar('Deleting profile...')
+    }
 
-    setStatus(statusTypes.INIT);
-    setActionLoading(true);
-    signedTransaction(actionType, payload);
+    setLoading({ type: loadingTypes.PROFILE, value: true, message: 'Profile creation/update/deletion ongoing...' });
+    signedTransaction(actionType, payload, enqueueSnackbar);
   };
 
   return {
     getProfile,
     profileData,
     profileAction,
-    actionLoading,
-    setActionLoading,
   };
 };
 

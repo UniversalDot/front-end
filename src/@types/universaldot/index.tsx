@@ -1,8 +1,5 @@
 export type MyProfile = {
   id: string;
-  username: string;
-  balance: string;
-  reputation: string;
   cover: string;
   position: string;
   quote: string;
@@ -22,17 +19,21 @@ export type ProfileState = {
 };
 
 export type ProfileDataSubstrate = {
-  balance: string;
-  interests: string;
-  name: string;
   owner: string;
+  name: string;
+  interests: string;
+  balance: string;
   reputation: string;
+  availableHoursPerWeek: string;
+  additionalInformation: string;
 } | null;
 
 export type ProfileDataAdapted = {
-  balance: string;
-  interests: string[];
-  name: string;
   owner: string;
+  name: string;
+  interests: string[];
+  balance: string;
   reputation: string;
+  availableHoursPerWeek: string;
+  additionalInformation: string;
 } | null;

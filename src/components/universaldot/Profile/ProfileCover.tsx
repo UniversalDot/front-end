@@ -8,7 +8,8 @@ import cssStyles from '../../../utils/cssStyles';
 // components
 import MyAvatar from '../../MyAvatar';
 import Image from '../../Image';
-
+// universaldot
+import { useProfile } from '../../../hooks/universaldot';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -45,7 +46,9 @@ type Props = {
 };
 
 export default function ProfileCover({ myProfile }: Props) {
-  const { position, cover, username } = myProfile;
+  const { profileData } = useProfile();
+
+  const { position, cover } = myProfile;
 
   return (
     <RootStyle>
@@ -68,7 +71,7 @@ export default function ProfileCover({ myProfile }: Props) {
             textAlign: { xs: 'center', md: 'left' },
           }}
         >
-          <Typography variant="h4">{username}</Typography>
+          <Typography variant="h4">{profileData?.name || 'N/A'}</Typography>
           <Typography sx={{ opacity: 0.72 }}>{position}</Typography>
         </Box>
       </InfoStyle>

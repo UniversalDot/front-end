@@ -33,8 +33,6 @@ const useUtils = () => {
         return opts.emptyAsNull ? [...memo, null] : memo;
       }
 
-      console.log('param value', value)
-
       let converted = value;
 
       // Deal with a vector
@@ -50,7 +48,8 @@ const useUtils = () => {
         return [...memo, converted];
       }
 
-      // Deal with a BoundedVec
+      // @TODO: check if correct;
+      // Deal with a bounded vector
       if (type.indexOf('BoundedVec<') >= 0) {
         converted = converted.split(',').map((e: string) => e.trim());
         converted = converted.map((single: string) =>
