@@ -190,37 +190,55 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                       gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(1, 1fr)' },
                     }}
                   >
-                    <FormControl variant="outlined">
-                      <InputLabel htmlFor="outlined-adornment-username">Username</InputLabel>
-                      <OutlinedInput
-                        id="outlined-adornment-username"
-                        type={'text'}
-                        value={localUsername}
-                        onChange={(event) => onUsernameChange(event.target.value)}
-                        // endAdornment={
-                        //   profileData ? (
-                        //     <Tooltip title="Edit username" placement="top">
-                        //       <InputAdornment
-                        //         position="end"
-                        //         sx={{ cursor: 'pointer', color: '#637381' }}
-                        //       >
-                        //         <Iconify
-                        //           icon="akar-icons:edit"
-                        //           width={20}
-                        //           height={20}
-                        //           onClick={() => setUsernameEditEnabled(true)}
-                        //         />
-                        //       </InputAdornment>
-                        //     </Tooltip>
-                        //   ) : (
-                        //     <></>
-                        //   )
-                        // }
-                        label="Username"
-                        onBlur={() => setUsernameEditEnabled(false)}
-                        readOnly={!usernameEditEnabled && Boolean(profileData)}
-                      />
-                    </FormControl>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <FormControl variant="outlined" sx={{ flex: 1 }}>
+                        <InputLabel htmlFor="outlined-adornment-username">Username</InputLabel>
+                        <OutlinedInput
+                          id="outlined-adornment-username"
+                          type={'text'}
+                          value={localUsername}
+                          onChange={(event) => onUsernameChange(event.target.value)}
+                          // endAdornment={
+                          //   profileData ? (
+                          //     <Tooltip title="Edit username" placement="top">
+                          //       <InputAdornment
+                          //         position="end"
+                          //         sx={{ cursor: 'pointer', color: '#637381' }}
+                          //       >
+                          //         <Iconify
+                          //           icon="akar-icons:edit"
+                          //           width={20}
+                          //           height={20}
+                          //           onClick={() => setUsernameEditEnabled(true)}
+                          //         />
+                          //       </InputAdornment>
+                          //     </Tooltip>
+                          //   ) : (
+                          //     <></>
+                          //   )
+                          // }
+                          label="Username"
+                          onBlur={() => setUsernameEditEnabled(false)}
+                          readOnly={!usernameEditEnabled && Boolean(profileData)}
+                        />
+                      </FormControl>
+                      {profileData && (
+                        <Box>
+                          <Tooltip title="Enable editing" placement="top">
+                            <IconButton
+                              color="primary"
+                              aria-label="upload picture"
+                              component="span"
+                              onClick={() => setUsernameEditEnabled(true)}
+                              sx={{ marginLeft: theme.spacing(1) }}
+                              disabled={usernameEditEnabled}
+                            >
+                              <Iconify icon="akar-icons:edit" width={20} height={20} />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      )}
+                    </Box>
                     <FormControl variant="outlined">
                       <InputLabel htmlFor="outlined-available-hours">
                         Available hours per week
@@ -245,22 +263,6 @@ export default function ConfigurationProfile({ myProfile }: Props) {
                       />
                     </FormControl>
                   </Box>
-                  {profileData && (
-                    <Box>
-                      <Tooltip title="Enable editing" placement="top">
-                        <IconButton
-                          color="primary"
-                          aria-label="upload picture"
-                          component="span"
-                          onClick={() => setUsernameEditEnabled(true)}
-                          sx={{ marginLeft: theme.spacing(1) }}
-                          disabled={usernameEditEnabled}
-                        >
-                          <Iconify icon="akar-icons:edit" width={20} height={20} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  )}
                 </Box>
               </Box>
 

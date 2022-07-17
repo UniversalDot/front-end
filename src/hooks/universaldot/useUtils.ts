@@ -33,10 +33,25 @@ const useUtils = () => {
         return opts.emptyAsNull ? [...memo, null] : memo;
       }
 
+      console.log('param value', value)
+
       let converted = value;
 
       // Deal with a vector
       if (type.indexOf('Vec<') >= 0) {
+        converted = converted.split(',').map((e: string) => e.trim());
+        converted = converted.map((single: string) =>
+          isNumType(type)
+            ? single.indexOf('.') >= 0
+              ? Number.parseFloat(single)
+              : Number.parseInt(single)
+            : single
+        );
+        return [...memo, converted];
+      }
+
+      // Deal with a BoundedVec
+      if (type.indexOf('BoundedVec<') >= 0) {
         converted = converted.split(',').map((e: string) => e.trim());
         converted = converted.map((single: string) =>
           isNumType(type)
