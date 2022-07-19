@@ -16,7 +16,7 @@ const { TENSORFLOW_URL } = windowInstance.env;
 const MODELS_PATH = '/v1/models';
 
 export const createTensorFlowAPI = () => {
-  const basePath = `${TENSORFLOW_URL}${MODELS_PATH}}`;
+  const basePath = `${TENSORFLOW_URL}${MODELS_PATH}`;
 
   return {
     async preditc(data: PredictRequest) {
