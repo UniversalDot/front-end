@@ -29,7 +29,17 @@ export default function Task({ id }: TaskProps) {
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
   const { getTask, taskAction } = useTasks();
-  const [data, setData] = useState<any>(null);
+  //@TODO - mocked for the moment - default is null;
+  // const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>({
+    title: 'Mocked title',
+    description: 'Mocked subheader',
+    specification: 'Mocked specification',
+    budget: 'Mocked budget',
+    deadline: 'Mocked deadline',
+    attachments: 'Mocked attachments',
+    keywords: 'Mocked keywords',
+  });
 
   useEffect(() => {
     if (id) {
@@ -64,7 +74,7 @@ export default function Task({ id }: TaskProps) {
         }
         subheader={
           <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
-            {data?.title}
+            {data?.description}
           </Typography>
         }
         action={

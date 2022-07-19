@@ -1,94 +1,58 @@
-import { useState } from 'react';
-
 // @mui
 import {
-  Card,
   Typography,
-  Box,
-  CardHeader,
-  IconButton,
-  Stack,
-  MenuItem,
-  Divider,
+  ListItemButton,
+  ListItemAvatar,
+  // Avatar,
+  ListItemText,
 } from '@mui/material';
 // components
 import MyAvatar from 'src/components/MyAvatar';
 import Iconify from 'src/components/Iconify';
-import MoreMenuPopup from '../MoreMenuPopup';
 // ----------------------------------------------------------------------
 
-export default function Event() {
-  const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
+type EventProps = {
+  title: string;
+  description: string;
+};
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setOpenMenuActions(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setOpenMenuActions(null);
+export default function Event({ title, description }: EventProps) {
+  const isUnread = {
+    unread: false,
   };
 
   return (
-    <Card>
-      <CardHeader
-        disableTypography
-        avatar={<MyAvatar />}
-        title={
-          <Typography variant="subtitle2" color="text.primary">
-            Title
+    <ListItemButton
+      sx={{
+        py: 1.5,
+        px: 2.5,
+        mt: '1px',
+        ...(isUnread.unread && {
+          bgcolor: 'action.selected',
+        }),
+      }}
+    >
+      <ListItemAvatar>
+        {/* <Avatar sx={{ bgcolor: 'background.neutral' }}>{avatar}</Avatar> */}
+        <MyAvatar />
+      </ListItemAvatar>
+      <ListItemText
+        primary={title}
+        secondary={
+          <Typography
+            variant="caption"
+            sx={{
+              mt: 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.disabled',
+            }}
+          >
+            <Iconify icon="eva:clock-outline" sx={{ mr: 0.5, width: 16, height: 16 }} />
+            2000 days ago
           </Typography>
-        }
-        subheader={
-          <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
-            Subheader
-          </Typography>
-        }
-        action={
-          <MoreMenuPopup
-            open={openMenu}
-            onOpen={handleOpenMenu}
-            onClose={handleCloseMenu}
-            actions={
-              <>
-                <MenuItem>
-                  <Iconify icon={'eva:download-fill'} />
-                  Start
-                </MenuItem>
-
-                <MenuItem>
-                  <Iconify icon={'eva:printer-fill'} />
-                  Complete
-                </MenuItem>
-
-                <MenuItem>
-                  <Iconify icon={'eva:share-fill'} />
-                  Update
-                </MenuItem>
-
-                <Divider sx={{ borderStyle: 'dashed' }} />
-
-                <MenuItem sx={{ color: 'error.main' }}>
-                  <Iconify icon={'eva:trash-2-outline'} />
-                  Delete
-                </MenuItem>
-              </>
-            }
-          />
         }
       />
-
-      <Stack spacing={3} sx={{ p: 3 }}>
-        <Typography>Message</Typography>
-        <Stack direction="row" alignItems="center">
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton>
-            <Iconify icon={'eva:message-square-fill'} width={20} height={20} />
-          </IconButton>
-          <IconButton>
-            <Iconify icon={'eva:share-fill'} width={20} height={20} />
-          </IconButton>
-        </Stack>
-      </Stack>
-    </Card>
+    </ListItemButton>
   );
 }

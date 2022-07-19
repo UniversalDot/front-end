@@ -1,18 +1,7 @@
 import { useEffect, useMemo } from 'react';
 // @mui
 import { styled } from '@mui/material/styles';
-import {
-  Container,
-  Card,
-  CardHeader,
-  Typography,
-  IconButton,
-  Stack,
-  Box,
-  Grid,
-  StackProps,
-  Paper,
-} from '@mui/material';
+import { Container, Typography, Stack, Grid, StackProps, Paper } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 // routes
@@ -24,7 +13,6 @@ import MyAvatar from 'src/components/MyAvatar';
 import Iconify from 'src/components/Iconify';
 // universaldot
 import Task from '../components/universaldot/Tasks/Task';
-import Event from '../components/universaldot/Tasks/Event';
 import Events from '../components/universaldot/Events';
 //hooks
 import { useTasks, useLoader } from '../hooks/universaldot';
@@ -55,19 +43,32 @@ export default function Tasks() {
     };
   }, [actionLoading, getAllTasks, resetAllTasks]);
 
-  const tasks = useMemo(() => {
-    if (allTasksReceived.length === 0) {
-      return <div>No tasks at the moment...</div>;
-    }
+  // @TODO - uncomment when available tasks to test;
+  // const tasks = useMemo(() => {
+  //   if (allTasksReceived.length === 0) {
+  //     return <div>No tasks at the moment...</div>;
+  //   }
 
-    return (
+  //   return (
+  //     <Stack spacing={3}>
+  //       {allTasksReceived.map((taskId: any, i: number) => (
+  //         <Task id={taskId} key={`task#${i}`} />
+  //       ))}
+  //     </Stack>
+  //   );
+  // }, [allTasksReceived]);
+
+  // @TODO - mocked response for the moment;
+  const tasks = useMemo(
+    () => (
       <Stack spacing={3}>
-        {allTasksReceived.map((taskId: any, i: number) => (
+        {[1, 2, 3, 4].map((taskId: any, i: number) => (
           <Task id={taskId} key={`task#${i}`} />
         ))}
       </Stack>
-    );
-  }, [allTasksReceived]);
+    ),
+    []
+  );
 
   return (
     <Page title="Tasks">
@@ -101,11 +102,6 @@ export default function Tasks() {
                   Events
                 </Typography>
               </ItemBlockStyle>
-              <Stack spacing={3}>
-                {[1, 2, 3].map((event, index) => (
-                  <Event key={`event-${index}`} />
-                ))}
-              </Stack>
               <Events />
             </Paper>
           </Grid>

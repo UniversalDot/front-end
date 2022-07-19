@@ -1,6 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useSubstrateState } from '../../substrate-lib';
-
+// @mui
+import {
+  Typography,
+  IconButton,
+  Box,
+  Tooltip,
+  Divider,
+  List,
+  ListSubheader,
+  Button,
+} from '@mui/material';
+// components
+import Iconify from 'src/components/Iconify';
+import Scrollbar from 'src/components/Scrollbar';
+import Event from 'src/components/universaldot/Tasks/Event';
 // Events to be filtered from feed
 const FILTERED_EVENTS = [
   'system:ExtrinsicSuccess:: (phase={"ApplyExtrinsic":0})',
@@ -55,18 +69,72 @@ const Events = () => {
     return () => unsub && unsub();
   }, [api?.query?.system]);
 
-  // eslint-disable-next-line multiline-ternary
   return api?.query?.system?.events ? (
-    <div>
-      <button onClick={(_) => setEventFeed([])} />
-      <div>
-        {eventFeed.map((event: any, index: number) => (
-          <div key={`e${index}`}>{event.summary + ' ' + event.content}</div>
-        ))}
-      </div>
-    </div>
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', py: 2, px: 2.5 }}>
+        <Box sx={{ flexGrow: 1 }}>
+          {/* <Typography variant="subtitle1">Events</Typography> */}
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            You have 1111 unread events
+          </Typography>
+        </Box>
+
+        {10000 > 0 && (
+          <Tooltip title=" Mark all as read">
+            <IconButton color="primary">
+              <Iconify icon="eva:done-all-fill" width={20} height={20} />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+
+      <Divider sx={{ borderStyle: 'dashed' }} />
+
+      <Scrollbar
+        // sx={{ height: { xs: 340, sm: 'auto' } }}
+        sx={{ height: 500 }}
+      >
+        <List
+          disablePadding
+          subheader={
+            <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
+              New
+            </ListSubheader>
+          }
+        >
+          {eventFeed.map((event: any, index: number) => (
+            <Event
+              key={`e${index}`}
+              title={`${event.summary} ${event.content}`}
+              description="todo-test"
+            />
+          ))}
+        </List>
+
+        <List
+          disablePadding
+          subheader={
+            <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
+              Old
+            </ListSubheader>
+          }
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((event: any, index: any) => (
+            <Event key={`e${index}`} title="test123" description="todo-test" />
+          ))}
+        </List>
+      </Scrollbar>
+
+      <Divider sx={{ borderStyle: 'dashed' }} />
+
+      <Box sx={{ p: 1 }}>
+        <Button fullWidth disableRipple>
+          View All
+        </Button>
+      </Box>
+    </Box>
   ) : (
-    <div>There are no events...</div>
+    <Box>No events at the moment...</Box>
   );
 };
 
