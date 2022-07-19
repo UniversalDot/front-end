@@ -20,7 +20,7 @@ import { useLoader } from './useLoader';
 import {
   statusTypes,
   pallets,
-  taskCallables,
+  TaskCallables,
   toastTypes,
   loadingTypes,
 } from '../../types';
@@ -92,7 +92,7 @@ const useTasks = () => {
   const getTask = useCallback(
     (taskId, responseHandler) => {
       const query = async () => {
-        const unsub = await api?.query[pallets.TASK][taskCallables.GET_TASK](
+        const unsub = await api?.query[pallets.TASK][TaskCallables.GET_TASK](
           taskId,
           responseHandler
         );
@@ -117,7 +117,7 @@ const useTasks = () => {
   //     };
 
   //     const query = async () => {
-  //       const unsub = await api?.query[pallets.TASK][taskCallables.GET_TASK](
+  //       const unsub = await api?.query[pallets.TASK][TaskCallables.GET_TASK](
   //         taskId,
   //         queryResHandler
   //       );
@@ -149,7 +149,7 @@ const useTasks = () => {
     setStatusMessage('Loading tasks...');
     if (selectedKeyring.value) {
       const query = async () => {
-        const unsub = await api.query[pallets.TASK][taskCallables.TASKS_OWNED](
+        const unsub = await api.query[pallets.TASK][TaskCallables.TASKS_OWNED](
           selectedKeyring.value,
           queryResponseHandler
         );
@@ -205,26 +205,26 @@ const useTasks = () => {
 
     let txExecute;
 
-    if (actionType === taskCallables.CREATE_TASK) {
+    if (actionType === TaskCallables.CREATE_TASK) {
       txExecute = api.tx[pallets.TASK][actionType](
         ...transformedPayloadForCreate
       );
     }
 
-    if (actionType === taskCallables.START_TASK) {
-      txExecute = api.tx[pallets.TASK][taskCallables.START_TASK](
+    if (actionType === TaskCallables.START_TASK) {
+      txExecute = api.tx[pallets.TASK][TaskCallables.START_TASK](
         ...transformedPayloadForStartCompleteRemove
       );
     }
 
-    if (actionType === taskCallables.COMPLETE_TASK) {
-      txExecute = api.tx[pallets.TASK][taskCallables.COMPLETE_TASK](
+    if (actionType === TaskCallables.COMPLETE_TASK) {
+      txExecute = api.tx[pallets.TASK][TaskCallables.COMPLETE_TASK](
         ...transformedPayloadForStartCompleteRemove
       );
     }
 
-    if (actionType === taskCallables.REMOVE_TASK) {
-      txExecute = api.tx[pallets.TASK][taskCallables.REMOVE_TASK](
+    if (actionType === TaskCallables.REMOVE_TASK) {
+      txExecute = api.tx[pallets.TASK][TaskCallables.REMOVE_TASK](
         ...transformedPayloadForStartCompleteRemove
       );
     }
@@ -248,19 +248,19 @@ const useTasks = () => {
 
       // @TODO: transfer to new toast from template;
       // if (callStatus?.isInBlock) {
-      //   if (actionType === taskCallables.CREATE_TASK) {
+      //   if (actionType === TaskCallables.CREATE_TASK) {
       //     toast('Task created successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === taskCallables.START_TASK) {
+      //   if (actionType === TaskCallables.START_TASK) {
       //     toast('Task started successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === taskCallables.COMPLETE_TASK) {
+      //   if (actionType === TaskCallables.COMPLETE_TASK) {
       //     toast('Task closed successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === taskCallables.REMOVE_TASK) {
+      //   if (actionType === TaskCallables.REMOVE_TASK) {
       //     toast('Task deleted successfully!', toastTypes.SUCCESS);
       //   }
       // }
@@ -289,19 +289,19 @@ const useTasks = () => {
     setStatus(statusTypes.INIT);
 
     // @TODO: transfer to new toast from template;
-    // if (actionType === taskCallables.CREATE_TASK) {
+    // if (actionType === TaskCallables.CREATE_TASK) {
     //   toast('Creating task...', toastTypes.INFO);
     // }
 
-    // if (actionType === taskCallables.START_TASK) {
+    // if (actionType === TaskCallables.START_TASK) {
     //   toast('Initiating task...', toastTypes.INFO);
     // }
 
-    // if (actionType === taskCallables.COMPLETE_TASK) {
+    // if (actionType === TaskCallables.COMPLETE_TASK) {
     //   toast('Closing task...', toastTypes.INFO);
     // }
 
-    // if (actionType === taskCallables.REMOVE_TASK) {
+    // if (actionType === TaskCallables.REMOVE_TASK) {
     //   toast('Deleting task...', toastTypes.INFO);
     // }
 

@@ -14,6 +14,9 @@ export const PATH_UNIVERSALDOT = {
   profile: {
     root: path(ROOTS_DASHBOARD, '/profile'),
   },
+  tasks: {
+    root: path(ROOTS_DASHBOARD, '/tasks'),
+  },
 };
 
 

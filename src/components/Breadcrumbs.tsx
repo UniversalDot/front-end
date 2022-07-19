@@ -11,7 +11,7 @@ import {
 
 // ----------------------------------------------------------------------
 
-type TLink = {
+export type TLink = {
   href?: string;
   name: string;
   icon?: ReactElement;

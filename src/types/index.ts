@@ -33,15 +33,16 @@ export enum ProfileCallables {
   REMOVE_PROFILE = 'removeProfile',
 };
 
-export const taskCallables = {
-  TASKS_OWNED: 'tasksOwned',
-  GET_TASK: 'tasks',
-  CREATE_TASK: 'createTask',
-  START_TASK: 'startTask',
-  COMPLETE_TASK: 'completeTask',
-  REMOVE_TASK: 'removeTask',
-  // TODO: not present in BE yet;
-  UPDATE_TASK: 'updateTask',
+export enum TaskCallables {
+  TASKS_OWNED = 'tasksOwned',
+  GET_TASK = 'tasks',
+  CREATE_TASK = 'createTask',
+  START_TASK = 'startTask',
+  COMPLETE_TASK = 'completeTask',
+  REMOVE_TASK = 'removeTask',
+  UPDATE_TASK = 'updateTask',
+  ACCEPT_TASK = 'acceptTask',
+  REJECT_TASK = 'rejectTask',
 };
 
 export const daoCallables = {

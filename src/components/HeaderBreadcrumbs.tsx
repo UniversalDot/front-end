@@ -2,14 +2,14 @@ import { ReactNode } from 'react';
 // @mui
 import { Box, Typography, Link } from '@mui/material';
 //
-import Breadcrumbs, { Props as BreadcrumbsProps } from './Breadcrumbs';
+import Breadcrumbs, { Props as BreadcrumbsProps, TLink } from './Breadcrumbs';
 
 // ----------------------------------------------------------------------
-
-interface Props extends BreadcrumbsProps {
+interface Props extends Omit<BreadcrumbsProps, 'links'> {
   action?: ReactNode;
   heading: string;
   moreLink?: string | string[];
+  links?: TLink[];
 }
 
 export default function HeaderBreadcrumbs({
@@ -27,7 +27,7 @@ export default function HeaderBreadcrumbs({
           <Typography variant="h4" gutterBottom>
             {heading}
           </Typography>
-          <Breadcrumbs links={links} {...other} />
+          {links && <Breadcrumbs links={links} {...other} />}
         </Box>
 
         {action && <Box sx={{ flexShrink: 0 }}>{action}</Box>}
