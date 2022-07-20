@@ -88,7 +88,7 @@ const Events = () => {
         )}
       </Box>
 
-      <Divider sx={{ borderStyle: 'dashed' }} />
+      <Divider sx={{ borderStyle: 'solid' }} />
 
       <Scrollbar
         // sx={{ height: { xs: 340, sm: 'auto' } }}
@@ -125,7 +125,7 @@ const Events = () => {
         </List>
       </Scrollbar>
 
-      <Divider sx={{ borderStyle: 'dashed' }} />
+      <Divider sx={{ borderStyle: 'solid' }} />
 
       <Box sx={{ p: 1 }}>
         <Button fullWidth disableRipple>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 
 // @mui
+import { useTheme } from '@mui/material/styles';
+
 import {
   Card,
   Typography,
@@ -15,6 +17,7 @@ import {
 import MyAvatar from 'src/components/MyAvatar';
 import Iconify from 'src/components/Iconify';
 import MoreMenuPopup from '../MoreMenuPopup';
+import Label from 'src/components/Label';
 //hooks
 import { useTasks } from 'src/hooks/universaldot';
 //types
@@ -25,21 +28,44 @@ type TaskProps = {
   id: string;
 };
 
+enum TaskStatusEnum {
+  CREATED = 'Created',
+  IN_PROGRESS = 'InProgress',
+  COMPLETED = 'Completed',
+  ACCEPTED = 'Accepted',
+}
+
+type TaskStatus =
+  | TaskStatusEnum.CREATED
+  | TaskStatusEnum.IN_PROGRESS
+  | TaskStatusEnum.COMPLETED
+  | TaskStatusEnum.ACCEPTED;
+
+type TaskType = {
+  title: string;
+  specification: string;
+  initiator: string;
+  volunteer: string;
+  currentOwner: string;
+  status: TaskStatus;
+  budget: number;
+  deadline: number;
+  attachments: string;
+  keywords: string;
+  feedback: string;
+  createdAt: number;
+  updatedAt: number;
+  completedAt: number;
+};
+
 export default function Task({ id }: TaskProps) {
+  const theme = useTheme();
+
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
   const { getTask, taskAction } = useTasks();
-  //@TODO - mocked for the moment - default is null;
-  // const [data, setData] = useState<any>(null);
-  const [data, setData] = useState<any>({
-    title: 'Mocked title',
-    description: 'Mocked subheader',
-    specification: 'Mocked specification',
-    budget: 'Mocked budget',
-    deadline: 'Mocked deadline',
-    attachments: 'Mocked attachments',
-    keywords: 'Mocked keywords',
-  });
+  const [data, setData] = useState<TaskType | null>(null);
+  console.log('data/task', data);
 
   useEffect(() => {
     if (id) {
@@ -59,6 +85,8 @@ export default function Task({ id }: TaskProps) {
   };
 
   const handleOptionsOnClick = (actionType: any, taskId: any) => {
+    console.log('actionType', actionType);
+    console.log('taskId', taskId);
     taskAction(actionType, taskId);
   };
 
@@ -68,13 +96,33 @@ export default function Task({ id }: TaskProps) {
         disableTypography
         avatar={<MyAvatar />}
         title={
-          <Typography variant="subtitle2" color="text.primary">
-            {data?.title}
-          </Typography>
+          <Box display="flex" alignItems="center">
+            <Typography variant="subtitle2" color="text.primary">
+              {data?.title}
+            </Typography>
+            <Label
+              variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+              // warning - error - success
+              color={'success'}
+              sx={{ marginLeft: '1rem' }}
+            >
+              {data?.status}
+            </Label>
+          </Box>
         }
         subheader={
+          // <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
+          //   {data?.status}
+          // </Typography>
+          // <Label
+          //   variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+          //   // warning - error - success
+          //   color={'success'}
+          // >
+          //   {data?.status}
+          // </Label>
           <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
-            {data?.description}
+            Created at: {data?.createdAt}
           </Typography>
         }
         action={
@@ -85,27 +133,27 @@ export default function Task({ id }: TaskProps) {
             actions={
               <>
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.ACCEPT_TASK, id)}>
-                  <Iconify icon={'eva:share-fill'} />
+                  <Iconify icon={'eva:checkmark-fill'} />
                   Accept
                 </MenuItem>
 
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.REJECT_TASK, id)}>
-                  <Iconify icon={'eva:share-fill'} />
+                  <Iconify icon={'eva:close-circle-outline'} />
                   Reject
                 </MenuItem>
 
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.START_TASK, id)}>
-                  <Iconify icon={'eva:download-fill'} />
+                  <Iconify icon={'gis:flag-start-b-o'} />
                   Start
                 </MenuItem>
 
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.COMPLETE_TASK, id)}>
-                  <Iconify icon={'eva:printer-fill'} />
+                  <Iconify icon={'carbon:task-complete'} />
                   Complete
                 </MenuItem>
 
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.UPDATE_TASK, id)}>
-                  <Iconify icon={'eva:share-fill'} />
+                  <Iconify icon={'ic:baseline-update'} />
                   Update
                 </MenuItem>
 
@@ -125,11 +173,38 @@ export default function Task({ id }: TaskProps) {
       />
 
       <Stack spacing={3} sx={{ p: 3 }}>
-        <Typography>{data?.specification}</Typography>
-        <Typography>{data?.budget}</Typography>
-        <Typography>{data?.deadline}</Typography>
-        <Typography>{data?.attachments}</Typography>
-        <Typography>{data?.keywords}</Typography>
+        <Divider sx={{ borderStyle: 'solid' }} />
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Specification
+          </Typography>
+          <Typography variant="body2">{data?.specification}</Typography>
+        </Stack>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Budget
+          </Typography>
+          <Typography variant="body2">{data?.budget}</Typography>
+        </Stack>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Deadline
+          </Typography>
+          <Typography variant="body2">{data?.deadline}</Typography>
+        </Stack>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Attachments
+          </Typography>
+          <Typography variant="body2">{data?.attachments}</Typography>
+        </Stack>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Keywords
+          </Typography>
+          <Typography variant="body2">{data?.keywords}</Typography>
+        </Stack>
+        {/* <Divider sx={{ borderStyle: 'solid' }} /> */}
         <Stack direction="row" alignItems="center">
           <Box sx={{ flexGrow: 1 }} />
           <IconButton>

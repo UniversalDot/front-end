@@ -44,31 +44,31 @@ export default function Tasks() {
   }, [actionLoading, getAllTasks, resetAllTasks]);
 
   // @TODO - uncomment when available tasks to test;
-  // const tasks = useMemo(() => {
-  //   if (allTasksReceived.length === 0) {
-  //     return <div>No tasks at the moment...</div>;
-  //   }
+  const tasks = useMemo(() => {
+    if (allTasksReceived.length === 0) {
+      return <div>No tasks at the moment...</div>;
+    }
 
-  //   return (
-  //     <Stack spacing={3}>
-  //       {allTasksReceived.map((taskId: any, i: number) => (
-  //         <Task id={taskId} key={`task#${i}`} />
-  //       ))}
-  //     </Stack>
-  //   );
-  // }, [allTasksReceived]);
-
-  // @TODO - mocked response for the moment;
-  const tasks = useMemo(
-    () => (
+    return (
       <Stack spacing={3}>
-        {[1, 2, 3, 4].map((taskId: any, i: number) => (
+        {allTasksReceived.map((taskId: any, i: number) => (
           <Task id={taskId} key={`task#${i}`} />
         ))}
       </Stack>
-    ),
-    []
-  );
+    );
+  }, [allTasksReceived]);
+
+  // @TODO - mocked response for the moment;
+  // const tasks = useMemo(
+  //   () => (
+  //     <Stack spacing={3}>
+  //       {[1, 2, 3, 4].map((taskId: any, i: number) => (
+  //         <Task id={taskId} key={`task#${i}`} />
+  //       ))}
+  //     </Stack>
+  //   ),
+  //   []
+  // );
 
   return (
     <Page title="Tasks">
@@ -86,7 +86,7 @@ export default function Tasks() {
             <Paper sx={{ p: 4 }} elevation={4}>
               <ItemBlockStyle sx={{ minWidth: 120, marginBottom: '2rem' }}>
                 {/* <Image disabledEffect alt={country.name} src={country.flag} sx={{ width: 28, mr: 1 }} /> */}
-                <Iconify icon={'eva:printer-fill'} sx={{ marginRight: '1rem' }} />
+                <Iconify icon={'bi:list-task'} sx={{ marginRight: '1rem' }} />
                 <Typography variant="subtitle1" color="text.primary">
                   Upcoming Tasks
                 </Typography>
@@ -97,7 +97,7 @@ export default function Tasks() {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 4 }} elevation={4}>
               <ItemBlockStyle sx={{ minWidth: 120, marginBottom: '2rem' }}>
-                <Iconify icon={'eva:printer-fill'} sx={{ marginRight: '1rem' }} />
+                <Iconify icon={'ic:baseline-event-repeat'} sx={{ marginRight: '1rem' }} />
                 <Typography variant="subtitle1" color="text.primary">
                   Events
                 </Typography>

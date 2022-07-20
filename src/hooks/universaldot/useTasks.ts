@@ -168,6 +168,8 @@ const useTasks = () => {
   ]);
 
   const signedTx = async (actionType: any, taskPayload: any) => {
+    console.log('actionType in signedTx', actionType)
+    console.log('taskPayload in signedTx', taskPayload)
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -205,6 +207,12 @@ const useTasks = () => {
 
     let txExecute;
 
+    if (actionType === TaskCallables.ACCEPT_TASK) {
+      txExecute = api.tx[pallets.TASK][actionType](
+        ...transformedPayloadForStartCompleteRemove
+      );
+    }
+
     if (actionType === TaskCallables.CREATE_TASK) {
       txExecute = api.tx[pallets.TASK][actionType](
         ...transformedPayloadForCreate
@@ -229,8 +237,10 @@ const useTasks = () => {
       );
     }
 
-    const transactionResponseHandler = ({ status }: any) => {
-      const callStatus = status;
+    const transactionResponseHandler = (response: any) => {
+      const callStatus = response.status;
+
+      console.log('response ', response.toHuman())
 
       if (callStatus?.isFinalized) {
         getAllTasks();
