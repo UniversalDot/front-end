@@ -36,6 +36,7 @@ export enum ProfileCallables {
 export enum TaskCallables {
   TASKS_OWNED = 'tasksOwned',
   GET_TASK = 'tasks',
+  TASKS = 'tasks',
   CREATE_TASK = 'createTask',
   START_TASK = 'startTask',
   COMPLETE_TASK = 'completeTask',
@@ -62,4 +63,35 @@ export const daoCallables = {
   VISION: 'vision',
   VISION_COUNT: 'visionCount',
   APPLICANTS_TO_ORGANIZATION: 'applicantsToOrganization',
+};
+
+export enum TaskStatusEnum {
+  CREATED = 'Created',
+  IN_PROGRESS = 'InProgress',
+  COMPLETED = 'Completed',
+  ACCEPTED = 'Accepted',
+}
+
+export type TaskStatus =
+  | TaskStatusEnum.CREATED
+  | TaskStatusEnum.IN_PROGRESS
+  | TaskStatusEnum.COMPLETED
+  | TaskStatusEnum.ACCEPTED;
+
+export type TaskType = {
+  taskId: string;
+  title: string;
+  specification: string;
+  initiator: string;
+  volunteer: string;
+  currentOwner: string;
+  status: TaskStatus;
+  budget: number;
+  deadline: number;
+  attachments: string;
+  keywords: string;
+  feedback: string;
+  createdAt: number;
+  updatedAt: number;
+  completedAt: number;
 };

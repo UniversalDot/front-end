@@ -21,21 +21,17 @@ import {
   statusTypes,
   pallets,
   TaskCallables,
-  toastTypes,
   loadingTypes,
 } from '../../types';
-// import { useToast } from './useToast';
 
 const useTasks = () => {
   const dispatch = useDispatch();
   const { api, keyring, keyringState } = useSubstrateState();
   const [unsub, setUnsub] = useState<Function | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
 
   const { selectedKeyring } = useUser();
   const { setStatus, setStatusMessage } = useStatus();
   const { setLoading } = useLoader();
-  // const { toast } = useToast();
 
   // TODO: reformat it to be DRY;
   const taskValues = useSelector(state => state.tasks.task);
@@ -135,6 +131,8 @@ const useTasks = () => {
       setLoading({ type: loadingTypes.TASKS, value: false });
       setStatusMessage('');
 
+      console.log('tasks res', result.toHuman())
+
       if (result.isNone) {
         dispatch(setTasks([]));
       }
@@ -144,7 +142,21 @@ const useTasks = () => {
     [dispatch, setLoading, setStatusMessage]
   );
 
-  const getAllTasks = useCallback(() => {
+  const queryPreparedResponseHandler = useCallback(
+    (result: any[]) => {
+      setLoading({ type: loadingTypes.TASKS, value: false });
+      setStatusMessage('');
+
+      if (result.length === 0) {
+        dispatch(setTasks([]));
+      }
+
+      dispatch(setTasks(result));
+    },
+    [dispatch, setLoading, setStatusMessage]
+  );
+
+  const getAllOwnedTasks = useCallback(() => {
     setLoading({ type: loadingTypes.TASKS, value: true });
     setStatusMessage('Loading tasks...');
     if (selectedKeyring.value) {
@@ -167,9 +179,37 @@ const useTasks = () => {
     setStatusMessage,
   ]);
 
-  const signedTx = async (actionType: any, taskPayload: any) => {
-    console.log('actionType in signedTx', actionType)
-    console.log('taskPayload in signedTx', taskPayload)
+  const getAllTaskEntries = useCallback(() => {
+    setLoading({ type: loadingTypes.TASKS, value: true });
+    setStatusMessage('Loading tasks...');
+    if (selectedKeyring.value) {
+      const query = async () => {
+        const allTaskEntries = (await api.query[pallets.TASK][TaskCallables.TASKS].entries());
+
+        const entriesPrepared = allTaskEntries.map((entry: any[]) => {
+          const entryString = entry.toString();
+          const taskObject = entry[1].toHuman();
+
+          return {
+            taskId: entryString.split(',')[0],
+            ...taskObject
+          }
+        });
+
+        queryPreparedResponseHandler(entriesPrepared)
+      };
+
+      query();
+    }
+  }, [
+    selectedKeyring.value,
+    api,
+    setLoading,
+    setStatusMessage,
+    queryPreparedResponseHandler
+  ]);
+
+  const signedTransaction = async (actionType: any, taskPayload: any, enqueueSnackbar: Function) => {
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -240,42 +280,35 @@ const useTasks = () => {
     const transactionResponseHandler = (response: any) => {
       const callStatus = response.status;
 
-      console.log('response ', response.toHuman())
+      console.log('response', response)
 
-      if (callStatus?.isFinalized) {
-        getAllTasks();
-      }
-
-      if (callStatus?.isFinalized) {
-        setStatus(statusTypes.FINALIZED);
-        setTimeout(() => {
-          setStatus('');
-        }, 5000);
-      }
-      if (callStatus?.isInBlock) {
-        setStatus(statusTypes.IN_BLOCK);
-      }
-
-      // @TODO: transfer to new toast from template;
-      // if (callStatus?.isInBlock) {
-      //   if (actionType === TaskCallables.CREATE_TASK) {
-      //     toast('Task created successfully!', toastTypes.SUCCESS);
-      //   }
-
-      //   if (actionType === TaskCallables.START_TASK) {
-      //     toast('Task started successfully!', toastTypes.SUCCESS);
-      //   }
-
-      //   if (actionType === TaskCallables.COMPLETE_TASK) {
-      //     toast('Task closed successfully!', toastTypes.SUCCESS);
-      //   }
-
-      //   if (actionType === TaskCallables.REMOVE_TASK) {
-      //     toast('Task deleted successfully!', toastTypes.SUCCESS);
-      //   }
+      // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
+      // if (callStatus?.isFinalized) {
+      //   getAllOwnedTasks();
       // }
 
-      setActionLoading(false);
+      if (callStatus?.isInBlock) {
+        setLoading({ type: loadingTypes.TASKS, value: false, message: '' });
+        if (actionType === TaskCallables.ACCEPT_TASK) {
+          enqueueSnackbar('Task accepted successfully!')
+        }
+
+        if (actionType === TaskCallables.CREATE_TASK) {
+          enqueueSnackbar('Task created successfully!')
+        }
+
+        if (actionType === TaskCallables.START_TASK) {
+          enqueueSnackbar('Task started successfully!')
+        }
+
+        if (actionType === TaskCallables.COMPLETE_TASK) {
+          enqueueSnackbar('Task completed successfully!')
+        }
+
+        if (actionType === TaskCallables.REMOVE_TASK) {
+          enqueueSnackbar('Task removed successfully!')
+        }
+      }
     };
 
     const transactionErrorHandler = (err: any) => {
@@ -290,7 +323,7 @@ const useTasks = () => {
     setUnsub(() => unsub);
   };
 
-  const taskAction = async (actionType: any, taskPayload: any) => {
+  const taskAction = async (actionType: any, taskPayload: any, enqueueSnackbar: Function) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
@@ -298,37 +331,39 @@ const useTasks = () => {
 
     setStatus(statusTypes.INIT);
 
-    // @TODO: transfer to new toast from template;
-    // if (actionType === TaskCallables.CREATE_TASK) {
-    //   toast('Creating task...', toastTypes.INFO);
-    // }
+    if (actionType === TaskCallables.ACCEPT_TASK) {
+      enqueueSnackbar('Accepting task...')
+    }
 
-    // if (actionType === TaskCallables.START_TASK) {
-    //   toast('Initiating task...', toastTypes.INFO);
-    // }
+    if (actionType === TaskCallables.CREATE_TASK) {
+      enqueueSnackbar('Creating task...')
+    }
 
-    // if (actionType === TaskCallables.COMPLETE_TASK) {
-    //   toast('Closing task...', toastTypes.INFO);
-    // }
+    if (actionType === TaskCallables.START_TASK) {
+      enqueueSnackbar('Starting task...')
+    }
 
-    // if (actionType === TaskCallables.REMOVE_TASK) {
-    //   toast('Deleting task...', toastTypes.INFO);
-    // }
+    if (actionType === TaskCallables.COMPLETE_TASK) {
+      enqueueSnackbar('Completing task...')
+    }
 
-    setActionLoading(true);
+    if (actionType === TaskCallables.REMOVE_TASK) {
+      enqueueSnackbar('Deleting task...')
+    }
 
-    signedTx(actionType, taskPayload);
+    setLoading({ type: loadingTypes.TASKS, value: true, message: 'Task action ongoing...' });
+    signedTransaction(actionType, taskPayload, enqueueSnackbar);
     dispatch(resetTask());
   };
 
   return {
     getTask,
     taskAction,
-    actionLoading,
     populateTask,
     taskValues,
     isEditMode,
-    getAllTasks,
+    getAllOwnedTasks,
+    getAllTaskEntries,
     tasks,
     resetAllTasks,
     taskErrors,

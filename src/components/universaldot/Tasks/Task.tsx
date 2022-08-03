@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 // @mui
 import { useTheme } from '@mui/material/styles';
-
+import { useSnackbar } from 'notistack';
 import {
   Card,
   Typography,
@@ -21,60 +21,35 @@ import Label from 'src/components/Label';
 //hooks
 import { useTasks } from 'src/hooks/universaldot';
 //types
-import { TaskCallables } from 'src/types';
+import { TaskCallables, TaskType } from 'src/types';
 // ----------------------------------------------------------------------
 
 type TaskProps = {
   id: string;
+  taskData?: TaskType;
 };
 
-enum TaskStatusEnum {
-  CREATED = 'Created',
-  IN_PROGRESS = 'InProgress',
-  COMPLETED = 'Completed',
-  ACCEPTED = 'Accepted',
-}
-
-type TaskStatus =
-  | TaskStatusEnum.CREATED
-  | TaskStatusEnum.IN_PROGRESS
-  | TaskStatusEnum.COMPLETED
-  | TaskStatusEnum.ACCEPTED;
-
-type TaskType = {
-  title: string;
-  specification: string;
-  initiator: string;
-  volunteer: string;
-  currentOwner: string;
-  status: TaskStatus;
-  budget: number;
-  deadline: number;
-  attachments: string;
-  keywords: string;
-  feedback: string;
-  createdAt: number;
-  updatedAt: number;
-  completedAt: number;
-};
-
-export default function Task({ id }: TaskProps) {
+export default function Task({ id, taskData }: TaskProps) {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
   const { getTask, taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
-  console.log('data/task', data);
 
   useEffect(() => {
-    if (id) {
+    if (id && !taskData) {
       const handleResponse = (dataFromResponse: any) =>
         !dataFromResponse.isNone && setData({ taskId: id, ...dataFromResponse.toHuman() });
 
       getTask(id, handleResponse);
     }
-  }, [id, getTask]);
+
+    if (id && taskData) {
+      setData(taskData);
+    }
+  }, [id, getTask, taskData]);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
     setOpenMenuActions(event.currentTarget);
@@ -85,9 +60,7 @@ export default function Task({ id }: TaskProps) {
   };
 
   const handleOptionsOnClick = (actionType: any, taskId: any) => {
-    console.log('actionType', actionType);
-    console.log('taskId', taskId);
-    taskAction(actionType, taskId);
+    taskAction(actionType, taskId, enqueueSnackbar);
   };
 
   return (

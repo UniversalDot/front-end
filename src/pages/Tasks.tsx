@@ -16,6 +16,7 @@ import Task from '../components/universaldot/Tasks/Task';
 import Events from '../components/universaldot/Events';
 //hooks
 import { useTasks, useLoader } from '../hooks/universaldot';
+import { TaskType } from 'src/types';
 
 // ----------------------------------------------------------------------
 
@@ -29,46 +30,51 @@ const ItemBlockStyle = styled((props: StackProps) => (
 export default function Tasks() {
   const { themeStretch } = useSettings();
 
-  const { getAllTasks, tasks: allTasksReceived, resetAllTasks, actionLoading } = useTasks();
+  const { getAllTaskEntries, tasks: allTasksReceived, resetAllTasks } = useTasks();
 
   const { loadingTasks } = useLoader();
 
   useEffect(() => {
-    if (!actionLoading) {
-      getAllTasks();
+    if (!loadingTasks) {
+      getAllTaskEntries();
     }
     return () => {
       resetAllTasks();
       return;
     };
-  }, [actionLoading, getAllTasks, resetAllTasks]);
+  }, [getAllTaskEntries, resetAllTasks, loadingTasks]);
 
-  // @TODO - uncomment when available tasks to test;
+  // // For unprepared tasks;
+  // const tasks = useMemo(() => {
+  //   if (allTasksReceived?.length === 0) {
+  //     return <div>No tasks at the moment...</div>;
+  //   }
+
+  //   console.log('all tasks received', allTasksReceived);
+
+  //   return (
+  //     <Stack spacing={3}>
+  //       {allTasksReceived?.map((taskId: any, i: number) => (
+  //         <Task id={taskId} alreadyPrepared key={`task#${i}`} />
+  //       ))}
+  //     </Stack>
+  //   );
+  // }, [allTasksReceived]);
+
+  // For prepared task entries;
   const tasks = useMemo(() => {
-    if (allTasksReceived.length === 0) {
+    if (allTasksReceived?.length === 0) {
       return <div>No tasks at the moment...</div>;
     }
 
     return (
       <Stack spacing={3}>
-        {allTasksReceived.map((taskId: any, i: number) => (
-          <Task id={taskId} key={`task#${i}`} />
+        {allTasksReceived?.map((task: TaskType, i: number) => (
+          <Task id={task.taskId} taskData={task} key={`task#${i}`} />
         ))}
       </Stack>
     );
   }, [allTasksReceived]);
-
-  // @TODO - mocked response for the moment;
-  // const tasks = useMemo(
-  //   () => (
-  //     <Stack spacing={3}>
-  //       {[1, 2, 3, 4].map((taskId: any, i: number) => (
-  //         <Task id={taskId} key={`task#${i}`} />
-  //       ))}
-  //     </Stack>
-  //   ),
-  //   []
-  // );
 
   return (
     <Page title="Tasks">
@@ -91,7 +97,7 @@ export default function Tasks() {
                   Upcoming Tasks
                 </Typography>
               </ItemBlockStyle>
-              {loadingTasks || actionLoading ? 'Loader todo here...' : tasks}
+              {loadingTasks ? 'Loader todo here...' : tasks}
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>
