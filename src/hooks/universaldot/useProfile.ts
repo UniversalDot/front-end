@@ -11,11 +11,16 @@ import { useUser } from './useUser';
 import { useLoader } from './useLoader';
 import { useUtils } from './useUtils';
 import {
-  pallets,
+  Pallets,
   ProfileCallables,
-  loadingTypes,
+  LoadingTypes,
+  MessageTiming,
+  ActionType,
+  ProfilePayload
 } from '../../types';
 import { ProfileDataSubstrate } from '../../@types/universaldot';
+import createSnackbarMessage from '../../utils/createSnackbarMessage';
+import createLoadingMessage from '../../utils/createLoadingMessage';
 
 const useProfile = () => {
   const dispatch = useDispatch();
@@ -30,7 +35,7 @@ const useProfile = () => {
 
   const queryResponseHandler = useCallback(
     result => {
-      setLoading({ type: loadingTypes.PROFILE, value: false, message: '' });
+      setLoading({ type: LoadingTypes.PROFILE, value: false, message: createLoadingMessage() });
 
       const setAllData = (profileData: ProfileDataSubstrate) => {
         const modifiedProfileData = {
@@ -49,14 +54,14 @@ const useProfile = () => {
 
   // @TODO: figure out how to make it simpler to check when API is availabile so it doesn't crash;
   const getProfile = useCallback(() => {
-    setLoading({ type: loadingTypes.PROFILE, value: true, message: 'Loading account / profile...' });
+    setLoading({ type: LoadingTypes.PROFILE, value: true, message: createLoadingMessage(LoadingTypes.PROFILE) });
 
     if (
       selectedKeyring.value
-      && api?.query?.[pallets.PROFILE]?.[ProfileCallables.PROFILES]
+      && api?.query?.[Pallets.PROFILE]?.[ProfileCallables.PROFILES]
     ) {
       const query = async () => {
-        const unsub = await api.query[pallets.PROFILE][
+        const unsub = await api.query[Pallets.PROFILE][
           ProfileCallables.PROFILES
         ](selectedKeyring.value, queryResponseHandler);
         const cb = () => unsub;
@@ -68,12 +73,12 @@ const useProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    api?.query?.[pallets.PROFILE]?.[ProfileCallables.PROFILES],
+    api?.query?.[Pallets.PROFILE]?.[ProfileCallables.PROFILES],
     selectedKeyring.value,
     setLoading,
   ]);
 
-  const signedTransaction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }, enqueueSnackbar: Function) => {
+  const signedTransaction = async (actionType: ActionType, payload: ProfilePayload, enqueueSnackbar: Function) => {
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -100,29 +105,19 @@ const useProfile = () => {
 
     const transactionResponseHandler = ({ status }: any) => {
       if (status?.isInBlock) {
-        setLoading({ type: loadingTypes.PROFILE, value: false, message: '' });
-
-        if (actionType === ProfileCallables.CREATE_PROFILE) {
-          enqueueSnackbar('Profile created successfully!')
-        }
-
-        if (actionType === ProfileCallables.UPDATE_PROFILE) {
-          enqueueSnackbar('Profile updated successfully!')
-        }
-
-        if (actionType === ProfileCallables.REMOVE_PROFILE) {
-          enqueueSnackbar('Profile removed successfully!')
-        }
+        setLoading({ type: LoadingTypes.PROFILE, value: false, message: createLoadingMessage() });
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.PROFILE, actionType)
       }
     };
 
     const transactionErrorHandler = (err: any) => {
-      console.log('err handler message', err)
+      // @TODO
+      console.log('Error handler message', err);
     };
 
     const fromAcct = await getFromAcct();
 
-    // @TODO: verify if correct;
+    // @TODO: verify how to do it correctly; use util or similar to this;
     const paramFieldsForTransformed = () => [
       { name: 'username', optional: false, type: 'Bytes' },
       { name: 'interests', optional: false, type: 'Bytes' },
@@ -144,17 +139,17 @@ const useProfile = () => {
     let txExecute;
 
     if (actionType === ProfileCallables.CREATE_PROFILE) {
-      txExecute = api.tx[pallets.PROFILE][ProfileCallables.CREATE_PROFILE](
+      txExecute = api.tx[Pallets.PROFILE][ProfileCallables.CREATE_PROFILE](
         ...transformed
       );
     }
 
     if (actionType === ProfileCallables.REMOVE_PROFILE) {
-      txExecute = api.tx[pallets.PROFILE][ProfileCallables.REMOVE_PROFILE]();
+      txExecute = api.tx[Pallets.PROFILE][ProfileCallables.REMOVE_PROFILE]();
     }
 
     if (actionType === ProfileCallables.UPDATE_PROFILE) {
-      txExecute = api.tx[pallets.PROFILE][ProfileCallables.UPDATE_PROFILE](
+      txExecute = api.tx[Pallets.PROFILE][ProfileCallables.UPDATE_PROFILE](
         ...transformed
       );
     }
@@ -166,25 +161,15 @@ const useProfile = () => {
     setUnsub(() => unsub);
   };
 
-  const profileAction = async (actionType: string, payload: { username: string, interests: string[], availableHoursPerWeek: string, otherInformation: string }, enqueueSnackbar: Function) => {
+  const profileAction = async (actionType: ActionType, payload: ProfilePayload, enqueueSnackbar: Function) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
     }
 
-    if (actionType === ProfileCallables.CREATE_PROFILE) {
-      enqueueSnackbar('Creating profile...')
-    }
+    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.PROFILE, actionType)
 
-    if (actionType === ProfileCallables.UPDATE_PROFILE) {
-      enqueueSnackbar('Updating profile...')
-    }
-
-    if (actionType === ProfileCallables.REMOVE_PROFILE) {
-      enqueueSnackbar('Deleting profile...')
-    }
-
-    setLoading({ type: loadingTypes.PROFILE, value: true, message: 'Profile creation/update/deletion ongoing...' });
+    setLoading({ type: LoadingTypes.PROFILE, value: true, message: createLoadingMessage(LoadingTypes.PROFILE, actionType) });
     signedTransaction(actionType, payload, enqueueSnackbar);
   };
 

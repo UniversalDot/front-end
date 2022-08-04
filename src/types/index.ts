@@ -5,11 +5,11 @@ export const statusTypes = {
   ERROR: 'ERROR',
 };
 
-export const loadingTypes = {
-  KEYRING: 'keyring',
-  PROFILE: 'profile',
-  TASKS: 'tasks',
-  DAO: 'dao',
+export enum LoadingTypes {
+  KEYRING = 'keyring',
+  PROFILE = 'profile',
+  TASKS = 'tasks',
+  DAO = 'dao',
 };
 
 export const toastTypes = {
@@ -20,10 +20,10 @@ export const toastTypes = {
   ERROR: 'error',
 };
 
-export const pallets = {
-  PROFILE: 'profile',
-  TASK: 'task',
-  DAO: 'dao',
+export enum Pallets {
+  PROFILE = 'profile',
+  TASK = 'task',
+  DAO = 'dao',
 };
 
 export enum ProfileCallables {
@@ -65,6 +65,25 @@ export const daoCallables = {
   APPLICANTS_TO_ORGANIZATION: 'applicantsToOrganization',
 };
 
+export enum DaoCallables {
+  ADD_MEMBERS = 'addMembers',
+  ADD_TASKS = 'addTasks',
+  CREATE_ORGANIZATION = 'createOrganization',
+  CREATE_VISION = 'createVision',
+  DISSOLVE_ORGANIZATION = 'dissolveOrganization',
+  REMOVE_MEMBERS = 'removeMembers',
+  REMOVE_TASKS = 'removeTasks',
+  REMOVE_VISION = 'removeVision',
+  SIGN_VISION = 'signVision',
+  UNSIGN_VISION = 'unsignVision',
+  // QUERY callables:
+  MEMBER_OF = 'memberOf',
+  ORGANIZATION_COUNT = 'organizationCount',
+  VISION = 'vision',
+  VISION_COUNT = 'visionCount',
+  APPLICANTS_TO_ORGANIZATION = 'applicantsToOrganization',
+};
+
 export enum TaskStatusEnum {
   CREATED = 'Created',
   IN_PROGRESS = 'InProgress',
@@ -95,3 +114,20 @@ export type TaskType = {
   updatedAt: number;
   completedAt: number;
 };
+
+export enum MessageTiming {
+  INIT = 'init',
+  FINAL = 'final',
+}
+
+export type ActionType = ProfileCallables | TaskCallables | DaoCallables;
+
+export type ProfilePayload = {
+  username: string,
+  interests: string[],
+  availableHoursPerWeek: string,
+  otherInformation: string
+}
+
+// @TODO
+export type TaskPayload = any;

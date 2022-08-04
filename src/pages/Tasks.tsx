@@ -62,19 +62,19 @@ export default function Tasks() {
   // }, [allTasksReceived]);
 
   // For prepared task entries;
-  const tasks = useMemo(() => {
-    if (allTasksReceived?.length === 0) {
-      return <div>No tasks at the moment...</div>;
-    }
-
-    return (
-      <Stack spacing={3}>
-        {allTasksReceived?.map((task: TaskType, i: number) => (
-          <Task id={task.taskId} taskData={task} key={`task#${i}`} />
-        ))}
-      </Stack>
-    );
-  }, [allTasksReceived]);
+  const tasks = useMemo(
+    () =>
+      allTasksReceived?.length > 0 ? (
+        <Stack spacing={3}>
+          {allTasksReceived?.map((task: TaskType, i: number) => (
+            <Task id={task.taskId} taskData={task} key={`task#${i}`} />
+          ))}
+        </Stack>
+      ) : (
+        <div>No tasks at the moment...</div>
+      ),
+    [allTasksReceived]
+  );
 
   return (
     <Page title="Tasks">

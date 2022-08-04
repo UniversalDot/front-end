@@ -15,14 +15,17 @@ import {
   setError,
 } from '../../redux/slices/tasksSlice';
 import { useUser } from './useUser';
-import { useStatus } from './useStatus';
 import { useLoader } from './useLoader';
 import {
-  statusTypes,
-  pallets,
+  Pallets,
   TaskCallables,
-  loadingTypes,
+  LoadingTypes,
+  MessageTiming,
+  ActionType,
+  TaskPayload
 } from '../../types';
+import createSnackbarMessage from '../../utils/createSnackbarMessage';
+import createLoadingMessage from '../../utils/createLoadingMessage';
 
 const useTasks = () => {
   const dispatch = useDispatch();
@@ -30,10 +33,8 @@ const useTasks = () => {
   const [unsub, setUnsub] = useState<Function | null>(null);
 
   const { selectedKeyring } = useUser();
-  const { setStatus, setStatusMessage } = useStatus();
   const { setLoading } = useLoader();
 
-  // TODO: reformat it to be DRY;
   const taskValues = useSelector(state => state.tasks.task);
   const isEditMode = useSelector(state => state.tasks.isEditMode);
   const tasks = useSelector(state => state.tasks.tasks);
@@ -88,7 +89,7 @@ const useTasks = () => {
   const getTask = useCallback(
     (taskId, responseHandler) => {
       const query = async () => {
-        const unsub = await api?.query[pallets.TASK][TaskCallables.GET_TASK](
+        const unsub = await api?.query[Pallets.TASK][TaskCallables.GET_TASK](
           taskId,
           responseHandler
         );
@@ -113,7 +114,7 @@ const useTasks = () => {
   //     };
 
   //     const query = async () => {
-  //       const unsub = await api?.query[pallets.TASK][TaskCallables.GET_TASK](
+  //       const unsub = await api?.query[Pallets.TASK][TaskCallables.GET_TASK](
   //         taskId,
   //         queryResHandler
   //       );
@@ -128,10 +129,7 @@ const useTasks = () => {
 
   const queryResponseHandler = useCallback(
     result => {
-      setLoading({ type: loadingTypes.TASKS, value: false });
-      setStatusMessage('');
-
-      console.log('tasks res', result.toHuman())
+      setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
 
       if (result.isNone) {
         dispatch(setTasks([]));
@@ -139,13 +137,12 @@ const useTasks = () => {
 
       dispatch(setTasks(result.toHuman()));
     },
-    [dispatch, setLoading, setStatusMessage]
+    [dispatch, setLoading]
   );
 
   const queryPreparedResponseHandler = useCallback(
     (result: any[]) => {
-      setLoading({ type: loadingTypes.TASKS, value: false });
-      setStatusMessage('');
+      setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
 
       if (result.length === 0) {
         dispatch(setTasks([]));
@@ -153,15 +150,15 @@ const useTasks = () => {
 
       dispatch(setTasks(result));
     },
-    [dispatch, setLoading, setStatusMessage]
+    [dispatch, setLoading]
   );
 
   const getAllOwnedTasks = useCallback(() => {
-    setLoading({ type: loadingTypes.TASKS, value: true });
-    setStatusMessage('Loading tasks...');
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
+
     if (selectedKeyring.value) {
       const query = async () => {
-        const unsub = await api.query[pallets.TASK][TaskCallables.TASKS_OWNED](
+        const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS_OWNED](
           selectedKeyring.value,
           queryResponseHandler
         );
@@ -176,15 +173,14 @@ const useTasks = () => {
     api,
     queryResponseHandler,
     setLoading,
-    setStatusMessage,
   ]);
 
   const getAllTaskEntries = useCallback(() => {
-    setLoading({ type: loadingTypes.TASKS, value: true });
-    setStatusMessage('Loading tasks...');
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
+
     if (selectedKeyring.value) {
       const query = async () => {
-        const allTaskEntries = (await api.query[pallets.TASK][TaskCallables.TASKS].entries());
+        const allTaskEntries = (await api.query[Pallets.TASK][TaskCallables.TASKS].entries());
 
         const entriesPrepared = allTaskEntries.map((entry: any[]) => {
           const entryString = entry.toString();
@@ -205,11 +201,10 @@ const useTasks = () => {
     selectedKeyring.value,
     api,
     setLoading,
-    setStatusMessage,
     queryPreparedResponseHandler
   ]);
 
-  const signedTransaction = async (actionType: any, taskPayload: any, enqueueSnackbar: Function) => {
+  const signedTransaction = async (actionType: ActionType, taskPayload: TaskPayload, enqueueSnackbar: Function) => {
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -248,31 +243,31 @@ const useTasks = () => {
     let txExecute;
 
     if (actionType === TaskCallables.ACCEPT_TASK) {
-      txExecute = api.tx[pallets.TASK][actionType](
+      txExecute = api.tx[Pallets.TASK][actionType](
         ...transformedPayloadForStartCompleteRemove
       );
     }
 
     if (actionType === TaskCallables.CREATE_TASK) {
-      txExecute = api.tx[pallets.TASK][actionType](
+      txExecute = api.tx[Pallets.TASK][actionType](
         ...transformedPayloadForCreate
       );
     }
 
     if (actionType === TaskCallables.START_TASK) {
-      txExecute = api.tx[pallets.TASK][TaskCallables.START_TASK](
+      txExecute = api.tx[Pallets.TASK][TaskCallables.START_TASK](
         ...transformedPayloadForStartCompleteRemove
       );
     }
 
     if (actionType === TaskCallables.COMPLETE_TASK) {
-      txExecute = api.tx[pallets.TASK][TaskCallables.COMPLETE_TASK](
+      txExecute = api.tx[Pallets.TASK][TaskCallables.COMPLETE_TASK](
         ...transformedPayloadForStartCompleteRemove
       );
     }
 
     if (actionType === TaskCallables.REMOVE_TASK) {
-      txExecute = api.tx[pallets.TASK][TaskCallables.REMOVE_TASK](
+      txExecute = api.tx[Pallets.TASK][TaskCallables.REMOVE_TASK](
         ...transformedPayloadForStartCompleteRemove
       );
     }
@@ -280,40 +275,21 @@ const useTasks = () => {
     const transactionResponseHandler = (response: any) => {
       const callStatus = response.status;
 
-      console.log('response', response)
-
       // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
       // if (callStatus?.isFinalized) {
       //   getAllOwnedTasks();
       // }
 
       if (callStatus?.isInBlock) {
-        setLoading({ type: loadingTypes.TASKS, value: false, message: '' });
-        if (actionType === TaskCallables.ACCEPT_TASK) {
-          enqueueSnackbar('Task accepted successfully!')
-        }
-
-        if (actionType === TaskCallables.CREATE_TASK) {
-          enqueueSnackbar('Task created successfully!')
-        }
-
-        if (actionType === TaskCallables.START_TASK) {
-          enqueueSnackbar('Task started successfully!')
-        }
-
-        if (actionType === TaskCallables.COMPLETE_TASK) {
-          enqueueSnackbar('Task completed successfully!')
-        }
-
-        if (actionType === TaskCallables.REMOVE_TASK) {
-          enqueueSnackbar('Task removed successfully!')
-        }
+        setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.TASK, actionType)
       }
     };
 
     const transactionErrorHandler = (err: any) => {
-      setStatus(statusTypes.ERROR);
-      setStatusMessage(err.toString());
+      // @TODO
+      // setStatus(statusTypes.ERROR);
+      // setStatusMessage(err.toString());
     };
 
     const unsub = await txExecute
@@ -323,35 +299,14 @@ const useTasks = () => {
     setUnsub(() => unsub);
   };
 
-  const taskAction = async (actionType: any, taskPayload: any, enqueueSnackbar: Function) => {
+  const taskAction = async (actionType: ActionType, taskPayload: TaskPayload, enqueueSnackbar: Function) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
     }
 
-    setStatus(statusTypes.INIT);
-
-    if (actionType === TaskCallables.ACCEPT_TASK) {
-      enqueueSnackbar('Accepting task...')
-    }
-
-    if (actionType === TaskCallables.CREATE_TASK) {
-      enqueueSnackbar('Creating task...')
-    }
-
-    if (actionType === TaskCallables.START_TASK) {
-      enqueueSnackbar('Starting task...')
-    }
-
-    if (actionType === TaskCallables.COMPLETE_TASK) {
-      enqueueSnackbar('Completing task...')
-    }
-
-    if (actionType === TaskCallables.REMOVE_TASK) {
-      enqueueSnackbar('Deleting task...')
-    }
-
-    setLoading({ type: loadingTypes.TASKS, value: true, message: 'Task action ongoing...' });
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS, actionType) });
+    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.TASK, actionType)
     signedTransaction(actionType, taskPayload, enqueueSnackbar);
     dispatch(resetTask());
   };
