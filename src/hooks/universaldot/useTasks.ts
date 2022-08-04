@@ -186,6 +186,9 @@ const useTasks = () => {
           const entryString = entry.toString();
           const taskObject = entry[1].toHuman();
 
+          console.log('entry task', entry)
+          console.log('entry task entryString', entryString)
+
           return {
             taskId: entryString.split(',')[0],
             ...taskObject
@@ -240,6 +243,8 @@ const useTasks = () => {
 
     const transformedPayloadOnlyTaskId = [taskPayload];
 
+    console.log('taskPayload', taskPayload)
+
     // @TODO - do the payload for reject;
     const transformedPayloadReject = [taskPayload, 'some feedback about the rejection'];
 
@@ -283,6 +288,37 @@ const useTasks = () => {
 
     const transactionResponseHandler = (response: any) => {
       const callStatus = response.status;
+
+      console.log('response original', response)
+      console.log('response readable', response.toHuman())
+
+
+      if (response) {
+        console.log('fleva tuka')
+
+        const responseHere = response;
+
+        console.log('responseHere', responseHere)
+
+        responseHere.events
+          // find/filter for failed events
+          .filter(({ event }: any) =>
+            api.events.system.ExtrinsicFailed.is(event)
+          )
+          // we know that data for system.ExtrinsicFailed is
+          // (DispatchError, DispatchInfo)
+          .forEach(({ event: { data: [error] } }: any) => {
+            if (error.isModule) {
+              // for module errors, we have the section indexed, lookup
+              const decoded = api.registry.findMetaError(error.asModule)
+              const { docs, method, section } = decoded
+              console.log(`${section}.${method}: ${docs.join(' ')}`)
+            } else {
+              // Other, CannotLookup, BadOrigin, no extra info
+              console.log(error.toString())
+            }
+          })
+      }
 
       // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
       // if (callStatus?.isFinalized) {

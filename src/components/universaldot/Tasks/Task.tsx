@@ -38,6 +38,9 @@ export default function Task({ id, taskData }: TaskProps) {
   const { getTask, taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
 
+  console.log('taskId', id);
+  console.log('taskData', taskData);
+
   useEffect(() => {
     if (id && !taskData) {
       const handleResponse = (dataFromResponse: any) =>
@@ -106,7 +109,8 @@ export default function Task({ id, taskData }: TaskProps) {
             onClose={handleCloseMenu}
             actions={
               <>
-                <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.ACCEPT_TASK, id)}>
+                {/* @TODO: this is only for creator of post */}
+                {/* <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.ACCEPT_TASK, id)}>
                   <Iconify icon={'eva:checkmark-fill'} />
                   Accept
                 </MenuItem>
@@ -114,7 +118,7 @@ export default function Task({ id, taskData }: TaskProps) {
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.REJECT_TASK, id)}>
                   <Iconify icon={'eva:close-circle-outline'} />
                   Reject
-                </MenuItem>
+                </MenuItem> */}
 
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.START_TASK, id)}>
                   <Iconify icon={'gis:flag-start-b-o'} />
@@ -126,7 +130,8 @@ export default function Task({ id, taskData }: TaskProps) {
                   Complete
                 </MenuItem>
 
-                <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.UPDATE_TASK, id)}>
+                {/* @TODO: this is only for creator of post */}
+                {/* <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.UPDATE_TASK, id)}>
                   <Iconify icon={'ic:baseline-update'} />
                   Update
                 </MenuItem>
@@ -139,7 +144,7 @@ export default function Task({ id, taskData }: TaskProps) {
                 >
                   <Iconify icon={'eva:trash-2-outline'} />
                   Delete
-                </MenuItem>
+                </MenuItem> */}
               </>
             }
           />
