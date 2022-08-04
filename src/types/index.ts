@@ -120,6 +120,11 @@ export enum MessageTiming {
   FINAL = 'final',
 }
 
+export enum TransactionStatus {
+  SUCCESS = 'success',
+  FAIL = 'fail',
+}
+
 export type ActionType = ProfileCallables | TaskCallables | DaoCallables;
 
 export type ProfilePayload = {

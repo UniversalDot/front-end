@@ -38,9 +38,6 @@ export default function Task({ id, taskData }: TaskProps) {
   const { getTask, taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
 
-  console.log('taskId', id);
-  console.log('taskData', taskData);
-
   useEffect(() => {
     if (id && !taskData) {
       const handleResponse = (dataFromResponse: any) =>
