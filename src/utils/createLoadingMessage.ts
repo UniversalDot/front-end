@@ -28,6 +28,10 @@ export default function createLoadingMessage(loadingType?: LoadingTypes, actionT
       return 'Task acception in process...'
     }
 
+    if (actionType === TaskCallables.REJECT_TASK) {
+      return 'Task rejection in process...'
+    }
+
     if (actionType === TaskCallables.CREATE_TASK) {
       return 'Task creation in process...'
     }

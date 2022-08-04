@@ -21,7 +21,7 @@ import Label from 'src/components/Label';
 //hooks
 import { useTasks } from 'src/hooks/universaldot';
 //types
-import { TaskCallables, TaskType } from 'src/types';
+import { TaskCallables, TaskType, ActionType } from 'src/types';
 // ----------------------------------------------------------------------
 
 type TaskProps = {
@@ -59,8 +59,9 @@ export default function Task({ id, taskData }: TaskProps) {
     setOpenMenuActions(null);
   };
 
-  const handleOptionsOnClick = (actionType: any, taskId: any) => {
+  const handleOptionsOnClick = (actionType: ActionType, taskId: string) => {
     taskAction(actionType, taskId, enqueueSnackbar);
+    handleCloseMenu();
   };
 
   return (

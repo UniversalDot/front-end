@@ -238,13 +238,22 @@ const useTasks = () => {
       taskPayload?.deadline || '',
     ];
 
-    const transformedPayloadForStartCompleteRemove = [taskPayload];
+    const transformedPayloadOnlyTaskId = [taskPayload];
+
+    // @TODO - do the payload for reject;
+    const transformedPayloadReject = [taskPayload, 'some feedback about the rejection'];
 
     let txExecute;
 
     if (actionType === TaskCallables.ACCEPT_TASK) {
       txExecute = api.tx[Pallets.TASK][actionType](
-        ...transformedPayloadForStartCompleteRemove
+        ...transformedPayloadOnlyTaskId
+      );
+    }
+
+    if (actionType === TaskCallables.REJECT_TASK) {
+      txExecute = api.tx[Pallets.TASK][actionType](
+        ...transformedPayloadReject
       );
     }
 
@@ -256,19 +265,19 @@ const useTasks = () => {
 
     if (actionType === TaskCallables.START_TASK) {
       txExecute = api.tx[Pallets.TASK][TaskCallables.START_TASK](
-        ...transformedPayloadForStartCompleteRemove
+        ...transformedPayloadOnlyTaskId
       );
     }
 
     if (actionType === TaskCallables.COMPLETE_TASK) {
       txExecute = api.tx[Pallets.TASK][TaskCallables.COMPLETE_TASK](
-        ...transformedPayloadForStartCompleteRemove
+        ...transformedPayloadOnlyTaskId
       );
     }
 
     if (actionType === TaskCallables.REMOVE_TASK) {
       txExecute = api.tx[Pallets.TASK][TaskCallables.REMOVE_TASK](
-        ...transformedPayloadForStartCompleteRemove
+        ...transformedPayloadOnlyTaskId
       );
     }
 

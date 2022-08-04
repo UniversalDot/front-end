@@ -37,6 +37,10 @@ export default function createSnackbarMessage(enqueueSnackbar: Function, message
         enqueueSnackbar('Accepting task...')
       }
 
+      if (actionType === TaskCallables.REJECT_TASK) {
+        enqueueSnackbar('Rejecting task...')
+      }
+
       if (actionType === TaskCallables.CREATE_TASK) {
         enqueueSnackbar('Creating task...')
       }
@@ -57,6 +61,10 @@ export default function createSnackbarMessage(enqueueSnackbar: Function, message
     if (messageTiming === MessageTiming.FINAL) {
       if (actionType === TaskCallables.ACCEPT_TASK) {
         enqueueSnackbar('Task accepted successfully!')
+      }
+
+      if (actionType === TaskCallables.REJECT_TASK) {
+        enqueueSnackbar('Task rejected successfully!')
       }
 
       if (actionType === TaskCallables.CREATE_TASK) {
