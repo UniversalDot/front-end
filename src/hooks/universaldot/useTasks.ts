@@ -182,13 +182,12 @@ const useTasks = () => {
     if (selectedKeyring.value) {
       const query = async () => {
         const allTaskEntries = (await api.query[Pallets.TASK][TaskCallables.TASKS].entries());
-
         const entriesPrepared = allTaskEntries.map((entry: any[]) => {
           const entryString = entry.toString();
           const taskObject = entry[1].toHuman();
 
           return {
-            taskId: entryString.split(',')[0],
+            taskId: `0x${entryString.split(',')[0].substring(82)}`,
             ...taskObject
           }
         });
@@ -312,10 +311,11 @@ const useTasks = () => {
           })
       }
 
-      // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
-      // if (callStatus?.isFinalized) {
-      //   getAllOwnedTasks();
-      // }
+      if (response.status?.isFinalized) {
+        // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
+        // getAllOwnedTasks();
+        getAllTaskEntries();
+      }
 
       if (response.status?.isInBlock) {
         setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
@@ -323,15 +323,8 @@ const useTasks = () => {
       }
     };
 
-    const transactionErrorHandler = (err: any) => {
-      // @TODO
-      // setStatus(statusTypes.ERROR);
-      // setStatusMessage(err.toString());
-    };
-
     const unsub = await txExecute
-      .signAndSend(fromAcct, transactionResponseHandler)
-      .catch(transactionErrorHandler);
+      .signAndSend(fromAcct, transactionResponseHandler);
 
     setUnsub(() => unsub);
   };

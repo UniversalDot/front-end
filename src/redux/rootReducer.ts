@@ -9,6 +9,7 @@ import tasksReducer from './slices/tasksSlice';
 import daoReducer from './slices/daoSlice';
 import loadersReducer from './slices/loadersSlice';
 import generalReducer from './slices/generalSlice';
+import calendarReducer from './slices/calendarSlice';
 // ----------------------------------------------------------------------
 
 const rootPersistConfig = {
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   tasks: tasksReducer,
   dao: daoReducer,
   loaders: loadersReducer,
+  calendar: calendarReducer,
 });
 
 export { rootPersistConfig, rootReducer };

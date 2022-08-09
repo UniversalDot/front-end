@@ -11,6 +11,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Provider as ReduxProvider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
+// @mui
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 // redux
 import { store, persistor } from './redux/store';
 // contexts
@@ -26,15 +29,17 @@ ReactDOM.render(
   <HelmetProvider>
     <ReduxProvider store={store}>
       {/* <PersistGate loading={null} persistor={persistor}> */}
-      <SettingsProvider>
-        <CollapseDrawerProvider>
-          <BrowserRouter>
-            <SubstrateContextProvider>
-              <App />
-            </SubstrateContextProvider>
-          </BrowserRouter>
-        </CollapseDrawerProvider>
-      </SettingsProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <SettingsProvider>
+          <CollapseDrawerProvider>
+            <BrowserRouter>
+              <SubstrateContextProvider>
+                <App />
+              </SubstrateContextProvider>
+            </BrowserRouter>
+          </CollapseDrawerProvider>
+        </SettingsProvider>
+      </LocalizationProvider>
       {/* </PersistGate> */}
     </ReduxProvider>
   </HelmetProvider>,

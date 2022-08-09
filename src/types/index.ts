@@ -76,12 +76,18 @@ export enum DaoCallables {
   REMOVE_VISION = 'removeVision',
   SIGN_VISION = 'signVision',
   UNSIGN_VISION = 'unsignVision',
+  TRANSFER_OWNERSHIP = 'transferOwnership',
+  UPDATE_ORGANIZATION = 'updateOrganization',
   // QUERY callables:
+  APPLICANTS_TO_ORGANIZATION = 'applicantsToOrganization',
   MEMBER_OF = 'memberOf',
+  MEMBERS = 'members',
   ORGANIZATION_COUNT = 'organizationCount',
+  ORGANIZATION_TASKS = 'organizationTasks',
+  ORGANIZATIONS = 'organizations',
+  PALLET_VERSION = 'palletVersion',
   VISION = 'vision',
   VISION_COUNT = 'visionCount',
-  APPLICANTS_TO_ORGANIZATION = 'applicantsToOrganization',
 };
 
 export enum TaskStatusEnum {
