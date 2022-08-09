@@ -148,3 +148,13 @@ it also displays the user's token balance. It is included in the template alread
 ![Logo](https://github.com/UniversalDot/documents/blob/9d0a4c0c984bee503e13278f72049da7eae16c14/logo/web3grant/web3%20foundation_grants_badge_black.jpg)
 
 UniversalDot is recipient of the technical grant from Web3 Foundation. 
+
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## Maintainers
+
+[@SlaveAtanasov](https://github.com/slaveatanasov)
