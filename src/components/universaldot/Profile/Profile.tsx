@@ -1,7 +1,7 @@
 // @mui
 import { Grid, Stack } from '@mui/material';
 // @types
-import { MyProfile } from '../../../@types/universaldot';
+import { MyProfile } from '../../../types';
 // universaldot
 import ProfileAbout from './ProfileAbout';
 import ProfileSocialInfo from './ProfileSocialInfo';

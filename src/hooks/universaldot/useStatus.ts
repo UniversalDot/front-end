@@ -4,6 +4,9 @@ import {
   setStatus as setStatusAction,
   setStatusMessage as setTheStatusMessage,
 } from '../../redux/slices/statusSlice';
+
+// @TODO: delete this hook when DAO refactor/porting is finished and use notistack;
+
 const useStatus = () => {
   const dispatch = useDispatch();
   const status = useSelector(state => state.status.status);

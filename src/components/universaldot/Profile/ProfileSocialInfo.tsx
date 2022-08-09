@@ -2,7 +2,7 @@
 import { styled } from '@mui/material/styles';
 import { Link, Card, CardHeader, Stack } from '@mui/material'; // @types
 // @types
-import { MyProfile } from '../../../@types/universaldot';
+import { MyProfile } from '../../../types';
 // components
 import Iconify from '../../Iconify';
 

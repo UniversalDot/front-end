@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { ProfileState } from '../../@types/universaldot';
+import { ProfileState } from '../../types';
 
 const initialState: ProfileState = {
   data: null,

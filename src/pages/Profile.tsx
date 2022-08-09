@@ -3,7 +3,7 @@ import { capitalCase } from 'change-case';
 import { styled } from '@mui/material/styles';
 import { Tab, Box, Card, Tabs, Container } from '@mui/material';
 // @types
-import { MyProfile } from '../@types/universaldot';
+import { MyProfile } from '../types';
 // routes
 import { PATH_UNIVERSALDOT } from '../routes/paths';
 // hooks

@@ -16,9 +16,9 @@ import {
   LoadingTypes,
   MessageTiming,
   ActionType,
-  ProfilePayload
+  ProfilePayload,
+  ProfileDataSubstrate
 } from '../../types';
-import { ProfileDataSubstrate } from '../../@types/universaldot';
 import createSnackbarMessage from '../../utils/createSnackbarMessage';
 import createLoadingMessage from '../../utils/createLoadingMessage';
 

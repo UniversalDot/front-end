@@ -14,7 +14,7 @@ import {
   LoadingTypes,
   daoCallables,
 } from '../../types';
-// import { useToast } from './useToast';
+
 import {
   setTotalOrganizations,
   setTotalVisions,
@@ -38,7 +38,6 @@ const useDao = () => {
   const { selectedKeyring } = useUser();
   const { setStatus, setStatusMessage } = useStatus();
   const { setLoading } = useLoader();
-  // const { toast } = useToast();
 
   const totalOrganizations = useSelector((state) => state.dao.totalOrganizations);
   const totalVisions = useSelector(state => state.dao.totalVisions);
