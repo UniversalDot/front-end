@@ -42,10 +42,10 @@ export default function Router() {
         { path: 'tasks', element: <Tasks /> },
         { path: 'calendar', element: <Calendar /> },
         {
-          path: 'organization',
+          path: 'dao',
           children: [
             {
-              element: <Navigate to="/dashboard/organization/other-organization" replace />,
+              element: <Navigate to="/dashboard/dao/other-organization" replace />,
               index: true,
             },
             { path: 'other-organization', element: <OrganizationOther /> },

@@ -1,9 +1,12 @@
 // @mui
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
+// routes
+import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
 import Page from '../components/Page';
+import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // universaldot
 import Organizations from 'src/components/universaldot/Organizations';
 // ----------------------------------------------------------------------
@@ -14,9 +17,13 @@ export default function OrganizationOwn() {
   return (
     <Page title="My organization">
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        <Typography variant="h3" component="h1" paragraph>
-          My organization
-        </Typography>
+        <HeaderBreadcrumbs
+          heading="DAO"
+          links={[
+            { name: 'Organization', href: PATH_UNIVERSALDOT.dao.root },
+            { name: 'My organization' },
+          ]}
+        />
         <Organizations type="own" />
       </Container>
     </Page>

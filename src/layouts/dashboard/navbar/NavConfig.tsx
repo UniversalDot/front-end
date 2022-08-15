@@ -27,11 +27,11 @@ const navConfig = [
       { title: 'Tasks', path: '/dashboard/tasks', icon: ICONS.booking },
       {
         title: 'Organization',
-        path: '/dashboard/organization',
+        path: '/dashboard/dao',
         icon: ICONS.banking,
         children: [
-          { title: 'Other organization', path: '/dashboard/organization/other-organization' },
-          { title: 'My organization', path: '/dashboard/organization/my-organization' },
+          { title: 'Other organization', path: '/dashboard/dao/other-organization' },
+          { title: 'My organization', path: '/dashboard/dao/my-organization' },
         ],
       },
       { title: 'Calendar', path: '/dashboard/calendar', icon: ICONS.calendar },
