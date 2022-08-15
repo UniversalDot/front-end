@@ -45,7 +45,7 @@ export default function UserTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>{name}</TableCell>
+        <TableCell>{name}</TableCell>
 
         <TableCell align="left">{orgId}</TableCell>
 

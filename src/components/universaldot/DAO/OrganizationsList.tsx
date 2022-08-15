@@ -38,7 +38,7 @@ type TableRowType = {
 
 type TableData = TableRowType[];
 
-const STATUS_OPTIONS = ['all', 'statusTest1', 'statusTest2'];
+const TAB_OPTIONS = ['Joined Organization', 'Recommended Organization'];
 
 const ROLE_OPTIONS = ['all', 'test1', 'test2', 'test3'];
 
@@ -72,6 +72,25 @@ const TABLE_DATA = [
   },
 ];
 
+const TABLE_DATA_RECOMMENDED_TAB = [
+  {
+    name: 'naaame1',
+    orgId: 'ooorgId1',
+    joinDate: 'joooinDate1',
+    tag: 'taaag1',
+    completedTask: 'cpppompletedTask1',
+    status: 'sttttatus1',
+  },
+  {
+    name: 'naaame2',
+    orgId: 'oooorgId2',
+    joinDate: 'joooinDate2',
+    tag: 'taaaag2',
+    completedTask: 'cooompletedTask2',
+    status: 'stttatus2',
+  },
+];
+
 // ----------------------------------------------------------------------
 
 export default function OrganizationsList() {
@@ -100,7 +119,19 @@ export default function OrganizationsList() {
 
   const [filterRole, setFilterRole] = useState('all');
 
-  const { currentTab: filterStatus, onChangeTab: onChangeFilterStatus } = useTabs('all');
+  const { currentTab, onChangeTab } = useTabs('Joined Organization');
+
+  const onSwitchTab = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
+    onChangeTab(event, tab);
+
+    if (tab === 'Joined Organization') {
+      setTableData(TABLE_DATA);
+    }
+
+    if (tab === 'Recommended Organization') {
+      setTableData(TABLE_DATA_RECOMMENDED_TAB);
+    }
+  };
 
   const handleFilterName = (filterName: string) => {
     setFilterName(filterName);
@@ -132,7 +163,6 @@ export default function OrganizationsList() {
     comparator: getComparator(order, orderBy),
     filterName,
     filterRole,
-    filterStatus,
   });
 
   const denseHeight = dense ? 52 : 72;
@@ -140,7 +170,7 @@ export default function OrganizationsList() {
   const isNotFound =
     (!dataFiltered.length && !!filterName) ||
     (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+    (!dataFiltered.length && !!currentTab);
 
   return (
     <Card>
@@ -148,11 +178,11 @@ export default function OrganizationsList() {
         allowScrollButtonsMobile
         variant="scrollable"
         scrollButtons="auto"
-        value={filterStatus}
-        onChange={onChangeFilterStatus}
+        value={currentTab}
+        onChange={(event, tab) => onSwitchTab(event, tab)}
         sx={{ px: 2, bgcolor: 'background.neutral' }}
       >
-        {STATUS_OPTIONS.map((tab) => (
+        {TAB_OPTIONS.map((tab) => (
           <Tab disableRipple key={tab} label={tab} value={tab} />
         ))}
       </Tabs>
@@ -257,13 +287,11 @@ function applySortFilter({
   tableData,
   comparator,
   filterName,
-  filterStatus,
   filterRole,
 }: {
   tableData: TableData;
   comparator: (a: any, b: any) => number;
   filterName: string;
-  filterStatus: string;
   filterRole: string;
 }) {
   const stabilizedThis = tableData.map((el, index) => [el, index] as const);
@@ -281,10 +309,6 @@ function applySortFilter({
       (item: Record<string, any>) =>
         item.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
-  }
-
-  if (filterStatus !== 'all') {
-    tableData = tableData.filter((item: Record<string, any>) => item.status === filterStatus);
   }
 
   if (filterRole !== 'all') {
