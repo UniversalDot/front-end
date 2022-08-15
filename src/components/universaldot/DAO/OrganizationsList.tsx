@@ -20,7 +20,7 @@ import useTabs from '../../../hooks/useTabs';
 import useTable, { getComparator, emptyRows } from '../../../hooks/useTable';
 // components
 import Iconify from '../../Iconify';
-import Scrollbar from '../../Scrollbar';
+// import Scrollbar from '../../Scrollbar';
 import { TableNoData, TableEmptyRows, TableHeadCustom, TableSelectedActions } from '../../table';
 import TableRow from './TableRow';
 import TableToolbar from './TableToolbar';
@@ -167,69 +167,68 @@ export default function OrganizationsList() {
         optionsRole={ROLE_OPTIONS}
       />
 
-      <Scrollbar>
-        <TableContainer sx={{ minWidth: 800, position: 'relative' }}>
-          {selected.length > 0 && (
-            <TableSelectedActions
-              dense={dense}
-              numSelected={selected.length}
-              rowCount={tableData.length}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.orgId)
-                )
-              }
-              actions={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={() => handleDeleteRows(selected)}>
-                    <Iconify icon={'eva:trash-2-outline'} />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
-          )}
+      {/* @TODO - Scrollbar causes lagging when expanding rows; consider removing it; adding workaround */}
+      {/* <Scrollbar> */}
+      <TableContainer sx={{ minWidth: 800, position: 'relative' }}>
+        {selected.length > 0 && (
+          <TableSelectedActions
+            dense={dense}
+            numSelected={selected.length}
+            rowCount={tableData.length}
+            onSelectAllRows={(checked) =>
+              onSelectAllRows(
+                checked,
+                tableData.map((row) => row.orgId)
+              )
+            }
+            actions={
+              <Tooltip title="Delete">
+                <IconButton color="primary" onClick={() => handleDeleteRows(selected)}>
+                  <Iconify icon={'eva:trash-2-outline'} />
+                </IconButton>
+              </Tooltip>
+            }
+          />
+        )}
 
-          <Table size={dense ? 'small' : 'medium'}>
-            <TableHeadCustom
-              order={order}
-              orderBy={orderBy}
-              headLabel={TABLE_HEAD}
-              rowCount={tableData.length}
-              numSelected={selected.length}
-              onSort={onSort}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.orgId)
-                )
-              }
-            />
+        <Table size={dense ? 'small' : 'medium'}>
+          <TableHeadCustom
+            order={order}
+            orderBy={orderBy}
+            headLabel={TABLE_HEAD}
+            rowCount={tableData.length}
+            numSelected={selected.length}
+            onSort={onSort}
+            onSelectAllRows={(checked) =>
+              onSelectAllRows(
+                checked,
+                tableData.map((row) => row.orgId)
+              )
+            }
+          />
 
-            <TableBody>
-              {dataFiltered
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
-                  <TableRow
-                    key={row.orgId}
-                    row={row}
-                    selected={selected.includes(row.orgId)}
-                    onSelectRow={() => onSelectRow(row.orgId)}
-                    onDeleteRow={() => handleDeleteRow(row.orgId)}
-                    onEditRow={() => handleEditRow(row.orgId)}
-                  />
-                ))}
-
-              <TableEmptyRows
-                height={denseHeight}
-                emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+          <TableBody>
+            {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+              <TableRow
+                key={row.orgId}
+                row={row}
+                selected={selected.includes(row.orgId)}
+                onSelectRow={() => onSelectRow(row.orgId)}
+                onDeleteRow={() => handleDeleteRow(row.orgId)}
+                onEditRow={() => handleEditRow(row.orgId)}
               />
+            ))}
 
-              <TableNoData isNotFound={isNotFound} />
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Scrollbar>
+            <TableEmptyRows
+              height={denseHeight}
+              emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+            />
+
+            <TableNoData isNotFound={isNotFound} />
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {/* </Scrollbar> */}
 
       <Box sx={{ position: 'relative' }}>
         <TablePagination
