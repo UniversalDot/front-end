@@ -1,4 +1,4 @@
-name: Deploy to hosting
+name: Deploy to 'hosting' branch
 on:
   push:	
     branches:	
@@ -13,11 +13,11 @@ jobs:
     # Checkout
     - uses: actions/checkout@v3
 
-    # Use Node it install dependencies and build
+    # Use Node to install dependencies and build
     - uses: actions/setup-node@v3
       with:
         node-version: 16
-    - name: Install dependencies
+    - name: Install dependencies and build
       run: |
         yarn install
         yarn build
