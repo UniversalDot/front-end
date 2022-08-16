@@ -3,6 +3,11 @@ import { enUS, frFR, zhCN, viVN, arSD } from '@mui/material/locale';
 // components
 import { SettingsValueProps } from './components/settings/type';
 
+// API
+// ----------------------------------------------------------------------
+
+export const HOST_API = process.env.REACT_APP_HOST_API_KEY || '';
+
 // LAYOUT
 // ----------------------------------------------------------------------
 

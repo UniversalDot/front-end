@@ -44,30 +44,24 @@ jobs:
           # relative to working_directory
           root: "./"
           paths:
-            - build/*
+            - "./"
 
 
   deploy:
      machine:
        enabled: true
-     working_directory: "./"
      steps:
        - add_ssh_keys:
            fingerprints:
               - "b4:2b:92:46:1a:f9:f1:b9:b5:46:f8:01:4a:92:f7:bb"
        - attach_workspace:
            at: "./"
-       # Install rsync. It will be used to upload our code to server
-       - run: sudo apt-get install rsync
        - run:
            name: Deploy Over SSH
            command: |
-            echo "Deploying to test.universaldot.me"
-            ssh -oStrictHostKeyChecking=no -p 65002 u787324618@185.224.137.168
+            ssh -p 65002 u787324618@185.224.137.168
             cd domains/universaldot.me/public_html/test
             yarn build
-            serve -s build
-     resource_class: large
 
   # deploy:
   #   docker:

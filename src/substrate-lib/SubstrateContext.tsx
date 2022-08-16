@@ -1,5 +1,4 @@
 import React, { useReducer, useContext, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import jsonrpc from '@polkadot/types/interfaces/jsonrpc';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
@@ -156,11 +155,6 @@ const SubstrateContextProvider = (props: any) => {
       {props.children}
     </SubstrateContext.Provider>
   );
-};
-
-// prop typechecking
-SubstrateContextProvider.propTypes = {
-  socket: PropTypes.string,
 };
 
 const useSubstrate = () => useContext(SubstrateContext);
