@@ -1,3 +1,4 @@
+import { useState } from 'react';
 // @mui
 import { Container } from '@mui/material';
 // hooks
@@ -9,10 +10,21 @@ import { PATH_UNIVERSALDOT } from '../routes/paths';
 import Page from '../components/Page';
 import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // universaldot
-import Organizations from 'src/components/universaldot/Organizations';
+// import Organizations from 'src/components/universaldot/Organizations';
 import { DAOLists } from '../components/universaldot/DAO';
-import { useState } from 'react';
+
 // ----------------------------------------------------------------------
+
+const TABLE_HEAD = [
+  { id: 'name', label: 'Name', align: 'left' },
+  { id: 'orgId', label: 'Org. ID', align: 'left' },
+  { id: 'joinDate', label: 'Join date', align: 'left' },
+  { id: 'tag', label: 'Tag', align: 'center' },
+  { id: 'completedTask', label: 'Completed task', align: 'left' },
+  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'actions1' },
+  { id: 'actions2' },
+];
 
 const TABLE_DATA_1 = [
   {
@@ -84,11 +96,12 @@ export default function OrganizationOther() {
           ]}
         />
         <DAOLists
-          listType="myOrganization"
+          listType="otherOrganization"
           tabs={TAB_OPTIONS}
           currentTab={currentTab}
           onTabSwitch={onTabSwitch}
           listData={listData}
+          listHead={TABLE_HEAD}
         />
         {/* <Organizations type="joined" /> */}
       </Container>

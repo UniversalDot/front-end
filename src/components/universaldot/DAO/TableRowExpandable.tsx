@@ -17,7 +17,7 @@ type Props = {
   onDeleteRow: VoidFunction;
 };
 
-export default function UserTableRow({
+export default function TableRowExpandable({
   row,
   selected,
   onEditRow,

@@ -21,7 +21,8 @@ import useTable, { getComparator, emptyRows } from '../../../hooks/useTable';
 import Iconify from '../../Iconify';
 // import Scrollbar from '../../Scrollbar';
 import { TableNoData, TableEmptyRows, TableHeadCustom, TableSelectedActions } from '../../table';
-import TableRow from './TableRow';
+import TableRowExpandable from './TableRowExpandable';
+import TableRowGeneric from './TableRowGeneric';
 import TableToolbar from './TableToolbar';
 
 // ----------------------------------------------------------------------
@@ -39,25 +40,16 @@ type TableData = TableRowType[];
 
 const ROLE_OPTIONS = ['all', 'test1', 'test2', 'test3'];
 
-const TABLE_HEAD = [
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'orgId', label: 'Org. ID', align: 'left' },
-  { id: 'joinDate', label: 'Join date', align: 'left' },
-  { id: 'tag', label: 'Tag', align: 'center' },
-  { id: 'completedTask', label: 'Completed task', align: 'left' },
-  { id: 'status', label: 'Status', align: 'left' },
-  { id: 'actions1' },
-  { id: 'actions2' },
-];
-
 type ListType = 'otherOrganization' | 'myOrganization';
 
 type OrganizationsListProps = {
   listType: ListType;
   currentTab: string;
   tabs: string[];
+  listHead: any[];
   listData: TableData;
   onTabSwitch: (event: React.SyntheticEvent<Element, Event>, tab: string) => void;
+  daoSubpage?: 'visions' | 'members' | 'tasks';
 };
 
 // ----------------------------------------------------------------------
@@ -66,8 +58,10 @@ export default function DAOLists({
   listType,
   tabs,
   currentTab,
+  listHead,
   listData,
   onTabSwitch,
+  daoSubpage,
 }: OrganizationsListProps) {
   const {
     dense,
@@ -87,6 +81,8 @@ export default function DAOLists({
     onChangePage,
     onChangeRowsPerPage,
   } = useTable();
+
+  const showGenericRow = listType === 'myOrganization' && daoSubpage;
 
   const [filterName, setFilterName] = useState('');
 
@@ -188,7 +184,7 @@ export default function DAOLists({
           <TableHeadCustom
             order={order}
             orderBy={orderBy}
-            headLabel={TABLE_HEAD}
+            headLabel={listHead}
             rowCount={listData.length}
             numSelected={selected.length}
             onSort={onSort}
@@ -201,16 +197,29 @@ export default function DAOLists({
           />
 
           <TableBody>
-            {dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-              <TableRow
-                key={row.orgId}
-                row={row}
-                selected={selected.includes(row.orgId)}
-                onSelectRow={() => onSelectRow(row.orgId)}
-                onDeleteRow={() => handleDeleteRow(row.orgId)}
-                onEditRow={() => handleEditRow(row.orgId)}
-              />
-            ))}
+            {dataFiltered
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row) =>
+                showGenericRow ? (
+                  <TableRowGeneric
+                    key={row.orgId}
+                    row={row}
+                    selected={selected.includes(row.orgId)}
+                    onSelectRow={() => onSelectRow(row.orgId)}
+                    onDeleteRow={() => handleDeleteRow(row.orgId)}
+                    onEditRow={() => handleEditRow(row.orgId)}
+                  />
+                ) : (
+                  <TableRowExpandable
+                    key={row.orgId}
+                    row={row}
+                    selected={selected.includes(row.orgId)}
+                    onSelectRow={() => onSelectRow(row.orgId)}
+                    onDeleteRow={() => handleDeleteRow(row.orgId)}
+                    onEditRow={() => handleEditRow(row.orgId)}
+                  />
+                )
+              )}
 
             <TableEmptyRows
               height={denseHeight}
