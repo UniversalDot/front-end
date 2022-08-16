@@ -31,7 +31,15 @@ const navConfig = [
         icon: ICONS.banking,
         children: [
           { title: 'Other organization', path: '/dashboard/dao/other-organization' },
-          { title: 'My organization', path: '/dashboard/dao/my-organization' },
+          {
+            title: 'My organization',
+            path: '/dashboard/dao/my-organization',
+            children: [
+              { title: 'Visions', path: '/dashboard/dao/my-organization/visions' },
+              { title: 'Members', path: '/dashboard/dao/my-organization/members' },
+              { title: 'Tasks', path: '/dashboard/dao/my-organization/tasks' },
+            ],
+          },
         ],
       },
       { title: 'Calendar', path: '/dashboard/calendar', icon: ICONS.calendar },

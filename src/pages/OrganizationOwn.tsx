@@ -11,7 +11,11 @@ import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 import Organizations from 'src/components/universaldot/Organizations';
 // ----------------------------------------------------------------------
 
-export default function OrganizationOwn() {
+type OrganizationOwnProps = {
+  subPage: 'visions' | 'members' | 'tasks';
+};
+
+export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const { themeStretch } = useSettings();
 
   return (
@@ -22,6 +26,7 @@ export default function OrganizationOwn() {
           links={[
             { name: 'Organization', href: PATH_UNIVERSALDOT.dao.root },
             { name: 'My organization' },
+            { name: subPage },
           ]}
         />
         <Organizations type="own" />

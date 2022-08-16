@@ -49,7 +49,18 @@ export default function Router() {
               index: true,
             },
             { path: 'other-organization', element: <OrganizationOther /> },
-            { path: 'my-organization', element: <OrganizationOwn /> },
+            {
+              path: 'my-organization',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/dao/my-organization/visions" replace />,
+                  index: true,
+                },
+                { path: 'visions', element: <OrganizationOwn subPage="visions" /> },
+                { path: 'members', element: <OrganizationOwn subPage="members" /> },
+                { path: 'tasks', element: <OrganizationOwn subPage="tasks" /> },
+              ],
+            },
           ],
         },
       ],

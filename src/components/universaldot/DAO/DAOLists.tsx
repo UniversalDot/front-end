@@ -16,7 +16,6 @@ import {
   FormControlLabel,
 } from '@mui/material';
 // hooks
-import useTabs from '../../../hooks/useTabs';
 import useTable, { getComparator, emptyRows } from '../../../hooks/useTable';
 // components
 import Iconify from '../../Iconify';
@@ -38,8 +37,6 @@ type TableRowType = {
 
 type TableData = TableRowType[];
 
-const TAB_OPTIONS = ['Joined Organization', 'Recommended Organization'];
-
 const ROLE_OPTIONS = ['all', 'test1', 'test2', 'test3'];
 
 const TABLE_HEAD = [
@@ -53,47 +50,25 @@ const TABLE_HEAD = [
   { id: 'actions2' },
 ];
 
-const TABLE_DATA = [
-  {
-    name: 'name1',
-    orgId: 'orgId1',
-    joinDate: 'joinDate1',
-    tag: 'tag1',
-    completedTask: 'completedTask1',
-    status: 'status1',
-  },
-  {
-    name: 'name2',
-    orgId: 'orgId2',
-    joinDate: 'joinDate2',
-    tag: 'tag2',
-    completedTask: 'completedTask2',
-    status: 'status2',
-  },
-];
+type ListType = 'otherOrganization' | 'myOrganization';
 
-const TABLE_DATA_RECOMMENDED_TAB = [
-  {
-    name: 'naaame1',
-    orgId: 'ooorgId1',
-    joinDate: 'joooinDate1',
-    tag: 'taaag1',
-    completedTask: 'cpppompletedTask1',
-    status: 'sttttatus1',
-  },
-  {
-    name: 'naaame2',
-    orgId: 'oooorgId2',
-    joinDate: 'joooinDate2',
-    tag: 'taaaag2',
-    completedTask: 'cooompletedTask2',
-    status: 'stttatus2',
-  },
-];
+type OrganizationsListProps = {
+  listType: ListType;
+  currentTab: string;
+  tabs: string[];
+  listData: TableData;
+  onTabSwitch: (event: React.SyntheticEvent<Element, Event>, tab: string) => void;
+};
 
 // ----------------------------------------------------------------------
 
-export default function OrganizationsList() {
+export default function DAOLists({
+  listType,
+  tabs,
+  currentTab,
+  listData,
+  onTabSwitch,
+}: OrganizationsListProps) {
   const {
     dense,
     page,
@@ -113,25 +88,9 @@ export default function OrganizationsList() {
     onChangeRowsPerPage,
   } = useTable();
 
-  const [tableData, setTableData] = useState(TABLE_DATA);
-
   const [filterName, setFilterName] = useState('');
 
   const [filterRole, setFilterRole] = useState('all');
-
-  const { currentTab, onChangeTab } = useTabs('Joined Organization');
-
-  const onSwitchTab = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
-    onChangeTab(event, tab);
-
-    if (tab === 'Joined Organization') {
-      setTableData(TABLE_DATA);
-    }
-
-    if (tab === 'Recommended Organization') {
-      setTableData(TABLE_DATA_RECOMMENDED_TAB);
-    }
-  };
 
   const handleFilterName = (filterName: string) => {
     setFilterName(filterName);
@@ -143,15 +102,19 @@ export default function OrganizationsList() {
   };
 
   const handleDeleteRow = (id: string) => {
-    const deleteRow = tableData.filter((row) => row.orgId !== id);
-    setSelected([]);
-    setTableData(deleteRow);
+    console.log('handleDeleteRow');
+
+    // const deleteRow = tableData.filter((row) => row.orgId !== id);
+    // setSelected([]);
+    // setTableData(deleteRow);
   };
 
   const handleDeleteRows = (selected: string[]) => {
-    const deleteRows = tableData.filter((row) => !selected.includes(row.orgId));
-    setSelected([]);
-    setTableData(deleteRows);
+    console.log('handleDeleteRows');
+
+    // const deleteRows = tableData.filter((row) => !selected.includes(row.orgId));
+    // setSelected([]);
+    // setTableData(deleteRows);
   };
 
   const handleEditRow = (id: string) => {
@@ -159,7 +122,7 @@ export default function OrganizationsList() {
   };
 
   const dataFiltered = applySortFilter({
-    tableData,
+    listData,
     comparator: getComparator(order, orderBy),
     filterName,
     filterRole,
@@ -179,10 +142,10 @@ export default function OrganizationsList() {
         variant="scrollable"
         scrollButtons="auto"
         value={currentTab}
-        onChange={(event, tab) => onSwitchTab(event, tab)}
+        onChange={(event, tab) => onTabSwitch(event, tab)}
         sx={{ px: 2, bgcolor: 'background.neutral' }}
       >
-        {TAB_OPTIONS.map((tab) => (
+        {tabs.map((tab) => (
           <Tab disableRipple key={tab} label={tab} value={tab} />
         ))}
       </Tabs>
@@ -204,11 +167,11 @@ export default function OrganizationsList() {
           <TableSelectedActions
             dense={dense}
             numSelected={selected.length}
-            rowCount={tableData.length}
+            rowCount={listData.length}
             onSelectAllRows={(checked) =>
               onSelectAllRows(
                 checked,
-                tableData.map((row) => row.orgId)
+                listData.map((row) => row.orgId)
               )
             }
             actions={
@@ -226,13 +189,13 @@ export default function OrganizationsList() {
             order={order}
             orderBy={orderBy}
             headLabel={TABLE_HEAD}
-            rowCount={tableData.length}
+            rowCount={listData.length}
             numSelected={selected.length}
             onSort={onSort}
             onSelectAllRows={(checked) =>
               onSelectAllRows(
                 checked,
-                tableData.map((row) => row.orgId)
+                listData.map((row) => row.orgId)
               )
             }
           />
@@ -251,7 +214,7 @@ export default function OrganizationsList() {
 
             <TableEmptyRows
               height={denseHeight}
-              emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+              emptyRows={emptyRows(page, rowsPerPage, listData.length)}
             />
 
             <TableNoData isNotFound={isNotFound} />
@@ -284,17 +247,17 @@ export default function OrganizationsList() {
 // ----------------------------------------------------------------------
 
 function applySortFilter({
-  tableData,
+  listData,
   comparator,
   filterName,
   filterRole,
 }: {
-  tableData: TableData;
+  listData: TableData;
   comparator: (a: any, b: any) => number;
   filterName: string;
   filterRole: string;
 }) {
-  const stabilizedThis = tableData.map((el, index) => [el, index] as const);
+  const stabilizedThis = listData.map((el, index) => [el, index] as const);
 
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -302,18 +265,20 @@ function applySortFilter({
     return a[1] - b[1];
   });
 
-  tableData = stabilizedThis.map((el) => el[0]);
+  let returedListData = stabilizedThis.map((el) => el[0]);
 
   if (filterName) {
-    tableData = tableData.filter(
+    returedListData = returedListData.filter(
       (item: Record<string, any>) =>
         item.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterRole !== 'all') {
-    tableData = tableData.filter((item: Record<string, any>) => item.tag === filterRole);
+    returedListData = returedListData.filter(
+      (item: Record<string, any>) => item.tag === filterRole
+    );
   }
 
-  return tableData;
+  return returedListData;
 }
