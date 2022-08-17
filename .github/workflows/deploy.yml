@@ -3,6 +3,7 @@ on:
   push:	
     branches:	
       - develop
+      - 9-temporarily-disable-warnings-as-errors-during-ci
 
 jobs:
   deploy:
@@ -20,6 +21,8 @@ jobs:
       run: |
         yarn install
         yarn build
+      env:
+        CI: false
 
     # Deploy to `hosting` branch
     - name: Deploy to hosting branch
