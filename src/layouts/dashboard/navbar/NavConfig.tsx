@@ -12,6 +12,9 @@ const ICONS = {
   ecommerce: getIcon('ic_ecommerce'),
   analytics: getIcon('ic_analytics'),
   dashboard: getIcon('ic_dashboard'),
+  calendar: getIcon('ic_calendar'),
+  booking: getIcon('ic_booking'),
+  banking: getIcon('ic_banking'),
 };
 
 const navConfig = [
@@ -20,18 +23,18 @@ const navConfig = [
   {
     subheader: 'general',
     items: [
-      { title: 'Profile', path: '/dashboard/profile', icon: ICONS.dashboard },
-      { title: 'Tasks', path: '/dashboard/tasks', icon: ICONS.ecommerce },
+      { title: 'Profile', path: '/dashboard/profile', icon: ICONS.user },
+      { title: 'Tasks', path: '/dashboard/tasks', icon: ICONS.booking },
       {
         title: 'Organization',
         path: '/dashboard/organization',
-        icon: ICONS.user,
+        icon: ICONS.banking,
         children: [
           { title: 'Other organization', path: '/dashboard/organization/other-organization' },
           { title: 'My organization', path: '/dashboard/organization/my-organization' },
         ],
       },
-      { title: 'Calendar', path: '/dashboard/calendar', icon: ICONS.analytics },
+      { title: 'Calendar', path: '/dashboard/calendar', icon: ICONS.calendar },
     ],
   },
 

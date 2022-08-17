@@ -19,21 +19,24 @@ const RootStyle = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: theme.palette.background.default,
+  opacity: '0.7',
 }));
 
 // ----------------------------------------------------------------------
 
 type Props = {
   isDashboard?: boolean;
+  show: boolean;
+  message?: string;
   sx?: SxProps;
 };
 
-export default function LoadingScreen({ isDashboard, ...other }: Props) {
+export default function LoadingScreen({ isDashboard, show, message, ...other }: Props) {
   return (
     <>
-      <ProgressBar />
+      {show && <ProgressBar />}
 
-      {!isDashboard && (
+      {show && !isDashboard && (
         <RootStyle {...other}>
           <m.div
             animate={{
@@ -47,7 +50,8 @@ export default function LoadingScreen({ isDashboard, ...other }: Props) {
               repeat: Infinity,
             }}
           >
-            <Logo disabledLink sx={{ width: 64, height: 64 }} />
+            {/* <Logo disabledLink sx={{ width: 64, height: 64 }} /> */}
+            {message && message}
           </m.div>
 
           <Box

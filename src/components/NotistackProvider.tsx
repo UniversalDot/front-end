@@ -84,7 +84,7 @@ export default function NotistackProvider({ children }: Props) {
         autoHideDuration={3000}
         TransitionComponent={isRTL ? Collapse : undefined}
         variant="success" // Set default variant
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         iconVariant={{
           info: <SnackbarIcon icon={'eva:info-fill'} color="info" />,
           success: <SnackbarIcon icon={'eva:checkmark-circle-2-fill'} color="success" />,
