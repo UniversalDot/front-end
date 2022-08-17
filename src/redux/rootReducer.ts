@@ -10,6 +10,7 @@ import daoReducer from './slices/daoSlice';
 import loadersReducer from './slices/loadersSlice';
 import generalReducer from './slices/generalSlice';
 import calendarReducer from './slices/calendarSlice';
+import kanbanReducer from './slices/kanbanSlice';
 // ----------------------------------------------------------------------
 
 const rootPersistConfig = {
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   dao: daoReducer,
   loaders: loadersReducer,
   calendar: calendarReducer,
+  kanban: kanbanReducer
 });
 
 export { rootPersistConfig, rootReducer };

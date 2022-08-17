@@ -10,7 +10,7 @@ import { PATH_UNIVERSALDOT } from '../routes/paths';
 import Page from '../components/Page';
 import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // universaldot
-import { DAOLists, DAOAnalytics, Select } from '../components/universaldot/DAO';
+import { DAOLists, DAOAnalytics, Select, Kanban } from '../components/universaldot/DAO';
 // import Organizations from 'src/components/universaldot/Organizations';
 // ----------------------------------------------------------------------
 
@@ -90,21 +90,26 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
         />
         <DAOAnalytics />
         {subPage === 'tasks' && (
-          <Select
-            options={SELECT_OPTIONS}
-            selectedOption={selectedOption}
-            onOptionSelect={onOptionSelect}
+          <>
+            <Select
+              options={SELECT_OPTIONS}
+              selectedOption={selectedOption}
+              onOptionSelect={onOptionSelect}
+            />
+            <Kanban />
+          </>
+        )}
+        {subPage !== 'tasks' && (
+          <DAOLists
+            listType="myOrganization"
+            tabs={TAB_OPTIONS}
+            currentTab={currentTab}
+            onTabSwitch={onTabSwitch}
+            listHead={TABLE_HEAD}
+            listData={listData}
+            daoSubpage={subPage}
           />
         )}
-        <DAOLists
-          listType="myOrganization"
-          tabs={TAB_OPTIONS}
-          currentTab={currentTab}
-          onTabSwitch={onTabSwitch}
-          listHead={TABLE_HEAD}
-          listData={listData}
-          daoSubpage={subPage}
-        />
         {/* <Organizations type="own" /> */}
       </Container>
     </Page>
