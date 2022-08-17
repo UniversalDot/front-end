@@ -1,6 +1,6 @@
 # Universaldot WEB APP: The Front-End of the digital economy
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/UniversalDot/front-end/tree/develop.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/UniversalDot/front-end/tree/develop)
+[![Deploy to 'hosting' branch](https://github.com/UniversalDot/front-end/actions/workflows/deploy.yml/badge.svg)](https://github.com/UniversalDot/front-end/actions/workflows/deploy.yml)
 
 ![Logo](https://github.com/UniversalDot/documents/blob/master/logo/rsz_jpg-02.jpg)
 
