@@ -19,8 +19,8 @@ jobs:
         node-version: 16
     - name: Install dependencies and build
       run: |
-        npm install
-        npm run build
+        yarn install
+        yarn build
 
     # Deploy to `hosting` branch
     - name: Deploy to hosting branch
