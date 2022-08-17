@@ -14,13 +14,16 @@ will be helpful, but not mandatory.
 
 ### Installation
 
-The codebase is installed using [git](https://git-scm.com/) and [yarn](https://yarnpkg.com/). This tutorial assumes you have installed yarn globally prior to installing it within the subdirectories. For the most recent version and how to install yarn, please refer to [yarn](https://yarnpkg.com/) documentation and installation guides. 
+The codebase is installed using [git](https://git-scm.com/) and [npm](https://github.com/npm/cli). This tutorial 
+assumes you have installed npm globally prior to installing it within the subdirectories. For the most recent 
+version and how to install npm, please refer to [npm](https://github.com/npm/cli) documentation and installation 
+guides. 
 
 ```bash
 # Clone the repository
 git clone https://github.com/UniversalDot/front-end.git
 cd front-end
-yarn install
+npm install
 ```
 
 ## Usage
@@ -28,13 +31,13 @@ yarn install
 You can start the template in development mode to connect to a locally running node
 
 ```bash
-yarn start
+npm run start
 ```
 
 You can also build the app in production mode,
 
 ```bash
-yarn build
+npm run build
 ```
 and open `build/index.html` in your favorite browser.
 
@@ -45,9 +48,9 @@ The template's configuration is stored in the `src/config` directory, with
 and finally environment variables, with precedence.
 
 * `development.json` affects the development environment
-* `test.json` affects the test environment, triggered in `yarn test` command.
+* `test.json` affects the test environment, triggered in `npm run test` command.
 * `production.json` affects the production environment, triggered in
-`yarn build` command.
+`npm run build` command.
 
 Some environment variables are read and integrated in the template `config` object,
 including:
@@ -98,7 +101,7 @@ You can then proceed to the Cypress UI where you can select to run individual te
 There are two ways to specify it:
 
 * With `PROVIDER_SOCKET` in `{common, development, production}.json`.
-* With `rpc=<ws or wss connection>` query paramter after the URL. This overrides the above setting.
+* With `rpc=<ws or wss connection>` query parameter after the URL. This overrides the above setting.
 
 ## Reusable Components
 
