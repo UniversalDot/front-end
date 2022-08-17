@@ -23,7 +23,7 @@ guides.
 # Clone the repository
 git clone https://github.com/UniversalDot/front-end.git
 cd front-end
-npm install
+npm install --legacy-peer-deps
 ```
 
 ## Usage
