@@ -11,8 +11,8 @@
     "build": "react-app-rewired build",
     "eject": "react-scripts eject",
     "clear-all": "rm -rf build node_modules",
-    "re-start": "rm -rf build node_modules && npm install && npm start",
-    "re-build": "rm -rf build node_modules && npm install && npm build",
+    "re-start": "rm -rf build node_modules && npm install --legacy-peer-deps && npm start",
+    "re-build": "rm -rf build node_modules && npm install --legacy-peer-deps && npm build",
     "deploy": "gh-pages -d build -m '[ci skip] Updates'"
   },
   "eslintConfig": {
