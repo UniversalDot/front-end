@@ -147,7 +147,7 @@ export default function CalendarForm({ event, range, onCancel }: Props) {
               {...field}
               label="Start date"
               inputFormat="dd/MM/yyyy hh:mm a"
-              renderInput={(params) => <TextField {...params} fullWidth />}
+              renderInput={(params: any) => <TextField {...params} fullWidth />}
             />
           )}
         />
@@ -160,7 +160,7 @@ export default function CalendarForm({ event, range, onCancel }: Props) {
               {...field}
               label="End date"
               inputFormat="dd/MM/yyyy hh:mm a"
-              renderInput={(params) => (
+              renderInput={(params: any) => (
                 <TextField
                   {...params}
                   fullWidth
