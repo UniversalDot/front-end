@@ -20,6 +20,8 @@ jobs:
       run: |
         yarn install
         yarn build
+      env:
+        CI: false
 
     # Deploy to `hosting` branch
     - name: Deploy to hosting branch
