@@ -208,7 +208,6 @@ export default function DAOLists({
                     row={row}
                     selected={selected.includes(row.name)}
                     onSelectRow={() => onSelectRow(row.name)}
-                    onDeleteRow={() => handleDeleteRow(row.name)}
                     onEditRow={() => handleEditRow(row.name)}
                   />
                 )

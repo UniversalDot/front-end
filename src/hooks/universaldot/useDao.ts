@@ -105,22 +105,22 @@ const useDao = () => {
     }
   };
 
-  const handleJoinedOrgsResponse = async (joinedOrganizationsResponse: any) => {
+  const handleJoinedOrganizationsResponse = async (joinedOrganizationsResponse: any) => {
     if (!joinedOrganizationsResponse.isNone) {
       const joinedOrgs: any[] = joinedOrganizationsResponse.toHuman();
 
       const query = async (organizationId: string) => {
         let returnValue = undefined;
 
-        const subscriptionUnsubscribeFn = await api?.query[Pallets.DAO][DaoCallables.ORGANIZATIONS](
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.ORGANIZATIONS](
           organizationId,
           (response: any) => {
             returnValue = { id: organizationId, ...response.toHuman() };
           }
         );
 
-        const unsubscribeCallback = () => subscriptionUnsubscribeFn;
-        unsubscribeCallback();
+        const cb = () => unsub;
+        cb();
 
         while (true) {
           await new Promise(r => setTimeout(r, 50));
@@ -158,11 +158,11 @@ const useDao = () => {
   );
 
   const getJoinedOrganizations = useCallback(
-    (userKey, daoQueryType) => {
+    (userKey) => {
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBER_OF](
           userKey,
-          (resData: any) => handleJoinedOrgsResponse(resData)
+          (response: any) => handleJoinedOrganizationsResponse(response)
         );
         const cb = () => unsub;
         cb();
@@ -429,7 +429,7 @@ const useDao = () => {
     setUnsub(() => unsub);
   };
 
-  const daoAction = async (actionType: any) => {
+  const daoAction = async (actionType: DaoCallables) => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);

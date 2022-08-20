@@ -64,11 +64,9 @@ export default function OrganizationOther() {
   const { selectedKeyring } = useUser();
   const { getJoinedOrganizations, joinedOrganizations } = useDao();
 
-  console.log('joinedOrganizations', joinedOrganizations);
-
   useEffect(() => {
     if (selectedKeyring.value) {
-      getJoinedOrganizations(selectedKeyring.value, DaoCallables.MEMBER_OF);
+      getJoinedOrganizations(selectedKeyring.value);
     }
   }, [selectedKeyring.value, getJoinedOrganizations]);
 
@@ -79,10 +77,10 @@ export default function OrganizationOther() {
         name: joinedOrganization.name,
         owner: joinedOrganization.owner,
         expandedContent: {
-          description: 'Desc.',
-          vision: 'Vision',
-          createdAt: 'Created at',
-          lastUpdatedAt: 'Last updated at',
+          description: joinedOrganization.description,
+          vision: joinedOrganization.vision,
+          createdAt: joinedOrganization.createdTime,
+          lastUpdatedAt: joinedOrganization.lastUpdated,
         },
         daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
       }));
@@ -94,7 +92,19 @@ export default function OrganizationOther() {
     onChangeTab(event, tab);
 
     if (tab === 'Joined Organization') {
-      setListData(TABLE_DATA_JOINED_ORG);
+      const tableData = joinedOrganizations.map((joinedOrganization: any) => ({
+        id: joinedOrganization.id,
+        name: joinedOrganization.name,
+        owner: joinedOrganization.owner,
+        expandedContent: {
+          description: joinedOrganization.description,
+          vision: joinedOrganization.vision,
+          createdAt: joinedOrganization.createdTime,
+          lastUpdatedAt: joinedOrganization.lastUpdated,
+        },
+        daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
+      }));
+      setListData(tableData);
     }
 
     if (tab === 'Recommended Organization') {

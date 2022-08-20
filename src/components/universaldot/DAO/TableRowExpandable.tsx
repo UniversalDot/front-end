@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { Checkbox, TableRow, TableCell, MenuItem, IconButton, Collapse } from '@mui/material';
 // config
 import { ICON } from '../../../config';
+// hooks
+import { useDao } from '../../../hooks/universaldot';
 // components
 import Iconify from '../../Iconify';
 import TableMoreMenu from './TableMoreMenu';
+import { DaoCallables } from '../../../types';
 
 // ----------------------------------------------------------------------
 
@@ -14,16 +17,9 @@ type Props = {
   selected: boolean;
   onEditRow: VoidFunction;
   onSelectRow: VoidFunction;
-  onDeleteRow: VoidFunction;
 };
 
-export default function TableRowExpandable({
-  row,
-  selected,
-  onEditRow,
-  onSelectRow,
-  onDeleteRow,
-}: Props) {
+export default function TableRowExpandable({ row, selected, onEditRow, onSelectRow }: Props) {
   const {
     name,
     owner,
@@ -36,6 +32,7 @@ export default function TableRowExpandable({
       daoActions: expandedDaoActions,
     },
   } = row;
+  const { daoAction } = useDao();
 
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
@@ -49,21 +46,18 @@ export default function TableRowExpandable({
     setOpenMenuActions(null);
   };
 
-  const rowActions = daoActions.map((daoAction: any) => {
-    console.log('');
-    return (
-      <MenuItem
-        key={daoAction.id}
-        // onClick={() => {
-        //   onDeleteRow();
-        //   handleCloseMenu();
-        // }}
-      >
-        <Iconify icon={'eva:edit-fill'} />
-        {daoAction.label}
-      </MenuItem>
-    );
-  });
+  const rowActions = daoActions.map((daoActionObject: { id: DaoCallables; label: string }) => (
+    <MenuItem
+      key={daoActionObject.id}
+      onClick={() => {
+        daoAction(daoActionObject.id);
+        handleCloseMenu();
+      }}
+    >
+      <Iconify icon={'eva:edit-fill'} />
+      {daoActionObject.label}
+    </MenuItem>
+  ));
 
   return (
     <>

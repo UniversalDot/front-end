@@ -167,7 +167,7 @@ const Organizations = ({ type }: any) => {
 
   useEffect(() => {
     if (selectedKeyring.value) {
-      getJoinedOrganizations(selectedKeyring.value, daoCallables.MEMBER_OF);
+      getJoinedOrganizations(selectedKeyring.value);
       getTotalOrganizations(daoCallables.ORGANIZATION_COUNT);
       getTotalVisions(daoCallables.VISION_COUNT);
       getSuggestedVisions(selectedKeyring.value, daoCallables.VISION);
