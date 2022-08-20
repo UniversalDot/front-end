@@ -35,6 +35,7 @@ const navConfig = [
             title: 'My organization',
             path: '/dashboard/dao/my-organization',
             children: [
+              { title: 'Organizations', path: '/dashboard/dao/my-organization/organizations' },
               { title: 'Visions', path: '/dashboard/dao/my-organization/visions' },
               { title: 'Members', path: '/dashboard/dao/my-organization/members' },
               { title: 'Tasks', path: '/dashboard/dao/my-organization/tasks' },

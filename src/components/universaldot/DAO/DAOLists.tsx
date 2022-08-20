@@ -49,7 +49,7 @@ type OrganizationsListProps = {
   listHead: any[];
   listData: TableData;
   onTabSwitch: (event: React.SyntheticEvent<Element, Event>, tab: string) => void;
-  daoSubpage?: 'visions' | 'members' | 'tasks';
+  daoSubpage?: 'organizations' | 'visions' | 'members' | 'tasks';
 };
 
 // ----------------------------------------------------------------------
@@ -82,7 +82,7 @@ export default function DAOLists({
     onChangeRowsPerPage,
   } = useTable();
 
-  const showGenericRow = listType === 'myOrganization' && daoSubpage;
+  const showGenericRow = listType === 'myOrganization' && daoSubpage !== 'organizations';
 
   const [filterName, setFilterName] = useState('');
 

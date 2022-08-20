@@ -15,7 +15,7 @@ import { DAOLists, DAOAnalytics, Select, Kanban } from '../components/universald
 // ----------------------------------------------------------------------
 
 type OrganizationOwnProps = {
-  subPage: 'visions' | 'members' | 'tasks';
+  subPage: 'organizations' | 'visions' | 'members' | 'tasks';
 };
 
 const TABLE_HEAD = [
@@ -26,6 +26,17 @@ const TABLE_HEAD = [
   { id: 'completedTask', label: 'Completed task', align: 'left' },
   { id: 'status', label: 'Status', align: 'left' },
   { id: 'actions' },
+];
+
+const TABLE_HEAD_ORGS = [
+  { id: 'name', label: 'Name', align: 'left' },
+  { id: 'orgId', label: 'Org. ID', align: 'left' },
+  { id: 'joinDate', label: 'Join date', align: 'left' },
+  { id: 'tag', label: 'Tag', align: 'center' },
+  { id: 'completedTask', label: 'Completed task', align: 'left' },
+  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'actions1' },
+  { id: 'actions2' },
 ];
 
 const TABLE_DATA = [
@@ -99,13 +110,24 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             <Kanban />
           </>
         )}
-        {subPage !== 'tasks' && (
+        {(subPage === 'visions' || subPage === 'members') && (
           <DAOLists
             listType="myOrganization"
             tabs={TAB_OPTIONS}
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
             listHead={TABLE_HEAD}
+            listData={listData}
+            daoSubpage={subPage}
+          />
+        )}
+        {subPage === 'organizations' && (
+          <DAOLists
+            listType="myOrganization"
+            tabs={TAB_OPTIONS}
+            currentTab={currentTab}
+            onTabSwitch={onTabSwitch}
+            listHead={TABLE_HEAD_ORGS}
             listData={listData}
             daoSubpage={subPage}
           />
