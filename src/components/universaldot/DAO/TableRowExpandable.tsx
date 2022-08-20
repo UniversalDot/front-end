@@ -24,7 +24,18 @@ export default function TableRowExpandable({
   onSelectRow,
   onDeleteRow,
 }: Props) {
-  const { name, orgId, joinDate, tag, completedTask, status } = row;
+  const {
+    name,
+    owner,
+    daoActions,
+    expandedContent: {
+      description,
+      vision,
+      createdAt,
+      lastUpdatedAt,
+      daoActions: expandedDaoActions,
+    },
+  } = row;
 
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
@@ -38,6 +49,22 @@ export default function TableRowExpandable({
     setOpenMenuActions(null);
   };
 
+  const rowActions = daoActions.map((daoAction: any) => {
+    console.log('');
+    return (
+      <MenuItem
+        key={daoAction.id}
+        // onClick={() => {
+        //   onDeleteRow();
+        //   handleCloseMenu();
+        // }}
+      >
+        <Iconify icon={'eva:edit-fill'} />
+        {daoAction.label}
+      </MenuItem>
+    );
+  });
+
   return (
     <>
       <TableRow hover selected={selected}>
@@ -47,9 +74,9 @@ export default function TableRowExpandable({
 
         <TableCell>{name}</TableCell>
 
-        <TableCell align="left">{orgId}</TableCell>
+        <TableCell align="left">{owner}</TableCell>
 
-        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+        {/* <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
           {joinDate}
         </TableCell>
 
@@ -57,36 +84,37 @@ export default function TableRowExpandable({
 
         <TableCell align="left">{completedTask}</TableCell>
 
-        <TableCell align="left">{status}</TableCell>
+        <TableCell align="left">{status}</TableCell> */}
 
         <TableCell align="right">
           <TableMoreMenu
             open={openMenu}
             onOpen={handleOpenMenu}
             onClose={handleCloseMenu}
-            actions={
-              <>
-                <MenuItem
-                  onClick={() => {
-                    onDeleteRow();
-                    handleCloseMenu();
-                  }}
-                  sx={{ color: 'error.main' }}
-                >
-                  <Iconify icon={'eva:trash-2-outline'} />
-                  Delete
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    onEditRow();
-                    handleCloseMenu();
-                  }}
-                >
-                  <Iconify icon={'eva:edit-fill'} />
-                  Edit
-                </MenuItem>
-              </>
-            }
+            actions={rowActions}
+            // actions={
+            //   <>
+            //     <MenuItem
+            //       onClick={() => {
+            //         onDeleteRow();
+            //         handleCloseMenu();
+            //       }}
+            //       sx={{ color: 'error.main' }}
+            //     >
+            //       <Iconify icon={'eva:trash-2-outline'} />
+            //       Delete
+            //     </MenuItem>
+            //     <MenuItem
+            //       onClick={() => {
+            //         onEditRow();
+            //         handleCloseMenu();
+            //       }}
+            //     >
+            //       <Iconify icon={'eva:edit-fill'} />
+            //       Edit
+            //     </MenuItem>
+            //   </>
+            // }
           />
         </TableCell>
 
@@ -105,7 +133,10 @@ export default function TableRowExpandable({
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={expanded} timeout="auto" unmountOnExit>
-            Expanded content here..
+            Description: {description}
+            Vision: {vision}
+            Created at: {createdAt}
+            Updated at: {lastUpdatedAt}
           </Collapse>
         </TableCell>
       </TableRow>

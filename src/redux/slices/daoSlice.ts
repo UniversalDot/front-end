@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+const initialState: any = {
   totalOrganizations: 0,
   totalVisions: 0,
   joinedOrganizations: [],
@@ -22,6 +22,7 @@ const daoSlice = createSlice({
       state.totalVisions = action.payload;
     },
     setJoinedOrganizations(state, action) {
+      console.log('setJoinedOrganizations in slice action', action)
       state.joinedOrganizations = action.payload;
     },
     setSuggestedVisions(state, action) {

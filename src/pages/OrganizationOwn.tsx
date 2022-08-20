@@ -12,49 +12,59 @@ import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // universaldot
 import { DAOLists, DAOAnalytics, Select, Kanban } from '../components/universaldot/DAO';
 // import Organizations from 'src/components/universaldot/Organizations';
+import { DaoCallables } from '../types';
 // ----------------------------------------------------------------------
 
 type OrganizationOwnProps = {
   subPage: 'organizations' | 'visions' | 'members' | 'tasks';
 };
 
-const TABLE_HEAD = [
+const TABLE_HEAD_MY_ORG = [
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'orgId', label: 'Org. ID', align: 'left' },
-  { id: 'joinDate', label: 'Join date', align: 'left' },
-  { id: 'tag', label: 'Tag', align: 'center' },
-  { id: 'completedTask', label: 'Completed task', align: 'left' },
-  { id: 'status', label: 'Status', align: 'left' },
+  { id: 'owner', label: 'Owner', align: 'left' },
+  { id: 'actions' },
+  { id: 'expandRow' },
+];
+
+const TABLE_DATA_MY_ORG = [
+  {
+    name: 'name1',
+    owner: 'owner1',
+    expandedContent: {
+      description: 'Desc.',
+      vision: 'Vision',
+      createdAt: 'Created at',
+      lastUpdatedAt: 'Last updated at',
+      daoActions: [
+        { id: DaoCallables.ADD_MEMBERS, label: 'Add members' },
+        { id: DaoCallables.ADD_TASKS, label: 'Add tasks' },
+        { id: DaoCallables.CREATE_VISION, label: 'Create vision' },
+      ],
+    },
+    daoActions: [
+      { id: DaoCallables.DISSOLVE_ORGANIZATION, label: 'Dissolve organization' },
+      { id: DaoCallables.UPDATE_ORGANIZATION, label: 'Update organization' },
+      { id: DaoCallables.TRANSFER_OWNERSHIP, label: 'Transfer ownership' },
+    ],
+  },
+];
+
+const TABLE_HEAD_VISIONS_MEMBERS = [
+  { id: 'name', label: 'Name', align: 'left' },
   { id: 'actions' },
 ];
 
-const TABLE_HEAD_ORGS = [
-  { id: 'name', label: 'Name', align: 'left' },
-  { id: 'orgId', label: 'Org. ID', align: 'left' },
-  { id: 'joinDate', label: 'Join date', align: 'left' },
-  { id: 'tag', label: 'Tag', align: 'center' },
-  { id: 'completedTask', label: 'Completed task', align: 'left' },
-  { id: 'status', label: 'Status', align: 'left' },
-  { id: 'actions1' },
-  { id: 'actions2' },
-];
-
-const TABLE_DATA = [
+const TABLE_DATA_VISIONS = [
   {
     name: 'name1',
-    orgId: 'orgId1',
-    joinDate: 'joinDate1',
-    tag: 'tag1',
-    completedTask: 'completedTask1',
-    status: 'status1',
+    daoActions: [{ id: DaoCallables.REMOVE_VISION, label: 'Remove vision' }],
   },
+];
+
+const TABLE_DATA_MEMBERS = [
   {
-    name: 'name2',
-    orgId: 'orgId2',
-    joinDate: 'joinDate2',
-    tag: 'tag2',
-    completedTask: 'completedTask2',
-    status: 'status2',
+    name: 'name1',
+    daoActions: [{ id: DaoCallables.REMOVE_MEMBERS, label: 'Remove member' }],
   },
 ];
 
@@ -65,9 +75,8 @@ const SELECT_OPTIONS = ['all', 'test1', 'test2', 'test3'];
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const { themeStretch } = useSettings();
 
-  const { currentTab, onChangeTab } = useTabs('All');
+  const { currentTab } = useTabs('All');
 
-  const [listData, setListData] = useState(TABLE_DATA);
   const [selectedOption, setSelectedOption] = useState('all');
 
   const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,15 +86,6 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const onTabSwitch = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
     console.log('not needed tab switch');
     return;
-    // onChangeTab(event, tab);
-
-    // if (tab === 'Joined Organization') {
-    //   setListData(TABLE_DATA_1);
-    // }
-
-    // if (tab === 'Recommended Organization') {
-    //   setListData(TABLE_DATA_2);
-    // }
   };
 
   return (
@@ -99,7 +99,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             { name: subPage },
           ]}
         />
-        <DAOAnalytics />
+        {/* <DAOAnalytics /> */}
         {subPage === 'tasks' && (
           <>
             <Select
@@ -110,14 +110,25 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             <Kanban />
           </>
         )}
-        {(subPage === 'visions' || subPage === 'members') && (
+        {subPage === 'visions' && (
           <DAOLists
             listType="myOrganization"
             tabs={TAB_OPTIONS}
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
-            listHead={TABLE_HEAD}
-            listData={listData}
+            listHead={TABLE_HEAD_VISIONS_MEMBERS}
+            listData={TABLE_DATA_VISIONS}
+            daoSubpage={subPage}
+          />
+        )}
+        {subPage === 'members' && (
+          <DAOLists
+            listType="myOrganization"
+            tabs={TAB_OPTIONS}
+            currentTab={currentTab}
+            onTabSwitch={onTabSwitch}
+            listHead={TABLE_HEAD_VISIONS_MEMBERS}
+            listData={TABLE_DATA_MEMBERS}
             daoSubpage={subPage}
           />
         )}
@@ -127,8 +138,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             tabs={TAB_OPTIONS}
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
-            listHead={TABLE_HEAD_ORGS}
-            listData={listData}
+            listHead={TABLE_HEAD_MY_ORG}
+            listData={TABLE_DATA_MY_ORG}
             daoSubpage={subPage}
           />
         )}

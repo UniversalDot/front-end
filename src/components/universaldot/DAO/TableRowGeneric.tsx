@@ -22,7 +22,7 @@ export default function TableRowGeneric({
   onSelectRow,
   onDeleteRow,
 }: Props) {
-  const { name, orgId, joinDate, tag, completedTask, status } = row;
+  const { name, daoActions } = row;
 
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
@@ -34,6 +34,22 @@ export default function TableRowGeneric({
     setOpenMenuActions(null);
   };
 
+  const rowActions = daoActions.map((daoAction: any) => {
+    console.log('');
+    return (
+      <MenuItem
+        key={daoAction.id}
+        // onClick={() => {
+        //   onDeleteRow();
+        //   handleCloseMenu();
+        // }}
+      >
+        <Iconify icon={'eva:edit-fill'} />
+        {daoAction.label}
+      </MenuItem>
+    );
+  });
+
   return (
     <TableRow hover selected={selected}>
       <TableCell padding="checkbox">
@@ -42,46 +58,12 @@ export default function TableRowGeneric({
 
       <TableCell>{name}</TableCell>
 
-      <TableCell align="left">{orgId}</TableCell>
-
-      <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-        {joinDate}
-      </TableCell>
-
-      <TableCell align="center">{tag}</TableCell>
-
-      <TableCell align="left">{completedTask}</TableCell>
-
-      <TableCell align="left">{status}</TableCell>
-
       <TableCell align="right">
         <TableMoreMenu
           open={openMenu}
           onOpen={handleOpenMenu}
           onClose={handleCloseMenu}
-          actions={
-            <>
-              <MenuItem
-                onClick={() => {
-                  onDeleteRow();
-                  handleCloseMenu();
-                }}
-                sx={{ color: 'error.main' }}
-              >
-                <Iconify icon={'eva:trash-2-outline'} />
-                Delete
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  onEditRow();
-                  handleCloseMenu();
-                }}
-              >
-                <Iconify icon={'eva:edit-fill'} />
-                Edit
-              </MenuItem>
-            </>
-          }
+          actions={rowActions}
         />
       </TableCell>
     </TableRow>

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import { Container } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
+import { useUser, useDao } from '../hooks/universaldot';
 // routes
 import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
@@ -12,55 +13,42 @@ import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // universaldot
 // import Organizations from 'src/components/universaldot/Organizations';
 import { DAOLists } from '../components/universaldot/DAO';
+import { DaoCallables } from '../types';
 
 // ----------------------------------------------------------------------
 
-const TABLE_HEAD = [
+const TABLE_HEAD_JOIN_REC_ORG = [
   { id: 'name', label: 'Name', align: 'left' },
-  { id: 'orgId', label: 'Org. ID', align: 'left' },
-  { id: 'joinDate', label: 'Join date', align: 'left' },
-  { id: 'tag', label: 'Tag', align: 'center' },
-  { id: 'completedTask', label: 'Completed task', align: 'left' },
-  { id: 'status', label: 'Status', align: 'left' },
-  { id: 'actions1' },
-  { id: 'actions2' },
+  { id: 'owner', label: 'Owner', align: 'left' },
+  { id: 'actions' },
+  { id: 'expandRow' },
 ];
 
-const TABLE_DATA_1 = [
+const TABLE_DATA_JOINED_ORG = [
   {
     name: 'name1',
-    orgId: 'orgId1',
-    joinDate: 'joinDate1',
-    tag: 'tag1',
-    completedTask: 'completedTask1',
-    status: 'status1',
-  },
-  {
-    name: 'name2',
-    orgId: 'orgId2',
-    joinDate: 'joinDate2',
-    tag: 'tag2',
-    completedTask: 'completedTask2',
-    status: 'status2',
+    owner: 'owner1',
+    expandedContent: {
+      description: 'Desc.',
+      vision: 'Vision',
+      createdAt: 'Created at',
+      lastUpdatedAt: 'Last updated at',
+    },
+    daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
   },
 ];
 
-const TABLE_DATA_2 = [
+const TABLE_DATA_RECOMMENDED_ORG = [
   {
-    name: 'naaame1',
-    orgId: 'ooorgId1',
-    joinDate: 'joooinDate1',
-    tag: 'taaag1',
-    completedTask: 'cpppompletedTask1',
-    status: 'sttttatus1',
-  },
-  {
-    name: 'naaame2',
-    orgId: 'oooorgId2',
-    joinDate: 'joooinDate2',
-    tag: 'taaaag2',
-    completedTask: 'cooompletedTask2',
-    status: 'stttatus2',
+    name: 'name1',
+    owner: 'owner1',
+    expandedContent: {
+      description: 'Desc.',
+      vision: 'Vision',
+      createdAt: 'Created at',
+      lastUpdatedAt: 'Last updated at',
+    },
+    daoActions: [{ id: DaoCallables.SIGN_VISION, label: 'Join organization' }],
   },
 ];
 
@@ -71,17 +59,46 @@ export default function OrganizationOther() {
 
   const { currentTab, onChangeTab } = useTabs('Joined Organization');
 
-  const [listData, setListData] = useState(TABLE_DATA_1);
+  const [listData, setListData] = useState(TABLE_DATA_JOINED_ORG);
+
+  const { selectedKeyring } = useUser();
+  const { getJoinedOrganizations, joinedOrganizations } = useDao();
+
+  console.log('joinedOrganizations', joinedOrganizations);
+
+  useEffect(() => {
+    if (selectedKeyring.value) {
+      getJoinedOrganizations(selectedKeyring.value, DaoCallables.MEMBER_OF);
+    }
+  }, [selectedKeyring.value, getJoinedOrganizations]);
+
+  useEffect(() => {
+    if (joinedOrganizations.length > 0) {
+      const tableData = joinedOrganizations.map((joinedOrganization: any) => ({
+        id: joinedOrganization.id,
+        name: joinedOrganization.name,
+        owner: joinedOrganization.owner,
+        expandedContent: {
+          description: 'Desc.',
+          vision: 'Vision',
+          createdAt: 'Created at',
+          lastUpdatedAt: 'Last updated at',
+        },
+        daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
+      }));
+      setListData(tableData);
+    }
+  }, [joinedOrganizations]);
 
   const onTabSwitch = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
     onChangeTab(event, tab);
 
     if (tab === 'Joined Organization') {
-      setListData(TABLE_DATA_1);
+      setListData(TABLE_DATA_JOINED_ORG);
     }
 
     if (tab === 'Recommended Organization') {
-      setListData(TABLE_DATA_2);
+      setListData(TABLE_DATA_RECOMMENDED_ORG);
     }
   };
 
@@ -100,8 +117,8 @@ export default function OrganizationOther() {
           tabs={TAB_OPTIONS}
           currentTab={currentTab}
           onTabSwitch={onTabSwitch}
+          listHead={TABLE_HEAD_JOIN_REC_ORG}
           listData={listData}
-          listHead={TABLE_HEAD}
         />
         {/* <Organizations type="joined" /> */}
       </Container>

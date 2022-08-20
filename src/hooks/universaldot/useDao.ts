@@ -12,7 +12,7 @@ import {
   Pallets,
   toastTypes,
   LoadingTypes,
-  daoCallables,
+  DaoCallables,
 } from '../../types';
 
 import {
@@ -76,9 +76,10 @@ const useDao = () => {
 
   const handleQueryResponse = (dataFromResponse: any, daoQueryType: any) => {
     if (!dataFromResponse.isNone) {
+      console.log('dataFromResponse.toHuman()', dataFromResponse.toHuman())
       switch (daoQueryType) {
         // TODO: wait for fixed data type from BE, mocked meanwhile:
-        case daoCallables.MEMBER_OF:
+        case DaoCallables.MEMBER_OF:
           dispatch(
             setJoinedOrganizations([
               'Organization 1',
@@ -87,19 +88,54 @@ const useDao = () => {
             ])
           );
           break;
-        case daoCallables.ORGANIZATION_COUNT:
+        case DaoCallables.ORGANIZATION_COUNT:
           dispatch(setTotalOrganizations(dataFromResponse.toHuman()));
           break;
-        case daoCallables.VISION_COUNT:
+        case DaoCallables.VISION_COUNT:
           dispatch(setTotalVisions(dataFromResponse.toHuman()));
           break;
-        case daoCallables.VISION:
+        case DaoCallables.VISION:
           dispatch(setSuggestedVisions(dataFromResponse.toHuman()));
           break;
-        case daoCallables.APPLICANTS_TO_ORGANIZATION:
+        case DaoCallables.APPLICANTS_TO_ORGANIZATION:
           dispatch(setApplicantsToOrg(dataFromResponse.toHuman()));
           break;
         default:
+      }
+    }
+  };
+
+  const handleJoinedOrgsResponse = async (joinedOrganizationsResponse: any) => {
+    if (!joinedOrganizationsResponse.isNone) {
+      const joinedOrgs: any[] = joinedOrganizationsResponse.toHuman();
+
+      const query = async (organizationId: string) => {
+        let returnValue = undefined;
+
+        const subscriptionUnsubscribeFn = await api?.query[Pallets.DAO][DaoCallables.ORGANIZATIONS](
+          organizationId,
+          (response: any) => {
+            returnValue = { id: organizationId, ...response.toHuman() };
+          }
+        );
+
+        const unsubscribeCallback = () => subscriptionUnsubscribeFn;
+        unsubscribeCallback();
+
+        while (true) {
+          await new Promise(r => setTimeout(r, 50));
+          if (returnValue) break;
+        }
+
+        return returnValue;
+      };
+
+      const organizationsAsObjects = await Promise.all(joinedOrgs.map(organizationId => query(organizationId)));
+
+      if (organizationsAsObjects) {
+        dispatch(
+          setJoinedOrganizations(organizationsAsObjects)
+        );
       }
     }
   };
@@ -108,9 +144,9 @@ const useDao = () => {
     organizationName => {
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][
-          daoCallables.APPLICANTS_TO_ORGANIZATION
+          DaoCallables.APPLICANTS_TO_ORGANIZATION
         ](organizationName, (resData: any) =>
-          handleQueryResponse(resData, daoCallables.APPLICANTS_TO_ORGANIZATION)
+          handleQueryResponse(resData, DaoCallables.APPLICANTS_TO_ORGANIZATION)
         );
         const cb = () => unsub;
         cb();
@@ -124,9 +160,9 @@ const useDao = () => {
   const getJoinedOrganizations = useCallback(
     (userKey, daoQueryType) => {
       const query = async () => {
-        const unsub = await api?.query[Pallets.DAO][daoCallables.MEMBER_OF](
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBER_OF](
           userKey,
-          (resData: any) => handleQueryResponse(resData, daoQueryType)
+          (resData: any) => handleJoinedOrgsResponse(resData)
         );
         const cb = () => unsub;
         cb();
@@ -141,7 +177,7 @@ const useDao = () => {
     daoQueryType => {
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][
-          daoCallables.ORGANIZATION_COUNT
+          DaoCallables.ORGANIZATION_COUNT
         ]((resData: any) => handleQueryResponse(resData, daoQueryType));
         const cb = () => unsub;
         cb();
@@ -155,7 +191,7 @@ const useDao = () => {
   const getTotalVisions = useCallback(
     daoQueryType => {
       const query = async () => {
-        const unsub = await api?.query[Pallets.DAO][daoCallables.VISION_COUNT](
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.VISION_COUNT](
           (resData: any) => handleQueryResponse(resData, daoQueryType)
         );
         const cb = () => unsub;
@@ -170,7 +206,7 @@ const useDao = () => {
   const getSuggestedVisions = useCallback(
     (userKey, daoQueryType) => {
       const query = async () => {
-        const unsub = await api?.query[Pallets.DAO][daoCallables.VISION](
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.VISION](
           userKey,
           (resData: any) => handleQueryResponse(resData, daoQueryType)
         );
@@ -246,62 +282,62 @@ const useDao = () => {
 
     let txExecute;
 
-    if (actionType === daoCallables.ADD_MEMBERS) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.ADD_MEMBERS](
+    if (actionType === DaoCallables.ADD_MEMBERS) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.ADD_MEMBERS](
         ...transformedPayloadAddMembers
       );
     }
 
-    if (actionType === daoCallables.ADD_TASKS) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.ADD_TASKS](
+    if (actionType === DaoCallables.ADD_TASKS) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.ADD_TASKS](
         ...transformedPayloadAddTasks
       );
     }
 
-    if (actionType === daoCallables.CREATE_ORGANIZATION) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.CREATE_ORGANIZATION](
+    if (actionType === DaoCallables.CREATE_ORGANIZATION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.CREATE_ORGANIZATION](
         ...transformedPayloadCreateOrg
       );
     }
 
-    if (actionType === daoCallables.CREATE_VISION) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.CREATE_VISION](
+    if (actionType === DaoCallables.CREATE_VISION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.CREATE_VISION](
         ...transformedPayloadCreateVision
       );
     }
 
-    if (actionType === daoCallables.DISSOLVE_ORGANIZATION) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.DISSOLVE_ORGANIZATION](
+    if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.DISSOLVE_ORGANIZATION](
         ...transformedPayloadDissolveOrg
       );
     }
 
-    if (actionType === daoCallables.REMOVE_MEMBERS) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.REMOVE_MEMBERS](
+    if (actionType === DaoCallables.REMOVE_MEMBERS) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.REMOVE_MEMBERS](
         ...transformedPayloadRemoveMembers
       );
     }
 
-    if (actionType === daoCallables.REMOVE_TASKS) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.REMOVE_TASKS](
+    if (actionType === DaoCallables.REMOVE_TASKS) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.REMOVE_TASKS](
         ...transformedPayloadRemoveTasks
       );
     }
 
-    if (actionType === daoCallables.REMOVE_VISION) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.REMOVE_VISION](
+    if (actionType === DaoCallables.REMOVE_VISION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.REMOVE_VISION](
         ...transformedPayloadRemoveVision
       );
     }
 
-    if (actionType === daoCallables.SIGN_VISION) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.SIGN_VISION](
+    if (actionType === DaoCallables.SIGN_VISION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.SIGN_VISION](
         ...transformedPayloadSignVision
       );
     }
 
-    if (actionType === daoCallables.UNSIGN_VISION) {
-      txExecute = api.tx[Pallets.DAO][daoCallables.UNSIGN_VISION](
+    if (actionType === DaoCallables.UNSIGN_VISION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.UNSIGN_VISION](
         ...transformedPayloadUnsignVision
       );
     }
@@ -325,52 +361,52 @@ const useDao = () => {
 
       // @TODO: transfer to new toast from template;
       // if (callStatus?.isInBlock) {
-      //   if (actionType === daoCallables.ADD_MEMBERS) {
+      //   if (actionType === DaoCallables.ADD_MEMBERS) {
       //     toast(
       //       'Member added to organization successfully!',
       //       toastTypes.SUCCESS
       //     );
       //   }
 
-      //   if (actionType === daoCallables.ADD_TASKS) {
+      //   if (actionType === DaoCallables.ADD_TASKS) {
       //     toast('Task added to organization successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === daoCallables.CREATE_ORGANIZATION) {
+      //   if (actionType === DaoCallables.CREATE_ORGANIZATION) {
       //     toast('Organization created successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === daoCallables.CREATE_VISION) {
+      //   if (actionType === DaoCallables.CREATE_VISION) {
       //     toast('Vision created successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === daoCallables.DISSOLVE_ORGANIZATION) {
+      //   if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
       //     toast('Organization dissolved successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === daoCallables.REMOVE_MEMBERS) {
+      //   if (actionType === DaoCallables.REMOVE_MEMBERS) {
       //     toast(
       //       'Member deleted from organization successfully!',
       //       toastTypes.SUCCESS
       //     );
       //   }
 
-      //   if (actionType === daoCallables.REMOVE_TASKS) {
+      //   if (actionType === DaoCallables.REMOVE_TASKS) {
       //     toast(
       //       'Task deleted from organization successfully!',
       //       toastTypes.SUCCESS
       //     );
       //   }
 
-      //   if (actionType === daoCallables.REMOVE_VISION) {
+      //   if (actionType === DaoCallables.REMOVE_VISION) {
       //     toast('Vision deleted successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === daoCallables.SIGN_VISION) {
+      //   if (actionType === DaoCallables.SIGN_VISION) {
       //     toast('Vision signed successfully!', toastTypes.SUCCESS);
       //   }
 
-      //   if (actionType === daoCallables.UNSIGN_VISION) {
+      //   if (actionType === DaoCallables.UNSIGN_VISION) {
       //     toast('Vision unsigned successfully!', toastTypes.SUCCESS);
       //   }
       // }

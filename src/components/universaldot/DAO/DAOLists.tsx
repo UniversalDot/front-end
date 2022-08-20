@@ -27,14 +27,7 @@ import TableToolbar from './TableToolbar';
 
 // ----------------------------------------------------------------------
 
-type TableRowType = {
-  name: string;
-  orgId: string;
-  joinDate: string;
-  tag: string;
-  completedTask: string;
-  status: string;
-};
+type TableRowType = any;
 
 type TableData = TableRowType[];
 
@@ -100,7 +93,7 @@ export default function DAOLists({
   const handleDeleteRow = (id: string) => {
     console.log('handleDeleteRow');
 
-    // const deleteRow = tableData.filter((row) => row.orgId !== id);
+    // const deleteRow = tableData.filter((row) => row.name !== id);
     // setSelected([]);
     // setTableData(deleteRow);
   };
@@ -108,7 +101,7 @@ export default function DAOLists({
   const handleDeleteRows = (selected: string[]) => {
     console.log('handleDeleteRows');
 
-    // const deleteRows = tableData.filter((row) => !selected.includes(row.orgId));
+    // const deleteRows = tableData.filter((row) => !selected.includes(row.name));
     // setSelected([]);
     // setTableData(deleteRows);
   };
@@ -167,7 +160,7 @@ export default function DAOLists({
             onSelectAllRows={(checked) =>
               onSelectAllRows(
                 checked,
-                listData.map((row) => row.orgId)
+                listData.map((row) => row.name)
               )
             }
             actions={
@@ -191,7 +184,7 @@ export default function DAOLists({
             onSelectAllRows={(checked) =>
               onSelectAllRows(
                 checked,
-                listData.map((row) => row.orgId)
+                listData.map((row) => row.name)
               )
             }
           />
@@ -202,21 +195,21 @@ export default function DAOLists({
               .map((row) =>
                 showGenericRow ? (
                   <TableRowGeneric
-                    key={row.orgId}
+                    key={row.name}
                     row={row}
-                    selected={selected.includes(row.orgId)}
-                    onSelectRow={() => onSelectRow(row.orgId)}
-                    onDeleteRow={() => handleDeleteRow(row.orgId)}
-                    onEditRow={() => handleEditRow(row.orgId)}
+                    selected={selected.includes(row.name)}
+                    onSelectRow={() => onSelectRow(row.name)}
+                    onDeleteRow={() => handleDeleteRow(row.name)}
+                    onEditRow={() => handleEditRow(row.name)}
                   />
                 ) : (
                   <TableRowExpandable
-                    key={row.orgId}
+                    key={row.name}
                     row={row}
-                    selected={selected.includes(row.orgId)}
-                    onSelectRow={() => onSelectRow(row.orgId)}
-                    onDeleteRow={() => handleDeleteRow(row.orgId)}
-                    onEditRow={() => handleEditRow(row.orgId)}
+                    selected={selected.includes(row.name)}
+                    onSelectRow={() => onSelectRow(row.name)}
+                    onDeleteRow={() => handleDeleteRow(row.name)}
+                    onEditRow={() => handleEditRow(row.name)}
                   />
                 )
               )}
