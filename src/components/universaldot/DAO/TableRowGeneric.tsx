@@ -34,21 +34,18 @@ export default function TableRowGeneric({
     setOpenMenuActions(null);
   };
 
-  const rowActions = daoActions.map((daoAction: any) => {
-    console.log('');
-    return (
-      <MenuItem
-        key={daoAction.id}
-        // onClick={() => {
-        //   onDeleteRow();
-        //   handleCloseMenu();
-        // }}
-      >
-        <Iconify icon={'eva:edit-fill'} />
-        {daoAction.label}
-      </MenuItem>
-    );
-  });
+  const rowActions = daoActions.map((daoAction: any) => (
+    <MenuItem
+      key={daoAction.id}
+      // onClick={() => {
+      //   onDeleteRow();
+      //   handleCloseMenu();
+      // }}
+    >
+      <Iconify icon={'eva:edit-fill'} />
+      {daoAction.label}
+    </MenuItem>
+  ));
 
   return (
     <TableRow hover selected={selected}>

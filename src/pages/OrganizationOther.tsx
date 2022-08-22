@@ -24,34 +24,6 @@ const TABLE_HEAD_JOIN_REC_ORG = [
   { id: 'expandRow' },
 ];
 
-const TABLE_DATA_JOINED_ORG = [
-  {
-    name: 'name1',
-    owner: 'owner1',
-    expandedContent: {
-      description: 'Desc.',
-      vision: 'Vision',
-      createdAt: 'Created at',
-      lastUpdatedAt: 'Last updated at',
-    },
-    daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
-  },
-];
-
-const TABLE_DATA_RECOMMENDED_ORG = [
-  {
-    name: 'name1',
-    owner: 'owner1',
-    expandedContent: {
-      description: 'Desc.',
-      vision: 'Vision',
-      createdAt: 'Created at',
-      lastUpdatedAt: 'Last updated at',
-    },
-    daoActions: [{ id: DaoCallables.SIGN_VISION, label: 'Join organization' }],
-  },
-];
-
 const TAB_OPTIONS = ['Joined Organization', 'Recommended Organization'];
 
 export default function OrganizationOther() {
@@ -59,7 +31,7 @@ export default function OrganizationOther() {
 
   const { currentTab, onChangeTab } = useTabs('Joined Organization');
 
-  const [listData, setListData] = useState(TABLE_DATA_JOINED_ORG);
+  const [listData, setListData] = useState([]);
 
   const { selectedKeyring } = useUser();
   const { getJoinedOrganizations, joinedOrganizations } = useDao();
@@ -108,7 +80,19 @@ export default function OrganizationOther() {
     }
 
     if (tab === 'Recommended Organization') {
-      setListData(TABLE_DATA_RECOMMENDED_ORG);
+      const tableData = joinedOrganizations.map((joinedOrganization: any) => ({
+        id: joinedOrganization.id,
+        name: 'Mock name',
+        owner: 'Mock owner',
+        expandedContent: {
+          description: 'Mock desc.',
+          vision: 'Mock vision',
+          createdAt: 'Mock created at',
+          lastUpdatedAt: 'Mock last updated at',
+        },
+        daoActions: [{ id: DaoCallables.SIGN_VISION, label: 'Join organization' }],
+      }));
+      setListData(tableData);
     }
   };
 

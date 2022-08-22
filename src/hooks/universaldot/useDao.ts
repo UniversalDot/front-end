@@ -13,6 +13,7 @@ import {
   toastTypes,
   LoadingTypes,
   DaoCallables,
+  ProfileCallables,
 } from '../../types';
 
 import {
@@ -25,6 +26,7 @@ import {
   setMemberOrTask as setMemberOrTaskForAnAction,
   setApplicants as setApplicantsToOrg,
   resetState,
+  setMembersOfSelectedOrganization,
 } from '../../redux/slices/daoSlice';
 
 import { useSelector, useDispatch } from '../../redux/store';
@@ -58,6 +60,10 @@ const useDao = () => {
     state => state.dao.applicantsToOrganization
   );
 
+  const membersOfTheSelectedOrganization = useSelector(
+    state => state.dao.membersOfSelectedOrganization
+  );
+
   const setVisionName = (visionName: any) => {
     dispatch(setVisionNameForAnAction(visionName));
   };
@@ -76,7 +82,6 @@ const useDao = () => {
 
   const handleQueryResponse = (dataFromResponse: any, daoQueryType: any) => {
     if (!dataFromResponse.isNone) {
-      console.log('dataFromResponse.toHuman()', dataFromResponse.toHuman())
       switch (daoQueryType) {
         // TODO: wait for fixed data type from BE, mocked meanwhile:
         case DaoCallables.MEMBER_OF:
@@ -140,6 +145,46 @@ const useDao = () => {
     }
   };
 
+  const handleMembersOfAnOrganizationResponse = async (membersResponse: any) => {
+    if (!membersResponse.isNone) {
+      const membersOfOrganization: any[] = membersResponse.toHuman();
+
+      const query = async (memberProfileId: string) => {
+        let returnValue = undefined;
+
+        const unsub = await api?.query[Pallets.PROFILE][ProfileCallables.PROFILES](
+          memberProfileId,
+          (response: any) => {
+            if (response.toString().length > 0) {
+              returnValue = response.toHuman();
+            } else {
+              returnValue = 'empty'
+            }
+          }
+        );
+
+        const cb = () => unsub;
+        cb();
+
+        while (true) {
+          await new Promise(r => setTimeout(r, 50));
+          if (returnValue) break;
+        }
+
+        return returnValue;
+      };
+
+      const membersAsObjects = await Promise.all(membersOfOrganization.map(memberProfileIdForQuery => query(memberProfileIdForQuery)));
+
+      if (membersAsObjects) {
+        const filteredObjects = membersAsObjects.filter((item) => item !== 'empty')
+        dispatch(
+          setMembersOfSelectedOrganization(filteredObjects)
+        );
+      }
+    }
+  };
+
   const getApplicants = useCallback(
     organizationName => {
       const query = async () => {
@@ -147,6 +192,22 @@ const useDao = () => {
           DaoCallables.APPLICANTS_TO_ORGANIZATION
         ](organizationName, (resData: any) =>
           handleQueryResponse(resData, DaoCallables.APPLICANTS_TO_ORGANIZATION)
+        );
+        const cb = () => unsub;
+        cb();
+      };
+
+      query();
+    },
+    [api]
+  );
+
+  const getMembersOfAnOrganization = useCallback(
+    (organizationId) => {
+      const query = async () => {
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBERS](
+          organizationId,
+          (response: any) => handleMembersOfAnOrganizationResponse(response)
         );
         const cb = () => unsub;
         cb();
@@ -465,6 +526,8 @@ const useDao = () => {
     allApplicants,
     getApplicants,
     resetFields,
+    getMembersOfAnOrganization,
+    membersOfTheSelectedOrganization,
   };
 };
 

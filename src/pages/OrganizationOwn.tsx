@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import { Container } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
+import { useUser, useDao } from '../hooks/universaldot';
 // routes
 import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
@@ -61,13 +62,6 @@ const TABLE_DATA_VISIONS = [
   },
 ];
 
-const TABLE_DATA_MEMBERS = [
-  {
-    name: 'name1',
-    daoActions: [{ id: DaoCallables.REMOVE_MEMBERS, label: 'Remove member' }],
-  },
-];
-
 const TAB_OPTIONS = ['All'];
 
 const SELECT_OPTIONS = ['all', 'test1', 'test2', 'test3'];
@@ -77,10 +71,55 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const { currentTab } = useTabs('All');
 
-  const [selectedOption, setSelectedOption] = useState('all');
+  const [selectedOption, setSelectedOption] = useState('');
+  const [selectOptions, setSelectOptions] = useState([]);
+
+  const [listDataVisions, setListDataVisions] = useState(TABLE_DATA_VISIONS);
+  const [listDataMembers, setListDataMembers] = useState([]);
+
+  const { selectedKeyring } = useUser();
+  const {
+    getJoinedOrganizations,
+    joinedOrganizations,
+    getMembersOfAnOrganization,
+    membersOfTheSelectedOrganization,
+  } = useDao();
+
+  useEffect(() => {
+    if (selectedKeyring.value) {
+      getJoinedOrganizations(selectedKeyring.value);
+    }
+  }, [selectedKeyring.value, getJoinedOrganizations]);
+
+  useEffect(() => {
+    if (joinedOrganizations) {
+      const mappedOptions = joinedOrganizations.map(
+        (joinedOrganization: any) => joinedOrganization.name
+      );
+      setSelectOptions(mappedOptions);
+    }
+  }, [joinedOrganizations]);
+
+  useEffect(() => {
+    if (membersOfTheSelectedOrganization) {
+      const tableData = membersOfTheSelectedOrganization.map((member: any) => ({
+        name: member.name,
+        daoActions: [{ id: DaoCallables.REMOVE_MEMBERS, label: 'Remove member' }],
+      }));
+      setListDataMembers(tableData);
+    }
+  }, [membersOfTheSelectedOrganization]);
 
   const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
+
+    const orgId = joinedOrganizations.find(
+      (joinedOrg: any) => joinedOrg.name === event.target.value
+    ).id;
+
+    if (orgId) {
+      getMembersOfAnOrganization(orgId);
+    }
   };
 
   const onTabSwitch = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
@@ -100,16 +139,14 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           ]}
         />
         {/* <DAOAnalytics /> */}
-        {subPage === 'tasks' && (
-          <>
-            <Select
-              options={SELECT_OPTIONS}
-              selectedOption={selectedOption}
-              onOptionSelect={onOptionSelect}
-            />
-            <Kanban />
-          </>
+        {selectOptions && (subPage === 'tasks' || subPage === 'members') && (
+          <Select
+            options={selectOptions}
+            selectedOption={selectedOption}
+            onOptionSelect={onOptionSelect}
+          />
         )}
+        {subPage === 'tasks' && <Kanban />}
         {subPage === 'visions' && (
           <DAOLists
             listType="myOrganization"
@@ -117,7 +154,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
             listHead={TABLE_HEAD_VISIONS_MEMBERS}
-            listData={TABLE_DATA_VISIONS}
+            listData={listDataVisions}
             daoSubpage={subPage}
           />
         )}
@@ -128,7 +165,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
             listHead={TABLE_HEAD_VISIONS_MEMBERS}
-            listData={TABLE_DATA_MEMBERS}
+            listData={listDataMembers}
             daoSubpage={subPage}
           />
         )}

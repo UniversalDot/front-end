@@ -9,7 +9,7 @@ import { useDao } from '../../../hooks/universaldot';
 import Iconify from '../../Iconify';
 import TableMoreMenu from './TableMoreMenu';
 import { DaoCallables } from '../../../types';
-
+import ExpandedRowContent from './ExpandedRowContent';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -20,18 +20,7 @@ type Props = {
 };
 
 export default function TableRowExpandable({ row, selected, onEditRow, onSelectRow }: Props) {
-  const {
-    name,
-    owner,
-    daoActions,
-    expandedContent: {
-      description,
-      vision,
-      createdAt,
-      lastUpdatedAt,
-      daoActions: expandedDaoActions,
-    },
-  } = row;
+  const { name, owner, daoActions, expandedContent } = row;
   const { daoAction } = useDao();
 
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
@@ -127,10 +116,7 @@ export default function TableRowExpandable({ row, selected, onEditRow, onSelectR
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={expanded} timeout="auto" unmountOnExit>
-            Description: {description}
-            Vision: {vision}
-            Created at: {createdAt}
-            Updated at: {lastUpdatedAt}
+            <ExpandedRowContent data={expandedContent} />
           </Collapse>
         </TableCell>
       </TableRow>
