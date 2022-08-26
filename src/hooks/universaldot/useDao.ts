@@ -27,6 +27,7 @@ import {
   setApplicants as setApplicantsToOrg,
   resetState,
   setMembersOfSelectedOrganization,
+  setOwnOrganizations,
 } from '../../redux/slices/daoSlice';
 
 import { useSelector, useDispatch } from '../../redux/store';
@@ -45,6 +46,9 @@ const useDao = () => {
   const totalVisions = useSelector(state => state.dao.totalVisions);
   const joinedOrganizations = useSelector(
     state => state.dao.joinedOrganizations
+  );
+  const ownOrganizations = useSelector(
+    state => state.dao.ownOrganizations
   );
   const suggestedVisions = useSelector(state => state.dao.suggestedVisions);
   const visionNameForAction = useSelector(
@@ -110,7 +114,7 @@ const useDao = () => {
     }
   };
 
-  const handleJoinedOrganizationsResponse = async (joinedOrganizationsResponse: any) => {
+  const handleOrganizationsResponse = async (joinedOrganizationsResponse: any, queryType: 'joined' | 'own', userKey: string) => {
     if (!joinedOrganizationsResponse.isNone) {
       const joinedOrgs: any[] = joinedOrganizationsResponse.toHuman();
 
@@ -138,9 +142,20 @@ const useDao = () => {
       const organizationsAsObjects = await Promise.all(joinedOrgs.map(organizationId => query(organizationId)));
 
       if (organizationsAsObjects) {
-        dispatch(
-          setJoinedOrganizations(organizationsAsObjects)
-        );
+        if (queryType === 'joined') {
+          dispatch(
+            setJoinedOrganizations(organizationsAsObjects)
+          );
+        }
+
+        if (queryType === 'own') {
+          const ownOrganizationsAsObjects = organizationsAsObjects.filter((organization: any) => organization.owner === userKey)
+
+          dispatch(
+            setOwnOrganizations(ownOrganizationsAsObjects)
+          );
+        }
+
       }
     }
   };
@@ -223,7 +238,23 @@ const useDao = () => {
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBER_OF](
           userKey,
-          (response: any) => handleJoinedOrganizationsResponse(response)
+          (response: any) => handleOrganizationsResponse(response, 'joined', userKey)
+        );
+        const cb = () => unsub;
+        cb();
+      };
+
+      query();
+    },
+    [api]
+  );
+
+  const getOwnOrganizations = useCallback(
+    (userKey) => {
+      const query = async () => {
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBER_OF](
+          userKey,
+          (response: any) => handleOrganizationsResponse(response, 'own', userKey)
         );
         const cb = () => unsub;
         cb();
@@ -528,6 +559,8 @@ const useDao = () => {
     resetFields,
     getMembersOfAnOrganization,
     membersOfTheSelectedOrganization,
+    getOwnOrganizations,
+    ownOrganizations
   };
 };
 

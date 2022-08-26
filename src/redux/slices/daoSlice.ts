@@ -4,6 +4,7 @@ const initialState: any = {
   totalOrganizations: 0,
   totalVisions: 0,
   joinedOrganizations: [],
+  ownOrganizations: [],
   membersOfSelectedOrganization: [],
   suggestedVisions: [],
   visionNameForAction: '',
@@ -21,6 +22,9 @@ const daoSlice = createSlice({
     },
     setTotalVisions(state, action) {
       state.totalVisions = action.payload;
+    },
+    setOwnOrganizations(state, action) {
+      state.ownOrganizations = action.payload;
     },
     setJoinedOrganizations(state, action) {
       state.joinedOrganizations = action.payload;
@@ -55,6 +59,7 @@ export const {
   setTotalOrganizations,
   setTotalVisions,
   setJoinedOrganizations,
+  setOwnOrganizations,
   setMembersOfSelectedOrganization,
   setSuggestedVisions,
   setVisionName,

@@ -27,29 +27,6 @@ const TABLE_HEAD_MY_ORG = [
   { id: 'expandRow' },
 ];
 
-const TABLE_DATA_MY_ORG = [
-  {
-    name: 'name1',
-    owner: 'owner1',
-    expandedContent: {
-      description: 'Desc.',
-      vision: 'Vision',
-      createdAt: 'Created at',
-      lastUpdatedAt: 'Last updated at',
-      daoActions: [
-        { id: DaoCallables.ADD_MEMBERS, label: 'Add members' },
-        { id: DaoCallables.ADD_TASKS, label: 'Add tasks' },
-        { id: DaoCallables.CREATE_VISION, label: 'Create vision' },
-      ],
-    },
-    daoActions: [
-      { id: DaoCallables.DISSOLVE_ORGANIZATION, label: 'Dissolve organization' },
-      { id: DaoCallables.UPDATE_ORGANIZATION, label: 'Update organization' },
-      { id: DaoCallables.TRANSFER_OWNERSHIP, label: 'Transfer ownership' },
-    ],
-  },
-];
-
 const TABLE_HEAD_VISIONS_MEMBERS = [
   { id: 'name', label: 'Name', align: 'left' },
   { id: 'actions' },
@@ -64,8 +41,6 @@ const TABLE_DATA_VISIONS = [
 
 const TAB_OPTIONS = ['All'];
 
-const SELECT_OPTIONS = ['all', 'test1', 'test2', 'test3'];
-
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const { themeStretch } = useSettings();
 
@@ -76,29 +51,51 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const [listDataVisions, setListDataVisions] = useState(TABLE_DATA_VISIONS);
   const [listDataMembers, setListDataMembers] = useState([]);
+  const [listDataOwnOrganizations, setListDataOwnOrganizations] = useState([]);
 
   const { selectedKeyring } = useUser();
   const {
-    getJoinedOrganizations,
-    joinedOrganizations,
+    getOwnOrganizations,
+    ownOrganizations,
     getMembersOfAnOrganization,
     membersOfTheSelectedOrganization,
   } = useDao();
 
   useEffect(() => {
     if (selectedKeyring.value) {
-      getJoinedOrganizations(selectedKeyring.value);
+      getOwnOrganizations(selectedKeyring.value);
     }
-  }, [selectedKeyring.value, getJoinedOrganizations]);
+  }, [selectedKeyring.value, getOwnOrganizations]);
 
   useEffect(() => {
-    if (joinedOrganizations) {
-      const mappedOptions = joinedOrganizations.map(
-        (joinedOrganization: any) => joinedOrganization.name
-      );
+    if (ownOrganizations) {
+      const mappedOptions = ownOrganizations.map((ownOrganization: any) => ownOrganization.name);
       setSelectOptions(mappedOptions);
+
+      const tableData = ownOrganizations.map((ownOrganization: any) => ({
+        id: ownOrganization.id,
+        name: ownOrganization.name,
+        owner: ownOrganization.owner,
+        expandedContent: {
+          description: ownOrganization.description,
+          vision: ownOrganization.vision,
+          createdAt: ownOrganization.createdTime,
+          lastUpdatedAt: ownOrganization.lastUpdated,
+          daoActions: [
+            { id: DaoCallables.ADD_MEMBERS, label: 'Add members' },
+            { id: DaoCallables.ADD_TASKS, label: 'Add tasks' },
+            { id: DaoCallables.CREATE_VISION, label: 'Create vision' },
+          ],
+        },
+        daoActions: [
+          { id: DaoCallables.DISSOLVE_ORGANIZATION, label: 'Dissolve organization' },
+          { id: DaoCallables.UPDATE_ORGANIZATION, label: 'Update organization' },
+          { id: DaoCallables.TRANSFER_OWNERSHIP, label: 'Transfer ownership' },
+        ],
+      }));
+      setListDataOwnOrganizations(tableData);
     }
-  }, [joinedOrganizations]);
+  }, [ownOrganizations]);
 
   useEffect(() => {
     if (membersOfTheSelectedOrganization) {
@@ -113,7 +110,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
 
-    const orgId = joinedOrganizations.find(
+    const orgId = ownOrganizations.find(
       (joinedOrg: any) => joinedOrg.name === event.target.value
     ).id;
 
@@ -176,7 +173,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
             listHead={TABLE_HEAD_MY_ORG}
-            listData={TABLE_DATA_MY_ORG}
+            listData={listDataOwnOrganizations}
             daoSubpage={subPage}
           />
         )}
