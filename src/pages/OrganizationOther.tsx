@@ -14,7 +14,7 @@ import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // import Organizations from 'src/components/universaldot/Organizations';
 import { DAOLists } from '../components/universaldot/DAO';
 import { DaoCallables } from '../types';
-
+import { useSnackbar } from 'notistack';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD_JOIN_REC_ORG = [
@@ -29,12 +29,14 @@ const TAB_OPTIONS = ['Joined Organization', 'Recommended Organization'];
 export default function OrganizationOther() {
   const { themeStretch } = useSettings();
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const { currentTab, onChangeTab } = useTabs('Joined Organization');
 
   const [listData, setListData] = useState([]);
 
   const { selectedKeyring } = useUser();
-  const { getJoinedOrganizations, joinedOrganizations } = useDao();
+  const { getJoinedOrganizations, joinedOrganizations, daoAction } = useDao();
 
   useEffect(() => {
     if (selectedKeyring.value) {
@@ -54,11 +56,17 @@ export default function OrganizationOther() {
           createdAt: joinedOrganization.createdTime,
           lastUpdatedAt: joinedOrganization.lastUpdated,
         },
-        daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
+        daoActions: [
+          {
+            id: DaoCallables.UNSIGN_VISION,
+            label: 'Leave organization',
+            cb: () => daoAction(DaoCallables.UNSIGN_VISION, '@TODO payload', enqueueSnackbar),
+          },
+        ],
       }));
       setListData(tableData);
     }
-  }, [joinedOrganizations]);
+  }, [joinedOrganizations, daoAction, enqueueSnackbar]);
 
   const onTabSwitch = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
     onChangeTab(event, tab);
@@ -74,7 +82,13 @@ export default function OrganizationOther() {
           createdAt: joinedOrganization.createdTime,
           lastUpdatedAt: joinedOrganization.lastUpdated,
         },
-        daoActions: [{ id: DaoCallables.UNSIGN_VISION, label: 'Leave organization' }],
+        daoActions: [
+          {
+            id: DaoCallables.UNSIGN_VISION,
+            label: 'Leave organization',
+            cb: () => daoAction(DaoCallables.UNSIGN_VISION, '@TODO payload', enqueueSnackbar),
+          },
+        ],
       }));
       setListData(tableData);
     }
@@ -90,7 +104,13 @@ export default function OrganizationOther() {
           createdAt: 'Mock created at',
           lastUpdatedAt: 'Mock last updated at',
         },
-        daoActions: [{ id: DaoCallables.SIGN_VISION, label: 'Join organization' }],
+        daoActions: [
+          {
+            id: DaoCallables.SIGN_VISION,
+            label: 'Join organization',
+            cb: () => daoAction(DaoCallables.SIGN_VISION, '@TODO payload', enqueueSnackbar),
+          },
+        ],
       }));
       setListData(tableData);
     }
@@ -114,7 +134,6 @@ export default function OrganizationOther() {
           listHead={TABLE_HEAD_JOIN_REC_ORG}
           listData={listData}
         />
-        {/* <Organizations type="joined" /> */}
       </Container>
     </Page>
   );

@@ -57,7 +57,6 @@ export default function Router() {
                   index: true,
                 },
                 { path: 'organizations', element: <OrganizationOwn subPage="organizations" /> },
-                { path: 'visions', element: <OrganizationOwn subPage="visions" /> },
                 { path: 'members', element: <OrganizationOwn subPage="members" /> },
                 { path: 'tasks', element: <OrganizationOwn subPage="tasks" /> },
               ],

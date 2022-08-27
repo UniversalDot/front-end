@@ -16,6 +16,7 @@ type Props = {
     daoActions: {
       id: DaoCallables;
       label: string;
+      cb: () => void;
     }[];
   };
 };

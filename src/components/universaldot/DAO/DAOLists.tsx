@@ -42,7 +42,7 @@ type OrganizationsListProps = {
   listHead: any[];
   listData: TableData;
   onTabSwitch: (event: React.SyntheticEvent<Element, Event>, tab: string) => void;
-  daoSubpage?: 'organizations' | 'visions' | 'members' | 'tasks';
+  daoSubpage?: 'organizations' | 'members' | 'tasks';
 };
 
 // ----------------------------------------------------------------------

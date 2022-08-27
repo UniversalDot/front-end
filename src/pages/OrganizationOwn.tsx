@@ -14,10 +14,11 @@ import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 import { DAOLists, DAOAnalytics, Select, Kanban } from '../components/universaldot/DAO';
 // import Organizations from 'src/components/universaldot/Organizations';
 import { DaoCallables } from '../types';
+import { useSnackbar } from 'notistack';
 // ----------------------------------------------------------------------
 
 type OrganizationOwnProps = {
-  subPage: 'organizations' | 'visions' | 'members' | 'tasks';
+  subPage: 'organizations' | 'members' | 'tasks';
 };
 
 const TABLE_HEAD_MY_ORG = [
@@ -32,24 +33,18 @@ const TABLE_HEAD_VISIONS_MEMBERS = [
   { id: 'actions' },
 ];
 
-const TABLE_DATA_VISIONS = [
-  {
-    name: 'name1',
-    daoActions: [{ id: DaoCallables.REMOVE_VISION, label: 'Remove vision' }],
-  },
-];
-
 const TAB_OPTIONS = ['All'];
 
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const { themeStretch } = useSettings();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const { currentTab } = useTabs('All');
 
   const [selectedOption, setSelectedOption] = useState('');
   const [selectOptions, setSelectOptions] = useState([]);
 
-  const [listDataVisions, setListDataVisions] = useState(TABLE_DATA_VISIONS);
   const [listDataMembers, setListDataMembers] = useState([]);
   const [listDataOwnOrganizations, setListDataOwnOrganizations] = useState([]);
 
@@ -59,6 +54,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     ownOrganizations,
     getMembersOfAnOrganization,
     membersOfTheSelectedOrganization,
+    daoAction,
   } = useDao();
 
   useEffect(() => {
@@ -82,30 +78,61 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           createdAt: ownOrganization.createdTime,
           lastUpdatedAt: ownOrganization.lastUpdated,
           daoActions: [
-            { id: DaoCallables.ADD_MEMBERS, label: 'Add members' },
-            { id: DaoCallables.ADD_TASKS, label: 'Add tasks' },
-            { id: DaoCallables.CREATE_VISION, label: 'Create vision' },
+            {
+              id: DaoCallables.ADD_MEMBERS,
+              label: 'Add members',
+              cb: () => daoAction(DaoCallables.ADD_MEMBERS, '@TODO payload', enqueueSnackbar),
+            },
+            {
+              id: DaoCallables.ADD_TASKS,
+              label: 'Add tasks',
+              cb: () => daoAction(DaoCallables.ADD_TASKS, '@TODO payload', enqueueSnackbar),
+            },
+            {
+              id: DaoCallables.CREATE_VISION,
+              label: 'Create vision',
+              cb: () => daoAction(DaoCallables.CREATE_VISION, '@TODO payload', enqueueSnackbar),
+            },
           ],
         },
         daoActions: [
-          { id: DaoCallables.DISSOLVE_ORGANIZATION, label: 'Dissolve organization' },
-          { id: DaoCallables.UPDATE_ORGANIZATION, label: 'Update organization' },
-          { id: DaoCallables.TRANSFER_OWNERSHIP, label: 'Transfer ownership' },
+          {
+            id: DaoCallables.DISSOLVE_ORGANIZATION,
+            label: 'Dissolve organization',
+            cb: () =>
+              daoAction(DaoCallables.DISSOLVE_ORGANIZATION, '@TODO payload', enqueueSnackbar),
+          },
+          {
+            id: DaoCallables.UPDATE_ORGANIZATION,
+            label: 'Update organization',
+            cb: () => daoAction(DaoCallables.UPDATE_ORGANIZATION, '@TODO payload', enqueueSnackbar),
+          },
+          {
+            id: DaoCallables.TRANSFER_OWNERSHIP,
+            label: 'Transfer ownership',
+            cb: () => daoAction(DaoCallables.TRANSFER_OWNERSHIP, '@TODO payload', enqueueSnackbar),
+          },
         ],
       }));
       setListDataOwnOrganizations(tableData);
     }
-  }, [ownOrganizations]);
+  }, [ownOrganizations, daoAction, enqueueSnackbar]);
 
   useEffect(() => {
     if (membersOfTheSelectedOrganization) {
       const tableData = membersOfTheSelectedOrganization.map((member: any) => ({
         name: member.name,
-        daoActions: [{ id: DaoCallables.REMOVE_MEMBERS, label: 'Remove member' }],
+        daoActions: [
+          {
+            id: DaoCallables.REMOVE_MEMBERS,
+            label: 'Remove member',
+            cb: () => daoAction(DaoCallables.REMOVE_MEMBERS, '@TODO payload', enqueueSnackbar),
+          },
+        ],
       }));
       setListDataMembers(tableData);
     }
-  }, [membersOfTheSelectedOrganization]);
+  }, [membersOfTheSelectedOrganization, daoAction, enqueueSnackbar]);
 
   const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
@@ -143,15 +170,15 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             onOptionSelect={onOptionSelect}
           />
         )}
-        {subPage === 'tasks' && <Kanban />}
-        {subPage === 'visions' && (
+        {/* {subPage === 'tasks' && <Kanban />} */}
+        {subPage === 'tasks' && (
           <DAOLists
             listType="myOrganization"
             tabs={TAB_OPTIONS}
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
             listHead={TABLE_HEAD_VISIONS_MEMBERS}
-            listData={listDataVisions}
+            listData={listDataMembers}
             daoSubpage={subPage}
           />
         )}
@@ -177,7 +204,6 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             daoSubpage={subPage}
           />
         )}
-        {/* <Organizations type="own" /> */}
       </Container>
     </Page>
   );

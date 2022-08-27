@@ -37,10 +37,10 @@ export default function TableRowGeneric({
   const rowActions = daoActions.map((daoAction: any) => (
     <MenuItem
       key={daoAction.id}
-      // onClick={() => {
-      //   onDeleteRow();
-      //   handleCloseMenu();
-      // }}
+      onClick={() => {
+        daoAction.cb();
+        handleCloseMenu();
+      }}
     >
       <Iconify icon={'eva:edit-fill'} />
       {daoAction.label}
