@@ -174,7 +174,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           {
             id: DaoCallables.REMOVE_TASKS,
             label: 'Remove task',
-            cb: () => daoAction(DaoCallables.REMOVE_TASKS, '@TODO payload', enqueueSnackbar),
+            cb: () =>
+              daoAction(DaoCallables.REMOVE_TASKS, [task.organizationId, task.id], enqueueSnackbar),
           },
           {
             id: TaskCallables.UPDATE_TASK,

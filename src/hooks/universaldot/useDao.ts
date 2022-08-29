@@ -56,7 +56,7 @@ const useDao = () => {
     state => state.dao.organizationTasks
   );
 
-  const handleOrganizationTasksResponse = async (organizationsTasks: any, actionType: ActionType, enqueueSnackbar: Function) => {
+  const handleOrganizationTasksResponse = async (organizationsTasks: any, actionType: ActionType, enqueueSnackbar: Function, organizationId: string) => {
     if (!organizationsTasks.isNone) {
 
       const orgTasks: any[] = organizationsTasks.toHuman();
@@ -67,7 +67,7 @@ const useDao = () => {
         const unsub = await api?.query[Pallets.TASK][TaskCallables.TASKS](
           taskId,
           (response: any) => {
-            returnValue = { id: taskId, ...response.toHuman() };
+            returnValue = { id: taskId, organizationId: organizationId, ...response.toHuman() };
           }
         );
 
@@ -251,7 +251,7 @@ const useDao = () => {
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][
           DaoCallables.ORGANIZATION_TASKS
-        ](organizationId, (response: any) => handleOrganizationTasksResponse(response, actionType, enqueueSnackbar));
+        ](organizationId, (response: any) => handleOrganizationTasksResponse(response, actionType, enqueueSnackbar, organizationId));
         const cb = () => unsub;
         cb();
       };
@@ -348,7 +348,7 @@ const useDao = () => {
     // TODO: orgName should be refactored to orgId in BE;
     const transformedPayloadRemoveMembers = ['@TODO'];
     // TODO: orgName should be refactored to orgId in BE;
-    const transformedPayloadRemoveTasks = ['@TODO'];
+    const transformedPayloadRemoveTasks = [...payload];
 
     let txExecute;
 
