@@ -7,7 +7,7 @@ import { useDao } from '../../../hooks/universaldot';
 // components
 import Iconify from '../../Iconify';
 import { DialogAnimate } from '../../animate';
-import { Select } from '../../universaldot/DAO';
+import { Select } from '.';
 // ----------------------------------------------------------------------
 
 type Props = {

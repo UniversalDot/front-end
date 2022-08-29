@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 // @mui
-import { Container } from '@mui/material';
+import { Container, Box, Button, DialogTitle, Typography } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
@@ -10,9 +10,10 @@ import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
 import Page from '../components/Page';
 import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
+import Iconify from '../components/Iconify';
+import { DialogAnimate } from '../components/animate';
 // universaldot
 import { DAOLists, DAOAnalytics, Select, Kanban } from '../components/universaldot/DAO';
-// import Organizations from 'src/components/universaldot/Organizations';
 import { DaoCallables } from '../types';
 import { useSnackbar } from 'notistack';
 // ----------------------------------------------------------------------
@@ -47,6 +48,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const [listDataMembers, setListDataMembers] = useState([]);
   const [listDataOwnOrganizations, setListDataOwnOrganizations] = useState([]);
+
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const { selectedKeyring } = useUser();
   const {
@@ -166,12 +169,28 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           ]}
         />
         {/* <DAOAnalytics /> */}
-        {selectOptions && (subPage === 'tasks' || subPage === 'members') && (
+        {selectOptions && subPage === 'members' && (
           <Select
             options={selectOptions}
             selectedOption={selectedOption}
             onOptionSelect={onOptionSelect}
           />
+        )}
+        {selectOptions && subPage === 'tasks' && (
+          <Box display="flex" alignItems="center" width="100%">
+            <Select
+              options={selectOptions}
+              selectedOption={selectedOption}
+              onOptionSelect={onOptionSelect}
+            />
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon={'eva:plus-fill'} />}
+              onClick={() => setIsOpenModal(true)}
+            >
+              Add task
+            </Button>
+          </Box>
         )}
         {/* {subPage === 'tasks' && <Kanban />} */}
         {subPage === 'tasks' && (
@@ -207,6 +226,12 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             daoSubpage={subPage}
           />
         )}
+        <DialogAnimate open={isOpenModal} onClose={() => setIsOpenModal(false)}>
+          <DialogTitle>Add task</DialogTitle>
+          <Box p="1.5rem">
+            <Typography> Add task form goes here.. also fix the table data for tasks</Typography>
+          </Box>
+        </DialogAnimate>
       </Container>
     </Page>
   );
