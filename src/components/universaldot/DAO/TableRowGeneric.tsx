@@ -13,6 +13,7 @@ type Props = {
   onEditRow: VoidFunction;
   onSelectRow: VoidFunction;
   onDeleteRow: VoidFunction;
+  daoSubpage?: 'organizations' | 'members' | 'tasks' | undefined;
 };
 
 export default function TableRowGeneric({
@@ -21,9 +22,8 @@ export default function TableRowGeneric({
   onEditRow,
   onSelectRow,
   onDeleteRow,
+  daoSubpage,
 }: Props) {
-  const { name, daoActions } = row;
-
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,7 +34,7 @@ export default function TableRowGeneric({
     setOpenMenuActions(null);
   };
 
-  const rowActions = daoActions.map((daoAction: any) => (
+  const rowActions = row.daoActions.map((daoAction: any) => (
     <MenuItem
       key={daoAction.id}
       onClick={() => {
@@ -48,21 +48,48 @@ export default function TableRowGeneric({
   ));
 
   return (
-    <TableRow hover selected={selected}>
-      <TableCell padding="checkbox">
-        <Checkbox checked={selected} onClick={onSelectRow} />
-      </TableCell>
+    <>
+      {!daoSubpage && (
+        <TableRow hover selected={selected}>
+          <TableCell padding="checkbox">
+            <Checkbox checked={selected} onClick={onSelectRow} />
+          </TableCell>
 
-      <TableCell>{name}</TableCell>
+          <TableCell>{row.name}</TableCell>
 
-      <TableCell align="right">
-        <TableMoreMenu
-          open={openMenu}
-          onOpen={handleOpenMenu}
-          onClose={handleCloseMenu}
-          actions={rowActions}
-        />
-      </TableCell>
-    </TableRow>
+          <TableCell align="right">
+            <TableMoreMenu
+              open={openMenu}
+              onOpen={handleOpenMenu}
+              onClose={handleCloseMenu}
+              actions={rowActions}
+            />
+          </TableCell>
+        </TableRow>
+      )}
+      {daoSubpage === 'tasks' && (
+        <TableRow hover selected={selected}>
+          <TableCell padding="checkbox">
+            <Checkbox checked={selected} onClick={onSelectRow} />
+          </TableCell>
+
+          <TableCell>{row.name}</TableCell>
+          <TableCell>{row.specification}</TableCell>
+          <TableCell>{row.budget}</TableCell>
+          <TableCell>{row.deadline}</TableCell>
+          <TableCell>{row.attachments}</TableCell>
+          <TableCell>{row.keywords}</TableCell>
+
+          <TableCell align="right">
+            <TableMoreMenu
+              open={openMenu}
+              onOpen={handleOpenMenu}
+              onClose={handleCloseMenu}
+              actions={rowActions}
+            />
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
 }

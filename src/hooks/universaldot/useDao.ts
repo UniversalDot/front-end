@@ -59,8 +59,6 @@ const useDao = () => {
   const handleOrganizationTasksResponse = async (organizationsTasks: any, actionType: ActionType, enqueueSnackbar: Function) => {
     if (!organizationsTasks.isNone) {
 
-      console.log('organizationsTasks', organizationsTasks)
-      console.log('organizationsTasks human', organizationsTasks.toHuman())
       const orgTasks: any[] = organizationsTasks.toHuman();
 
       const query = async (taskId: string) => {
@@ -147,15 +145,12 @@ const useDao = () => {
     if (!membersResponse.isNone) {
       const membersOfOrganization: any[] = membersResponse.toHuman();
 
-      console.log('profiles in organization', membersResponse.toHuman())
-
       const query = async (memberProfileId: string) => {
         let returnValue = undefined;
 
         const unsub = await api?.query[Pallets.PROFILE][ProfileCallables.PROFILES](
           memberProfileId,
           (response: any) => {
-            console.log('each profile object in organization', response.toHuman())
             if (response.toString().length > 0) {
 
               returnValue = response.toHuman();
@@ -285,6 +280,34 @@ const useDao = () => {
     [api]
   );
 
+  // const handleAddTaskToOrganizationResponse = async (taskForOrganization: any) => {
+  //   if (!taskForOrganization.isNone) {
+
+  //     console.log('organizationsTasks', taskForOrganization)
+  //     console.log('organizationsTasks human', taskForOrganization.toHuman())
+
+  //   }
+  // };
+
+
+  // const addTaskToOrganization = useCallback(
+  //   (organizationId, taskId) => {
+  //     const query = async () => {
+  //       // @TODO: confirm if payload is formatted well;
+  //       const payload = [organizationId, taskId]
+  //       const unsub = await api?.query[Pallets.DAO][DaoCallables.ADD_TASKS](
+  //         payload,
+  //         (response: any) => handleAddTaskToOrganizationResponse(response)
+  //       );
+  //       const cb = () => unsub;
+  //       cb();
+  //     };
+
+  //     query();
+  //   },
+  //   [api]
+  // );
+
   const signedTx = async (actionType: ActionType, payload: any, enqueueSnackbar: Function) => {
     const accountPair =
       selectedKeyring.value &&
@@ -316,7 +339,7 @@ const useDao = () => {
     const transformedPayloadAddMembers = ['@TODO'];
 
     // TODO: orgName should be refactored to orgId in BE;
-    const transformedPayloadAddTasks = ['@TODO']
+    const transformedPayloadAddTasks = [...payload]
 
     const transformedPayloadCreateOrg = ['@TODO'];
     // TODO: should accept more data (title, desc, etc.) not just visionDocument;
@@ -365,7 +388,7 @@ const useDao = () => {
       );
     }
 
-    const transactionResponseHandler = (res: { status: any; }) => {
+    const transactionResponseHandler = (res: any) => {
       const callStatus = res.status;
 
       if (callStatus?.isFinalized) {
@@ -414,7 +437,8 @@ const useDao = () => {
     ownOrganizations,
     getApplicantsToOrganization,
     getOrganizationTasks,
-    organizationTasks
+    organizationTasks,
+    // addTaskToOrganization
   };
 };
 

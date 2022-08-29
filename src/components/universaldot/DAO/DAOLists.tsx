@@ -192,19 +192,20 @@ export default function DAOLists({
           <TableBody>
             {dataFiltered
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) =>
+              .map((row, index) =>
                 showGenericRow ? (
                   <TableRowGeneric
-                    key={row.name}
+                    key={index}
                     row={row}
                     selected={selected.includes(row.name)}
                     onSelectRow={() => onSelectRow(row.name)}
                     onDeleteRow={() => handleDeleteRow(row.name)}
                     onEditRow={() => handleEditRow(row.name)}
+                    daoSubpage={daoSubpage}
                   />
                 ) : (
                   <TableRowExpandable
-                    key={row.name}
+                    key={index}
                     row={row}
                     selected={selected.includes(row.name)}
                     onSelectRow={() => onSelectRow(row.name)}

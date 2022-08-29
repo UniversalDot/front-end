@@ -19,6 +19,7 @@ import {
   Select,
   Kanban,
   CreateTaskForm,
+  AddTaskToOrganizationForm,
 } from '../components/universaldot/DAO';
 import { DaoCallables, TaskCallables } from '../types';
 import { useSnackbar } from 'notistack';
@@ -67,6 +68,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const [listDataTasks, setListDataTasks] = useState([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [modalType, setModalType] = useState<'addToOrg' | 'createTask'>('createTask');
 
   const { selectedKeyring } = useUser();
   const {
@@ -162,7 +164,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   useEffect(() => {
     if (organizationTasks) {
       const tableData = organizationTasks.map((task: any) => ({
-        name: task.name,
+        name: task.title,
         specification: task.specification,
         budget: task.budget,
         deadline: task.deadline,
@@ -182,6 +184,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           // @TODO others
         ],
       }));
+
       setListDataTasks(tableData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,9 +245,23 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             <Button
               variant="contained"
               startIcon={<Iconify icon={'eva:plus-fill'} />}
-              onClick={() => setIsOpenModal(true)}
+              onClick={() => {
+                setIsOpenModal(true);
+                setModalType('addToOrg');
+              }}
+              style={{ marginRight: '1rem' }}
             >
-              Add task
+              Add task to organization
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon={'eva:plus-fill'} />}
+              onClick={() => {
+                setIsOpenModal(true);
+                setModalType('createTask');
+              }}
+            >
+              Create task
             </Button>
           </Box>
         )}
@@ -283,22 +300,37 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           />
         )}
         <DialogAnimate open={isOpenModal} onClose={() => setIsOpenModal(false)}>
-          <DialogTitle>Add task</DialogTitle>
+          <DialogTitle>
+            {modalType === 'createTask' ? 'Create task' : 'Add task to organization'}
+          </DialogTitle>
           <Box p="1.5rem">
             <Typography> Add task form goes here.. also fix the table data for tasks</Typography>
-            <CreateTaskForm
-              taskForm={
-                {
-                  title: 'test1',
-                  specification: 'test2',
-                  budget: '33312525',
-                  deadline: '4445125122',
-                  attachments: 'test4',
-                  keywords: 'test5',
-                } || {}
-              }
-              onCancel={() => setIsOpenModal(false)}
-            />
+            {modalType === 'createTask' && (
+              <CreateTaskForm
+                taskForm={
+                  {
+                    title: 'test1',
+                    specification: 'test2',
+                    budget: '33312525',
+                    deadline: '4445125122',
+                    attachments: 'test4',
+                    keywords: 'test5',
+                  } || {}
+                }
+                onCancel={() => setIsOpenModal(false)}
+              />
+            )}
+            {modalType === 'addToOrg' && (
+              <AddTaskToOrganizationForm
+                form={
+                  {
+                    organizationId: 'test1',
+                    taskId: 'test2',
+                  } || {}
+                }
+                onCancel={() => setIsOpenModal(false)}
+              />
+            )}
           </Box>
         </DialogAnimate>
       </Container>

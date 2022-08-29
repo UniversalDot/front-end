@@ -231,8 +231,6 @@ const useTasks = () => {
 
     const fromAcct = await getFromAcct();
 
-    console.log('taskPayload', taskPayload)
-
     const transformedPayloadForCreate = [
       taskPayload?.title || '',
       taskPayload?.specification || '',
@@ -289,6 +287,7 @@ const useTasks = () => {
       let txFailed = false;
       let failureText: string = '';
 
+      // TODO: better error handling;
       if (response.dispatchError) {
         response.events
           // find/filter for failed events
@@ -314,6 +313,8 @@ const useTasks = () => {
             }
           })
       }
+
+
 
       if (response.status?.isFinalized) {
         // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
