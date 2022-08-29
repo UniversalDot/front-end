@@ -5,12 +5,13 @@ import { Stack, TextField, MenuItem } from '@mui/material';
 type Props = {
   options: string[];
   selectedOption: string;
+  disabled?: boolean;
   onOptionSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export default function Select({ selectedOption, onOptionSelect, options }: Props) {
+export default function Select({ selectedOption, onOptionSelect, options, disabled }: Props) {
   return (
-    <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }} sx={{ py: 2.5, px: 3 }}>
+    <Stack spacing={2} direction={{ xs: 'column', sm: 'row' }} sx={{ py: 2.5, px: 3 }} flex="1">
       <TextField
         fullWidth
         select
@@ -26,6 +27,7 @@ export default function Select({ selectedOption, onOptionSelect, options }: Prop
           maxWidth: { sm: 240 },
           textTransform: 'capitalize',
         }}
+        disabled={disabled}
       >
         {options.map((option) => (
           <MenuItem

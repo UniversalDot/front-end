@@ -73,6 +73,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
         name: ownOrganization.name,
         owner: ownOrganization.owner,
         expandedContent: {
+          organizationId: ownOrganization.id,
           description: ownOrganization.description,
           vision: ownOrganization.vision,
           createdAt: ownOrganization.createdTime,
@@ -83,16 +84,16 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               label: 'Add members',
               cb: () => daoAction(DaoCallables.ADD_MEMBERS, '@TODO payload', enqueueSnackbar),
             },
-            {
-              id: DaoCallables.ADD_TASKS,
-              label: 'Add tasks',
-              cb: () => daoAction(DaoCallables.ADD_TASKS, '@TODO payload', enqueueSnackbar),
-            },
-            {
-              id: DaoCallables.CREATE_VISION,
-              label: 'Create vision',
-              cb: () => daoAction(DaoCallables.CREATE_VISION, '@TODO payload', enqueueSnackbar),
-            },
+            // {
+            //   id: DaoCallables.ADD_TASKS,
+            //   label: 'Add tasks',
+            //   cb: () => daoAction(DaoCallables.ADD_TASKS, '@TODO payload', enqueueSnackbar),
+            // },
+            // {
+            //   id: DaoCallables.CREATE_VISION,
+            //   label: 'Create vision',
+            //   cb: () => daoAction(DaoCallables.CREATE_VISION, '@TODO payload', enqueueSnackbar),
+            // },
           ],
         },
         daoActions: [
@@ -116,7 +117,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
       }));
       setListDataOwnOrganizations(tableData);
     }
-  }, [ownOrganizations, daoAction, enqueueSnackbar]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownOrganizations]);
 
   useEffect(() => {
     if (membersOfTheSelectedOrganization) {
@@ -132,7 +134,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
       }));
       setListDataMembers(tableData);
     }
-  }, [membersOfTheSelectedOrganization, daoAction, enqueueSnackbar]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [membersOfTheSelectedOrganization]);
 
   const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);

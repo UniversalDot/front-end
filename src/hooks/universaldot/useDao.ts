@@ -45,7 +45,7 @@ const useDao = () => {
     state => state.dao.ownOrganizations
   );
 
-  const allApplicants = useSelector(
+  const applicantsToOrganization = useSelector(
     state => state.dao.applicantsToOrganization
   );
 
@@ -58,9 +58,6 @@ const useDao = () => {
       switch (daoQueryType) {
         case DaoCallables.ORGANIZATION_COUNT:
           dispatch(setTotalOrganizations(dataFromResponse.toHuman()));
-          break;
-        case DaoCallables.APPLICANTS_TO_ORGANIZATION:
-          dispatch(setApplicantsToOrg(dataFromResponse.toHuman()));
           break;
         default:
       }
@@ -113,7 +110,7 @@ const useDao = () => {
     }
   };
 
-  const handleMembersOfAnOrganizationResponse = async (membersResponse: any) => {
+  const handleMembersOfAnOrganizationResponse = async (membersResponse: any, daoType: DaoCallables.MEMBERS | DaoCallables.APPLICANTS_TO_ORGANIZATION) => {
     if (!membersResponse.isNone) {
       const membersOfOrganization: any[] = membersResponse.toHuman();
 
@@ -146,36 +143,28 @@ const useDao = () => {
 
       if (membersAsObjects) {
         const filteredObjects = membersAsObjects.filter((item) => item !== 'empty')
-        dispatch(
-          setMembersOfSelectedOrganization(filteredObjects)
-        );
+
+        if (daoType === DaoCallables.MEMBERS) {
+          dispatch(
+            setMembersOfSelectedOrganization(filteredObjects)
+          );
+        }
+
+        if (daoType === DaoCallables.APPLICANTS_TO_ORGANIZATION) {
+          dispatch(
+            setApplicantsToOrg(filteredObjects)
+          );
+        }
       }
     }
   };
-
-  const getApplicants = useCallback(
-    organizationName => {
-      const query = async () => {
-        const unsub = await api?.query[Pallets.DAO][
-          DaoCallables.APPLICANTS_TO_ORGANIZATION
-        ](organizationName, (resData: any) =>
-          handleQueryResponse(resData, DaoCallables.APPLICANTS_TO_ORGANIZATION)
-        );
-        const cb = () => unsub;
-        cb();
-      };
-
-      query();
-    },
-    [api]
-  );
 
   const getMembersOfAnOrganization = useCallback(
     (organizationId) => {
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBERS](
           organizationId,
-          (response: any) => handleMembersOfAnOrganizationResponse(response)
+          (response: any) => handleMembersOfAnOrganizationResponse(response, DaoCallables.MEMBERS)
         );
         const cb = () => unsub;
         cb();
@@ -224,6 +213,22 @@ const useDao = () => {
         const unsub = await api?.query[Pallets.DAO][
           DaoCallables.ORGANIZATION_COUNT
         ]((resData: any) => handleQueryResponse(resData, daoQueryType));
+        const cb = () => unsub;
+        cb();
+      };
+
+      query();
+    },
+    [api]
+  );
+
+  const getApplicantsToOrganization = useCallback(
+    (organizationId) => {
+      const query = async () => {
+        const unsub = await api?.query[Pallets.DAO][DaoCallables.APPLICANTS_TO_ORGANIZATION](
+          organizationId,
+          (response: any) => handleMembersOfAnOrganizationResponse(response, DaoCallables.APPLICANTS_TO_ORGANIZATION)
+        );
         const cb = () => unsub;
         cb();
       };
@@ -357,12 +362,12 @@ const useDao = () => {
     getTotalOrganizations,
     totalOrganizations,
     joinedOrganizations,
-    allApplicants,
-    getApplicants,
+    applicantsToOrganization,
     getMembersOfAnOrganization,
     membersOfTheSelectedOrganization,
     getOwnOrganizations,
-    ownOrganizations
+    ownOrganizations,
+    getApplicantsToOrganization
   };
 };
 

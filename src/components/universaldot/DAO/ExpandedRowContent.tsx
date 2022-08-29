@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import { Box, Card, Button, Typography, Stack, DialogTitle } from '@mui/material';
 import { DaoCallables } from '../../../types';
+//hooks
+import { useDao } from '../../../hooks/universaldot';
 // components
 import Iconify from '../../Iconify';
 import { DialogAnimate } from '../../animate';
+import { Select } from '../../universaldot/DAO';
 // ----------------------------------------------------------------------
 
 type Props = {
   data: {
+    organizationId: string;
     description: string;
     vision: string;
     createdAt: string;
@@ -22,11 +26,40 @@ type Props = {
 };
 
 export default function ExpandedRowContent({
-  data: { description, vision, createdAt, lastUpdatedAt, daoActions },
+  data: { organizationId, description, vision, createdAt, lastUpdatedAt, daoActions },
 }: Props) {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedDaoLabel, setSelectedDaoLabel] = useState<string>('');
   const [selectedDaoId, setSelectedDaoId] = useState<DaoCallables | null>(null);
+
+  const { getApplicantsToOrganization, applicantsToOrganization } = useDao();
+
+  const [selectedOption, setSelectedOption] = useState('');
+  const [selectOptions, setSelectOptions] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (organizationId) {
+      getApplicantsToOrganization(organizationId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organizationId]);
+
+  useEffect(() => {
+    if (applicantsToOrganization?.length > 0) {
+      const mappedOptions = applicantsToOrganization.map(
+        (applicantToOrganization: any) => applicantToOrganization.name
+      );
+      setSelectOptions(mappedOptions);
+    }
+  }, [applicantsToOrganization]);
+
+  const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedOption(event.target.value);
+
+    // const applicantName = applicantsToOrganization.find(
+    //   (applicant: any) => applicant.name === event.target.value
+    // ).id;
+  };
 
   return (
     <>
@@ -102,8 +135,29 @@ export default function ExpandedRowContent({
       <DialogAnimate open={isOpenModal} onClose={() => setIsOpenModal(false)}>
         <DialogTitle>{selectedDaoLabel}</DialogTitle>
         <Box p="1.5rem">
-          <Typography> Form goes here..</Typography>
-          <Typography>{selectedDaoId}</Typography>
+          {selectedDaoId === DaoCallables.ADD_TASKS && (
+            <Box display="flex" alignItems="center" width="100%">
+              <Typography> Form goes here..</Typography>
+            </Box>
+          )}
+
+          {selectedDaoId === DaoCallables.ADD_MEMBERS && (
+            <Box display="flex" alignItems="center" width="100%">
+              <Select
+                options={selectOptions}
+                selectedOption={selectedOption}
+                onOptionSelect={onOptionSelect}
+                disabled={applicantsToOrganization?.length === 0}
+              />
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon={'eva:plus-fill'} />}
+                disabled={!selectedOption}
+              >
+                Accept member
+              </Button>
+            </Box>
+          )}
         </Box>
       </DialogAnimate>
     </>

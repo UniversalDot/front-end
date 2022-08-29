@@ -66,7 +66,8 @@ export default function OrganizationOther() {
       }));
       setListData(tableData);
     }
-  }, [joinedOrganizations, daoAction, enqueueSnackbar]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [joinedOrganizations]);
 
   const onTabSwitch = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
     onChangeTab(event, tab);
