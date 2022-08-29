@@ -8,6 +8,8 @@ import { useDao } from '../../../hooks/universaldot';
 import Iconify from '../../Iconify';
 import { DialogAnimate } from '../../animate';
 import { Select } from '.';
+import { useSnackbar } from 'notistack';
+
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -28,6 +30,8 @@ type Props = {
 export default function ExpandedRowContent({
   data: { organizationId, description, vision, createdAt, lastUpdatedAt, daoActions },
 }: Props) {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedDaoLabel, setSelectedDaoLabel] = useState<string>('');
   const [selectedDaoId, setSelectedDaoId] = useState<DaoCallables | null>(null);
@@ -39,7 +43,11 @@ export default function ExpandedRowContent({
 
   useEffect(() => {
     if (organizationId) {
-      getApplicantsToOrganization(organizationId);
+      getApplicantsToOrganization(
+        organizationId,
+        DaoCallables.APPLICANTS_TO_ORGANIZATION,
+        enqueueSnackbar
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId]);

@@ -231,11 +231,15 @@ const useTasks = () => {
 
     const fromAcct = await getFromAcct();
 
+    console.log('taskPayload', taskPayload)
+
     const transformedPayloadForCreate = [
       taskPayload?.title || '',
       taskPayload?.specification || '',
       taskPayload?.budget || '',
       taskPayload?.deadline || '',
+      taskPayload?.attachments || '',
+      taskPayload?.keywords || '',
     ];
 
     const transformedPayloadOnlyTaskId = [taskPayload];

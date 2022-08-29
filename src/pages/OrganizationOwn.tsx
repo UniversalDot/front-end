@@ -13,8 +13,14 @@ import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 import Iconify from '../components/Iconify';
 import { DialogAnimate } from '../components/animate';
 // universaldot
-import { DAOLists, DAOAnalytics, Select, Kanban } from '../components/universaldot/DAO';
-import { DaoCallables } from '../types';
+import {
+  DAOLists,
+  DAOAnalytics,
+  Select,
+  Kanban,
+  CreateTaskForm,
+} from '../components/universaldot/DAO';
+import { DaoCallables, TaskCallables } from '../types';
 import { useSnackbar } from 'notistack';
 // ----------------------------------------------------------------------
 
@@ -34,6 +40,16 @@ const TABLE_HEAD_VISIONS_MEMBERS = [
   { id: 'actions' },
 ];
 
+const TABLE_HEAD_TASKS = [
+  { id: 'name', label: 'Name', align: 'left' },
+  { id: 'specification', label: 'Specification', align: 'left' },
+  { id: 'budget', label: 'Budget', align: 'left' },
+  { id: 'deadline', label: 'Deadline', align: 'left' },
+  { id: 'attachments', label: 'Attachments', align: 'left' },
+  { id: 'keywords', label: 'Keywords', align: 'left' },
+  { id: 'actions' },
+];
+
 const TAB_OPTIONS = ['All'];
 
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
@@ -48,6 +64,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const [listDataMembers, setListDataMembers] = useState([]);
   const [listDataOwnOrganizations, setListDataOwnOrganizations] = useState([]);
+  const [listDataTasks, setListDataTasks] = useState([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -58,6 +75,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     getMembersOfAnOrganization,
     membersOfTheSelectedOrganization,
     daoAction,
+    getOrganizationTasks,
+    organizationTasks,
   } = useDao();
 
   useEffect(() => {
@@ -140,7 +159,38 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [membersOfTheSelectedOrganization]);
 
-  const onOptionSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (organizationTasks) {
+      const tableData = organizationTasks.map((task: any) => ({
+        name: task.name,
+        specification: task.specification,
+        budget: task.budget,
+        deadline: task.deadline,
+        attachments: task.attachments,
+        keywords: task.keywords,
+        daoActions: [
+          {
+            id: DaoCallables.REMOVE_TASKS,
+            label: 'Remove task',
+            cb: () => daoAction(DaoCallables.REMOVE_TASKS, '@TODO payload', enqueueSnackbar),
+          },
+          {
+            id: TaskCallables.UPDATE_TASK,
+            label: 'Update task',
+            cb: () => daoAction(TaskCallables.UPDATE_TASK, '@TODO payload', enqueueSnackbar),
+          },
+          // @TODO others
+        ],
+      }));
+      setListDataTasks(tableData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organizationTasks]);
+
+  const onOptionSelect = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    subpage: 'members' | 'tasks'
+  ) => {
     setSelectedOption(event.target.value);
 
     const orgId = ownOrganizations.find(
@@ -148,7 +198,13 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     ).id;
 
     if (orgId) {
-      getMembersOfAnOrganization(orgId);
+      if (subpage === 'members') {
+        getMembersOfAnOrganization(orgId, DaoCallables.MEMBERS, enqueueSnackbar);
+      }
+
+      if (subpage === 'tasks') {
+        getOrganizationTasks(orgId, DaoCallables.ORGANIZATION_TASKS, enqueueSnackbar);
+      }
     }
   };
 
@@ -173,7 +229,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           <Select
             options={selectOptions}
             selectedOption={selectedOption}
-            onOptionSelect={onOptionSelect}
+            onOptionSelect={(event) => onOptionSelect(event, 'members')}
           />
         )}
         {selectOptions && subPage === 'tasks' && (
@@ -181,7 +237,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             <Select
               options={selectOptions}
               selectedOption={selectedOption}
-              onOptionSelect={onOptionSelect}
+              onOptionSelect={(event) => onOptionSelect(event, 'tasks')}
             />
             <Button
               variant="contained"
@@ -199,8 +255,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             tabs={TAB_OPTIONS}
             currentTab={currentTab}
             onTabSwitch={onTabSwitch}
-            listHead={TABLE_HEAD_VISIONS_MEMBERS}
-            listData={listDataMembers}
+            listHead={TABLE_HEAD_TASKS}
+            listData={listDataTasks}
             daoSubpage={subPage}
           />
         )}
@@ -230,6 +286,19 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           <DialogTitle>Add task</DialogTitle>
           <Box p="1.5rem">
             <Typography> Add task form goes here.. also fix the table data for tasks</Typography>
+            <CreateTaskForm
+              taskForm={
+                {
+                  title: 'test1',
+                  specification: 'test2',
+                  budget: '33312525',
+                  deadline: '4445125122',
+                  attachments: 'test4',
+                  keywords: 'test5',
+                } || {}
+              }
+              onCancel={() => setIsOpenModal(false)}
+            />
           </Box>
         </DialogAnimate>
       </Container>

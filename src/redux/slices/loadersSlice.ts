@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   profile: false,
   tasks: false,
+  dao: false,
   message: ''
 };
 

@@ -1,4 +1,4 @@
-import { LoadingTypes, ProfileCallables, TaskCallables, ActionType } from "src/types";
+import { LoadingTypes, ProfileCallables, TaskCallables, ActionType, DaoCallables } from "src/types";
 
 export default function createLoadingMessage(loadingType?: LoadingTypes, actionType?: ActionType) {
   if (!actionType && loadingType === LoadingTypes.PROFILE) {
@@ -47,6 +47,17 @@ export default function createLoadingMessage(loadingType?: LoadingTypes, actionT
     if (actionType === TaskCallables.REMOVE_TASK) {
       return 'Task deletion in process...'
     }
+  }
+
+  if (actionType && loadingType === LoadingTypes.DAO) {
+    if (actionType === DaoCallables.ORGANIZATION_TASKS) {
+      return 'Fetching organization tasks...'
+    }
+
+    if (actionType === DaoCallables.MEMBERS) {
+      return 'Fetching organization members...'
+    }
+
   }
 
   return '';

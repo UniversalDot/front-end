@@ -1,4 +1,4 @@
-import { Pallets, ProfileCallables, TaskCallables, MessageTiming, ActionType, TransactionStatus } from "src/types";
+import { Pallets, ProfileCallables, TaskCallables, MessageTiming, ActionType, TransactionStatus, DaoCallables } from "src/types";
 
 export default function createSnackbarMessage(enqueueSnackbar: Function, messageTiming: MessageTiming, pallet: Pallets, actionType: ActionType, transactionStatus?: TransactionStatus, customMessage?: string) {
   if (pallet === Pallets.PROFILE) {
@@ -109,6 +109,28 @@ export default function createSnackbarMessage(enqueueSnackbar: Function, message
         if (actionType === TaskCallables.REMOVE_TASK) {
           enqueueSnackbar(`Sorry, error occured: ${customMessage}`, { variant: 'error', autoHideDuration: 5000 })
         }
+      }
+    }
+  }
+
+  if (pallet === Pallets.DAO) {
+    if (messageTiming === MessageTiming.INIT) {
+      if (actionType === DaoCallables.ORGANIZATION_TASKS) {
+        enqueueSnackbar('Fetching organization tasks...', { autoHideDuration: 5000 })
+      }
+
+      if (actionType === DaoCallables.MEMBERS) {
+        enqueueSnackbar('Fetching organization members...', { autoHideDuration: 5000 })
+      }
+    }
+
+    if (messageTiming === MessageTiming.FINAL) {
+      if (actionType === DaoCallables.ORGANIZATION_TASKS) {
+        enqueueSnackbar('Organization tasks fetched successfully!', { autoHideDuration: 5000 })
+      }
+
+      if (actionType === DaoCallables.MEMBERS) {
+        enqueueSnackbar('Organization members fetched successfully!', { autoHideDuration: 5000 })
       }
     }
   }

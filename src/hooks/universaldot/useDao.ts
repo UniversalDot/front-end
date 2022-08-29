@@ -13,14 +13,15 @@ import {
   ProfileCallables,
   MessageTiming,
   ActionType,
+  TaskCallables,
 } from '../../types';
 
 import {
-  setTotalOrganizations,
   setJoinedOrganizations,
   setApplicants as setApplicantsToOrg,
   setMembersOfSelectedOrganization,
   setOwnOrganizations,
+  setOrganizationTasks
 } from '../../redux/slices/daoSlice';
 
 import { useSelector, useDispatch } from '../../redux/store';
@@ -35,8 +36,6 @@ const useDao = () => {
 
   const { selectedKeyring } = useUser();
   const { setLoading } = useLoader();
-
-  const totalOrganizations = useSelector((state) => state.dao.totalOrganizations);
 
   const joinedOrganizations = useSelector(
     state => state.dao.joinedOrganizations
@@ -53,16 +52,50 @@ const useDao = () => {
     state => state.dao.membersOfSelectedOrganization
   );
 
-  const handleQueryResponse = (dataFromResponse: any, daoQueryType: any) => {
-    if (!dataFromResponse.isNone) {
-      switch (daoQueryType) {
-        case DaoCallables.ORGANIZATION_COUNT:
-          dispatch(setTotalOrganizations(dataFromResponse.toHuman()));
-          break;
-        default:
+  const organizationTasks = useSelector(
+    state => state.dao.organizationTasks
+  );
+
+  const handleOrganizationTasksResponse = async (organizationsTasks: any, actionType: ActionType, enqueueSnackbar: Function) => {
+    if (!organizationsTasks.isNone) {
+
+      console.log('organizationsTasks', organizationsTasks)
+      console.log('organizationsTasks human', organizationsTasks.toHuman())
+      const orgTasks: any[] = organizationsTasks.toHuman();
+
+      const query = async (taskId: string) => {
+        let returnValue = undefined;
+
+        const unsub = await api?.query[Pallets.TASK][TaskCallables.TASKS](
+          taskId,
+          (response: any) => {
+            returnValue = { id: taskId, ...response.toHuman() };
+          }
+        );
+
+        const cb = () => unsub;
+        cb();
+
+        while (true) {
+          await new Promise(r => setTimeout(r, 50));
+          if (returnValue) break;
+        }
+
+        return returnValue;
+      };
+
+      const tasksAsObjects = await Promise.all(orgTasks.map(taskId => query(taskId)));
+
+      if (tasksAsObjects) {
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
+        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+        dispatch(
+          setOrganizationTasks(tasksAsObjects)
+        );
       }
     }
   };
+
 
   const handleOrganizationsResponse = async (joinedOrganizationsResponse: any, queryType: 'joined' | 'own', userKey: string) => {
     if (!joinedOrganizationsResponse.isNone) {
@@ -110,9 +143,11 @@ const useDao = () => {
     }
   };
 
-  const handleMembersOfAnOrganizationResponse = async (membersResponse: any, daoType: DaoCallables.MEMBERS | DaoCallables.APPLICANTS_TO_ORGANIZATION) => {
+  const handleMembersOfAnOrganizationResponse = async (membersResponse: any, daoType: DaoCallables.MEMBERS | DaoCallables.APPLICANTS_TO_ORGANIZATION, actionType: ActionType, enqueueSnackbar: Function) => {
     if (!membersResponse.isNone) {
       const membersOfOrganization: any[] = membersResponse.toHuman();
+
+      console.log('profiles in organization', membersResponse.toHuman())
 
       const query = async (memberProfileId: string) => {
         let returnValue = undefined;
@@ -120,7 +155,9 @@ const useDao = () => {
         const unsub = await api?.query[Pallets.PROFILE][ProfileCallables.PROFILES](
           memberProfileId,
           (response: any) => {
+            console.log('each profile object in organization', response.toHuman())
             if (response.toString().length > 0) {
+
               returnValue = response.toHuman();
             } else {
               returnValue = 'empty'
@@ -142,6 +179,9 @@ const useDao = () => {
       const membersAsObjects = await Promise.all(membersOfOrganization.map(memberProfileIdForQuery => query(memberProfileIdForQuery)));
 
       if (membersAsObjects) {
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
+        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+
         const filteredObjects = membersAsObjects.filter((item) => item !== 'empty')
 
         if (daoType === DaoCallables.MEMBERS) {
@@ -160,11 +200,13 @@ const useDao = () => {
   };
 
   const getMembersOfAnOrganization = useCallback(
-    (organizationId) => {
+    (organizationId, actionType: ActionType, enqueueSnackbar: Function) => {
+      createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
+      setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][DaoCallables.MEMBERS](
           organizationId,
-          (response: any) => handleMembersOfAnOrganizationResponse(response, DaoCallables.MEMBERS)
+          (response: any) => handleMembersOfAnOrganizationResponse(response, DaoCallables.MEMBERS, actionType, enqueueSnackbar)
         );
         const cb = () => unsub;
         cb();
@@ -207,12 +249,14 @@ const useDao = () => {
     [api]
   );
 
-  const getTotalOrganizations = useCallback(
-    daoQueryType => {
+  const getOrganizationTasks = useCallback(
+    (organizationId, actionType: ActionType, enqueueSnackbar: Function) => {
+      createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
+      setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][
-          DaoCallables.ORGANIZATION_COUNT
-        ]((resData: any) => handleQueryResponse(resData, daoQueryType));
+          DaoCallables.ORGANIZATION_TASKS
+        ](organizationId, (response: any) => handleOrganizationTasksResponse(response, actionType, enqueueSnackbar));
         const cb = () => unsub;
         cb();
       };
@@ -223,11 +267,14 @@ const useDao = () => {
   );
 
   const getApplicantsToOrganization = useCallback(
-    (organizationId) => {
+    (organizationId, actionType: ActionType, enqueueSnackbar: Function) => {
+      createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
+      setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+
       const query = async () => {
         const unsub = await api?.query[Pallets.DAO][DaoCallables.APPLICANTS_TO_ORGANIZATION](
           organizationId,
-          (response: any) => handleMembersOfAnOrganizationResponse(response, DaoCallables.APPLICANTS_TO_ORGANIZATION)
+          (response: any) => handleMembersOfAnOrganizationResponse(response, DaoCallables.APPLICANTS_TO_ORGANIZATION, actionType, enqueueSnackbar)
         );
         const cb = () => unsub;
         cb();
@@ -359,15 +406,15 @@ const useDao = () => {
   return {
     daoAction,
     getJoinedOrganizations,
-    getTotalOrganizations,
-    totalOrganizations,
     joinedOrganizations,
     applicantsToOrganization,
     getMembersOfAnOrganization,
     membersOfTheSelectedOrganization,
     getOwnOrganizations,
     ownOrganizations,
-    getApplicantsToOrganization
+    getApplicantsToOrganization,
+    getOrganizationTasks,
+    organizationTasks
   };
 };
 

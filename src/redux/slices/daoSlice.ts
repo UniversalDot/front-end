@@ -6,12 +6,16 @@ const initialState: any = {
   ownOrganizations: [],
   membersOfSelectedOrganization: [],
   applicantsToOrganization: [],
+  organizationTasks: []
 };
 
 const daoSlice = createSlice({
   name: 'dao',
   initialState,
   reducers: {
+    setOrganizationTasks(state, action) {
+      state.organizationTasks = action.payload;
+    },
     setTotalOrganizations(state, action) {
       state.totalOrganizations = action.payload;
     },
@@ -36,6 +40,7 @@ export const {
   setOwnOrganizations,
   setMembersOfSelectedOrganization,
   setApplicants,
+  setOrganizationTasks
 } = daoSlice.actions;
 
 export default daoSlice.reducer;
