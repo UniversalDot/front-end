@@ -20,6 +20,8 @@ jobs:
       run: |
         npm install --legacy-peer-deps
         npm run build
+      env:
+        CI: false
 
     # Deploy to `hosting` branch
     - name: Deploy to hosting branch
