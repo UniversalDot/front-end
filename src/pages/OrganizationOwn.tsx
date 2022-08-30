@@ -4,7 +4,7 @@ import { Container, Box, Button, DialogTitle, Typography } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
-import { useUser, useDao } from '../hooks/universaldot';
+import { useUser, useDao, useTasks } from '../hooks/universaldot';
 // routes
 import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
@@ -51,6 +51,20 @@ const TABLE_HEAD_TASKS = [
   { id: 'actions' },
 ];
 
+const defaultTaskFormData = {
+  title: '',
+  specification: '',
+  budget: '',
+  deadline: '',
+  attachments: '',
+  keywords: '',
+};
+
+const defaultAddTaskToOrganizationFormData = {
+  organizationId: '',
+  taskId: '',
+};
+
 const TAB_OPTIONS = ['All'];
 
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
@@ -60,6 +74,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const { currentTab } = useTabs('All');
 
+  const { taskAction } = useTasks();
+
   const [selectedOption, setSelectedOption] = useState('');
   const [selectOptions, setSelectOptions] = useState([]);
 
@@ -68,7 +84,15 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const [listDataTasks, setListDataTasks] = useState([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [modalType, setModalType] = useState<'addToOrg' | 'createTask'>('createTask');
+  const [modalType, setModalType] = useState<'addToOrg' | 'createTask' | 'updateTask'>(
+    'createTask'
+  );
+  const [taskIdInEdit, setTaskIdInEdit] = useState<string>('');
+
+  const [taskFormData, setTaskFormData] = useState(defaultTaskFormData);
+  const [addTaskToOrganizationFormData, setAddTaskToOrganizationFormData] = useState(
+    defaultAddTaskToOrganizationFormData
+  );
 
   const { selectedKeyring } = useUser();
   const {
@@ -180,9 +204,32 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           {
             id: TaskCallables.UPDATE_TASK,
             label: 'Update task',
-            cb: () => daoAction(TaskCallables.UPDATE_TASK, '@TODO payload', enqueueSnackbar),
+            cb: () => {
+              setIsOpenModal(true);
+              setModalType('updateTask');
+              setTaskIdInEdit(task.id);
+              setTaskFormData({
+                title: task.title,
+                specification: task.specification,
+                budget: task.budget.replaceAll(',', ''),
+                deadline: task.deadline.replaceAll(',', ''),
+                attachments: task.attachments,
+                keywords: task.keywords,
+              });
+            },
           },
-          // @TODO others
+          // @TODO: make these 2 conditional;
+          {
+            id: TaskCallables.ACCEPT_TASK,
+            label: 'Accept task',
+            cb: () => taskAction(TaskCallables.ACCEPT_TASK, [task.id], enqueueSnackbar),
+          },
+          {
+            id: TaskCallables.REJECT_TASK,
+            label: 'Reject task',
+            cb: () =>
+              taskAction(TaskCallables.REJECT_TASK, [task.id, '@TODO feedback'], enqueueSnackbar),
+          },
         ],
       }));
 
@@ -215,6 +262,22 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const onTabSwitch = (event: React.SyntheticEvent<Element, Event>, tab: string) => {
     console.log('not needed tab switch');
     return;
+  };
+
+  const createTaskCleanup = () => {
+    setIsOpenModal(false);
+    setTaskFormData(defaultTaskFormData);
+  };
+
+  const updateTaskCleanup = () => {
+    setIsOpenModal(false);
+    setModalType('createTask');
+    setTaskIdInEdit('');
+    setTaskFormData(defaultTaskFormData);
+  };
+
+  const addTaskToOrganizationCleanup = () => {
+    setIsOpenModal(false);
   };
 
   return (
@@ -302,34 +365,27 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
         )}
         <DialogAnimate open={isOpenModal} onClose={() => setIsOpenModal(false)}>
           <DialogTitle>
-            {modalType === 'createTask' ? 'Create task' : 'Add task to organization'}
+            {modalType === 'createTask'
+              ? 'Create task'
+              : modalType === 'updateTask'
+              ? 'Update task'
+              : 'Add task to organization'}
           </DialogTitle>
           <Box p="1.5rem">
-            <Typography> Add task form goes here.. also fix the table data for tasks</Typography>
             {modalType === 'createTask' && (
+              <CreateTaskForm taskForm={taskFormData || {}} onCancel={() => createTaskCleanup()} />
+            )}
+            {modalType === 'updateTask' && (
               <CreateTaskForm
-                taskForm={
-                  {
-                    title: 'test1',
-                    specification: 'test2',
-                    budget: '33312525',
-                    deadline: '4445125122',
-                    attachments: 'test4',
-                    keywords: 'test5',
-                  } || {}
-                }
-                onCancel={() => setIsOpenModal(false)}
+                taskForm={taskFormData || {}}
+                taskIdForEdit={taskIdInEdit}
+                onCancel={() => updateTaskCleanup()}
               />
             )}
             {modalType === 'addToOrg' && (
               <AddTaskToOrganizationForm
-                form={
-                  {
-                    organizationId: 'test1',
-                    taskId: 'test2',
-                  } || {}
-                }
-                onCancel={() => setIsOpenModal(false)}
+                form={addTaskToOrganizationFormData || {}}
+                onCancel={() => addTaskToOrganizationCleanup()}
               />
             )}
           </Box>

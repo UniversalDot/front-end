@@ -5,18 +5,8 @@ import { useSnackbar } from 'notistack';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Box, Stack, Button, Tooltip, TextField, IconButton, DialogActions } from '@mui/material';
+import { Stack, Button, DialogActions } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-// redux
-import { useDispatch } from '../../../redux/store';
-// import {
-//   createTaskForm,
-//   updateTaskForm,
-//   resetTaskForm,
-//   setTaskFormIsLoading,
-// } from '../../../redux/slices/daoSlice';
-// components
-import Iconify from '../../Iconify';
 import { FormProvider, RHFTextField } from '../../hook-form';
 import { useTasks } from 'src/hooks/universaldot';
 import { TaskCallables } from 'src/types';
@@ -62,17 +52,14 @@ type FormValuesProps = {
 
 type Props = {
   taskForm: TaskForm;
+  taskIdForEdit?: string;
   onCancel: VoidFunction;
 };
 
-export default function CreateTaskForm({ taskForm, onCancel }: Props) {
+export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel }: Props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const { taskAction } = useTasks();
-
-  const dispatch = useDispatch();
-
-  const isCreating = Object.keys(taskForm).length === 0;
 
   const TaskSchema = Yup.object().shape({
     title: Yup.string().max(255).required('Title is required'),
@@ -91,8 +78,19 @@ export default function CreateTaskForm({ taskForm, onCancel }: Props) {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = async (data: FormValuesProps) => {
-    try {
+  const onSubmit = (data: FormValuesProps) => {
+    if (taskIdForEdit) {
+      const updatedTask = {
+        taskId: taskIdForEdit,
+        title: data.title,
+        specification: data.specification,
+        budget: data.budget,
+        deadline: data.deadline,
+        attachments: data.attachments,
+        keywords: data.keywords,
+      };
+      taskAction(TaskCallables.UPDATE_TASK, updatedTask, enqueueSnackbar);
+    } else {
       const newTask = {
         title: data.title,
         specification: data.specification,
@@ -101,32 +99,14 @@ export default function CreateTaskForm({ taskForm, onCancel }: Props) {
         attachments: data.attachments,
         keywords: data.keywords,
       };
-      if (taskForm.title) {
-        // @TODO: do update later;
-        // taskAction(TaskCallables.UPDATE_TASK, newTask, enqueueSnackbar);
-        taskAction(TaskCallables.CREATE_TASK, newTask, enqueueSnackbar);
-      } else {
-        enqueueSnackbar('Create success!');
-        taskAction(TaskCallables.CREATE_TASK, newTask, enqueueSnackbar);
-      }
-      onCancel();
-      reset();
-    } catch (error) {
-      console.error(error);
+      enqueueSnackbar('Create success!');
+      taskAction(TaskCallables.CREATE_TASK, newTask, enqueueSnackbar);
     }
+    onCancel();
+    reset();
   };
 
-  // const handleDelete = async () => {
-  //   if (!taskForm.title) return;
-  //   try {
-  //     onCancel();
-  //     dispatch(resetTaskForm());
-  //     enqueueSnackbar('Delete success!');
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
+  // @TODO: see what it is for;
   const values = watch();
 
   return (
@@ -146,21 +126,16 @@ export default function CreateTaskForm({ taskForm, onCancel }: Props) {
       </Stack>
 
       <DialogActions>
-        {/* {!isCreating && (
-          <Tooltip title="Delete Event">
-            <IconButton onClick={handleDelete}>
-              <Iconify icon="eva:trash-2-outline" width={20} height={20} />
-            </IconButton>
-          </Tooltip>
-        )} */}
-        <Box sx={{ flexGrow: 1 }} />
-
         <Button variant="outlined" color="inherit" onClick={onCancel}>
           Cancel
         </Button>
 
-        <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-          Add
+        <LoadingButton
+          type="submit"
+          variant="contained"
+          // loading={isSubmitting}
+        >
+          {taskIdForEdit ? 'Update' : 'Create'}
         </LoadingButton>
       </DialogActions>
     </FormProvider>

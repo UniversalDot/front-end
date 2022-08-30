@@ -240,16 +240,34 @@ const useTasks = () => {
       taskPayload?.keywords || '',
     ];
 
+    const transformedPayloadForUpdate = [
+      taskPayload?.taskId || '',
+      taskPayload?.title || '',
+      taskPayload?.specification || '',
+      taskPayload?.budget || '',
+      taskPayload?.deadline || '',
+      taskPayload?.attachments || '',
+      taskPayload?.keywords || '',
+    ];
+
     const transformedPayloadOnlyTaskId = [taskPayload];
 
     // @TODO - do the payload for reject;
-    const transformedPayloadReject = [taskPayload, 'some feedback about the rejection'];
+    const transformedPayloadReject = [...taskPayload];
+
+
+    const transformedPayloadOnlyTaskId2 = [...taskPayload];
+
+    console.log('payload', taskPayload)
+    console.log('transformedPayloadReject', transformedPayloadReject)
+    console.log('transformedPayloadOnlyTaskId', transformedPayloadOnlyTaskId2)
+
 
     let txExecute;
 
     if (actionType === TaskCallables.ACCEPT_TASK) {
       txExecute = api.tx[Pallets.TASK][actionType](
-        ...transformedPayloadOnlyTaskId
+        ...transformedPayloadOnlyTaskId2
       );
     }
 
@@ -262,6 +280,12 @@ const useTasks = () => {
     if (actionType === TaskCallables.CREATE_TASK) {
       txExecute = api.tx[Pallets.TASK][actionType](
         ...transformedPayloadForCreate
+      );
+    }
+
+    if (actionType === TaskCallables.UPDATE_TASK) {
+      txExecute = api.tx[Pallets.TASK][TaskCallables.UPDATE_TASK](
+        ...transformedPayloadForUpdate
       );
     }
 
@@ -315,6 +339,7 @@ const useTasks = () => {
       }
 
 
+      console.log('response', response)
 
       if (response.status?.isFinalized) {
         // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
