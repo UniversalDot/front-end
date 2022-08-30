@@ -48,6 +48,7 @@ const TABLE_HEAD_TASKS = [
   { id: 'deadline', label: 'Deadline', align: 'left' },
   { id: 'attachments', label: 'Attachments', align: 'left' },
   { id: 'keywords', label: 'Keywords', align: 'left' },
+  { id: 'status', label: 'Status', align: 'left' },
   { id: 'actions' },
 ];
 
@@ -84,9 +85,9 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const [listDataTasks, setListDataTasks] = useState([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [modalType, setModalType] = useState<'addToOrg' | 'createTask' | 'updateTask'>(
-    'createTask'
-  );
+  const [modalType, setModalType] = useState<
+    'addToOrg' | 'createTask' | 'updateTask' | 'rejectFeedback'
+  >('createTask');
   const [taskIdInEdit, setTaskIdInEdit] = useState<string>('');
 
   const [taskFormData, setTaskFormData] = useState(defaultTaskFormData);
@@ -194,6 +195,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
         deadline: task.deadline,
         attachments: task.attachments,
         keywords: task.keywords,
+        status: task.status,
         daoActions: [
           {
             id: DaoCallables.REMOVE_TASKS,
@@ -223,13 +225,23 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             id: TaskCallables.ACCEPT_TASK,
             label: 'Accept task',
             cb: () => taskAction(TaskCallables.ACCEPT_TASK, [task.id], enqueueSnackbar),
+            isHidden: task.status !== 'Completed' ? true : false,
           },
           {
             id: TaskCallables.REJECT_TASK,
             label: 'Reject task',
-            cb: () =>
-              taskAction(TaskCallables.REJECT_TASK, [task.id, '@TODO feedback'], enqueueSnackbar),
+            cb: () => {
+              setIsOpenModal(true);
+              setModalType('rejectFeedback');
+            },
+            isHidden: task.status !== 'Completed' ? true : false,
           },
+          // {
+          //   id: TaskCallables.REJECT_TASK,
+          //   label: 'Reject task',
+          //   cb: () =>
+          //     taskAction(TaskCallables.REJECT_TASK, [task.id, '@TODO feedback'], enqueueSnackbar),
+          // },
         ],
       }));
 
@@ -369,6 +381,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               ? 'Create task'
               : modalType === 'updateTask'
               ? 'Update task'
+              : modalType === 'rejectFeedback'
+              ? 'Rejection feedback'
               : 'Add task to organization'}
           </DialogTitle>
           <Box p="1.5rem">
@@ -383,6 +397,12 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               />
             )}
             {modalType === 'addToOrg' && (
+              <AddTaskToOrganizationForm
+                form={addTaskToOrganizationFormData || {}}
+                onCancel={() => addTaskToOrganizationCleanup()}
+              />
+            )}
+            {modalType === 'rejectFeedback' && (
               <AddTaskToOrganizationForm
                 form={addTaskToOrganizationFormData || {}}
                 onCancel={() => addTaskToOrganizationCleanup()}

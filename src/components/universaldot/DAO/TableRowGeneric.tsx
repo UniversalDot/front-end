@@ -34,18 +34,20 @@ export default function TableRowGeneric({
     setOpenMenuActions(null);
   };
 
-  const rowActions = row.daoActions.map((daoAction: any) => (
-    <MenuItem
-      key={daoAction.id}
-      onClick={() => {
-        daoAction.cb();
-        handleCloseMenu();
-      }}
-    >
-      <Iconify icon={'eva:edit-fill'} />
-      {daoAction.label}
-    </MenuItem>
-  ));
+  const rowActions = row.daoActions.map((daoAction: any) =>
+    !daoAction.isHidden ? (
+      <MenuItem
+        key={daoAction.id}
+        onClick={() => {
+          daoAction.cb();
+          handleCloseMenu();
+        }}
+      >
+        <Iconify icon={'eva:edit-fill'} />
+        {daoAction.label}
+      </MenuItem>
+    ) : null
+  );
 
   return (
     <>
@@ -79,6 +81,7 @@ export default function TableRowGeneric({
           <TableCell>{row.deadline}</TableCell>
           <TableCell>{row.attachments}</TableCell>
           <TableCell>{row.keywords}</TableCell>
+          <TableCell>{row.status}</TableCell>
 
           <TableCell align="right">
             <TableMoreMenu
