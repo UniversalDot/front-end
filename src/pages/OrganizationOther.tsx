@@ -11,7 +11,6 @@ import { PATH_UNIVERSALDOT } from '../routes/paths';
 import Page from '../components/Page';
 import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // universaldot
-// import Organizations from 'src/components/universaldot/Organizations';
 import { DAOLists } from '../components/universaldot/DAO';
 import { DaoCallables } from '../types';
 import { useSnackbar } from 'notistack';

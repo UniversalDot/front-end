@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 // @mui
-import { Container, Box, Button, DialogTitle, Typography } from '@mui/material';
+import { Container, Box, Button, DialogTitle } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
@@ -15,13 +15,14 @@ import { DialogAnimate } from '../components/animate';
 // universaldot
 import {
   DAOLists,
-  DAOAnalytics,
+  // DAOAnalytics,
   Select,
-  Kanban,
+  // Kanban,
   CreateTaskForm,
   AddTaskToOrganizationForm,
+  RejectTaskForm,
 } from '../components/universaldot/DAO';
-import { DaoCallables, TaskCallables } from '../types';
+import { DaoCallables, TaskCallables, TaskStatusEnum } from '../types';
 import { useSnackbar } from 'notistack';
 // ----------------------------------------------------------------------
 
@@ -66,6 +67,10 @@ const defaultAddTaskToOrganizationFormData = {
   taskId: '',
 };
 
+const defaultRejectTaskFormData = {
+  feedback: '',
+};
+
 const TAB_OPTIONS = ['All'];
 
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
@@ -89,11 +94,11 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     'addToOrg' | 'createTask' | 'updateTask' | 'rejectFeedback'
   >('createTask');
   const [taskIdInEdit, setTaskIdInEdit] = useState<string>('');
+  const [taskIdToReject, setTaskIdToReject] = useState<string>('');
 
   const [taskFormData, setTaskFormData] = useState(defaultTaskFormData);
-  const [addTaskToOrganizationFormData, setAddTaskToOrganizationFormData] = useState(
-    defaultAddTaskToOrganizationFormData
-  );
+  const [addTaskToOrganizationFormData] = useState(defaultAddTaskToOrganizationFormData);
+  const [rejectTaskFormData] = useState(defaultRejectTaskFormData);
 
   const { selectedKeyring } = useUser();
   const {
@@ -133,16 +138,6 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               label: 'Add members',
               cb: () => daoAction(DaoCallables.ADD_MEMBERS, '@TODO payload', enqueueSnackbar),
             },
-            // {
-            //   id: DaoCallables.ADD_TASKS,
-            //   label: 'Add tasks',
-            //   cb: () => daoAction(DaoCallables.ADD_TASKS, '@TODO payload', enqueueSnackbar),
-            // },
-            // {
-            //   id: DaoCallables.CREATE_VISION,
-            //   label: 'Create vision',
-            //   cb: () => daoAction(DaoCallables.CREATE_VISION, '@TODO payload', enqueueSnackbar),
-            // },
           ],
         },
         daoActions: [
@@ -220,12 +215,11 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               });
             },
           },
-          // @TODO: make these 2 conditional;
           {
             id: TaskCallables.ACCEPT_TASK,
             label: 'Accept task',
             cb: () => taskAction(TaskCallables.ACCEPT_TASK, [task.id], enqueueSnackbar),
-            isHidden: task.status !== 'Completed' ? true : false,
+            isHidden: task.status !== TaskStatusEnum.COMPLETED ? true : false,
           },
           {
             id: TaskCallables.REJECT_TASK,
@@ -234,14 +228,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               setIsOpenModal(true);
               setModalType('rejectFeedback');
             },
-            isHidden: task.status !== 'Completed' ? true : false,
+            isHidden: task.status !== TaskStatusEnum.COMPLETED ? true : false,
           },
-          // {
-          //   id: TaskCallables.REJECT_TASK,
-          //   label: 'Reject task',
-          //   cb: () =>
-          //     taskAction(TaskCallables.REJECT_TASK, [task.id, '@TODO feedback'], enqueueSnackbar),
-          // },
         ],
       }));
 
@@ -290,6 +278,10 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const addTaskToOrganizationCleanup = () => {
     setIsOpenModal(false);
+  };
+  const rejectTaskCleanup = () => {
+    setIsOpenModal(false);
+    setTaskIdToReject('');
   };
 
   return (
@@ -403,9 +395,10 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               />
             )}
             {modalType === 'rejectFeedback' && (
-              <AddTaskToOrganizationForm
-                form={addTaskToOrganizationFormData || {}}
-                onCancel={() => addTaskToOrganizationCleanup()}
+              <RejectTaskForm
+                form={rejectTaskFormData || {}}
+                onCancel={() => rejectTaskCleanup()}
+                taskId={taskIdToReject}
               />
             )}
           </Box>

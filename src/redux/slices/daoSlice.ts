@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: any = {
-  totalOrganizations: 0,
   joinedOrganizations: [],
   ownOrganizations: [],
   membersOfSelectedOrganization: [],
@@ -15,9 +14,6 @@ const daoSlice = createSlice({
   reducers: {
     setOrganizationTasks(state, action) {
       state.organizationTasks = action.payload;
-    },
-    setTotalOrganizations(state, action) {
-      state.totalOrganizations = action.payload;
     },
     setOwnOrganizations(state, action) {
       state.ownOrganizations = action.payload;
@@ -35,7 +31,6 @@ const daoSlice = createSlice({
 });
 
 export const {
-  setTotalOrganizations,
   setJoinedOrganizations,
   setOwnOrganizations,
   setMembersOfSelectedOrganization,

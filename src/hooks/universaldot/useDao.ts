@@ -1,11 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable indent */
 import { useCallback, useState } from 'react';
 import { web3FromSource } from '@polkadot/extension-dapp';
 import { useSubstrateState } from '../../substrate-lib';
-// import {} from '../store/slices/daoSlice';
 import { useUser } from './useUser';
 import { useLoader } from './useLoader';
+import { useUtils } from './useUtils';
 import {
   Pallets,
   LoadingTypes,
@@ -14,6 +12,7 @@ import {
   MessageTiming,
   ActionType,
   TaskCallables,
+  TransactionStatus
 } from '../../types';
 
 import {
@@ -36,6 +35,7 @@ const useDao = () => {
 
   const { selectedKeyring } = useUser();
   const { setLoading } = useLoader();
+  const { getErrorInfo } = useUtils();
 
   const joinedOrganizations = useSelector(
     state => state.dao.joinedOrganizations
@@ -131,7 +131,6 @@ const useDao = () => {
 
         if (queryType === 'own') {
           const ownOrganizationsAsObjects = organizationsAsObjects.filter((organization: any) => organization.owner === userKey)
-
           dispatch(
             setOwnOrganizations(ownOrganizationsAsObjects)
           );
@@ -152,7 +151,6 @@ const useDao = () => {
           memberProfileId,
           (response: any) => {
             if (response.toString().length > 0) {
-
               returnValue = response.toHuman();
             } else {
               returnValue = 'empty'
@@ -209,6 +207,7 @@ const useDao = () => {
 
       query();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [api]
   );
 
@@ -225,6 +224,7 @@ const useDao = () => {
 
       query();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [api]
   );
 
@@ -241,6 +241,7 @@ const useDao = () => {
 
       query();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [api]
   );
 
@@ -258,6 +259,7 @@ const useDao = () => {
 
       query();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [api]
   );
 
@@ -277,36 +279,9 @@ const useDao = () => {
 
       query();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [api]
   );
-
-  // const handleAddTaskToOrganizationResponse = async (taskForOrganization: any) => {
-  //   if (!taskForOrganization.isNone) {
-
-  //     console.log('organizationsTasks', taskForOrganization)
-  //     console.log('organizationsTasks human', taskForOrganization.toHuman())
-
-  //   }
-  // };
-
-
-  // const addTaskToOrganization = useCallback(
-  //   (organizationId, taskId) => {
-  //     const query = async () => {
-  //       // @TODO: confirm if payload is formatted well;
-  //       const payload = [organizationId, taskId]
-  //       const unsub = await api?.query[Pallets.DAO][DaoCallables.ADD_TASKS](
-  //         payload,
-  //         (response: any) => handleAddTaskToOrganizationResponse(response)
-  //       );
-  //       const cb = () => unsub;
-  //       cb();
-  //     };
-
-  //     query();
-  //   },
-  //   [api]
-  // );
 
   const signedTx = async (actionType: ActionType, payload: any, enqueueSnackbar: Function) => {
     const accountPair =
@@ -335,81 +310,71 @@ const useDao = () => {
 
     const fromAcct = await getFromAcct();
 
-    // TODO: orgName should be refactored to orgId in BE; add from argument payload down below;
-    const transformedPayloadAddMembers = ['@TODO'];
-
-    // TODO: orgName should be refactored to orgId in BE;
-    const transformedPayloadAddTasks = [...payload]
-
-    const transformedPayloadCreateOrg = ['@TODO'];
-    // TODO: should accept more data (title, desc, etc.) not just visionDocument;
-
-    const transformedPayloadDissolveOrg = ['@TODO'];
-    // TODO: orgName should be refactored to orgId in BE;
-    const transformedPayloadRemoveMembers = ['@TODO'];
-    // TODO: orgName should be refactored to orgId in BE;
-    const transformedPayloadRemoveTasks = [...payload];
-
     let txExecute;
 
     if (actionType === DaoCallables.ADD_MEMBERS) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.ADD_MEMBERS](
-        ...transformedPayloadAddMembers
+        ...payload
       );
     }
 
     if (actionType === DaoCallables.ADD_TASKS) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.ADD_TASKS](
-        ...transformedPayloadAddTasks
+        ...payload
       );
     }
 
     if (actionType === DaoCallables.CREATE_ORGANIZATION) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.CREATE_ORGANIZATION](
-        ...transformedPayloadCreateOrg
+        ...payload
       );
     }
 
     if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.DISSOLVE_ORGANIZATION](
-        ...transformedPayloadDissolveOrg
+        ...payload
       );
     }
 
     if (actionType === DaoCallables.REMOVE_MEMBERS) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.REMOVE_MEMBERS](
-        ...transformedPayloadRemoveMembers
+        ...payload
       );
     }
 
     if (actionType === DaoCallables.REMOVE_TASKS) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.REMOVE_TASKS](
-        ...transformedPayloadRemoveTasks
+        ...payload
       );
     }
 
-    const transactionResponseHandler = (res: any) => {
-      const callStatus = res.status;
+    const transactionResponseHandler = (response: any) => {
+      let txFailed = false;
+      let failureText: string = '';
 
-      if (callStatus?.isFinalized) {
-        // TODO: make a call to repopulate state with latest changes from the blockchain;
+      console.log('response', response)
+
+      if (response.status?.isFinalized) {
+        // TODO: Maybe do a call to repopulate state with latest changes from the blockchain;
       }
 
-      if (callStatus?.isInBlock) {
+      if (response.dispatchError) {
+        console.log('response.dispatchError', response.dispatchError)
+
+        const { txFailed: txFailedResult, failureText: failureTextResult } = getErrorInfo(response, api)
+
+        txFailed = txFailedResult;
+        failureText = failureTextResult;
+      }
+
+      if (response.status?.isInBlock) {
         setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage() });
-        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText)
       }
+
     };
 
-    const transactionErrorHandler = (err: any) => {
-      // @TODO
-      console.log('Error handler message', err);
-    };
-
-    const unsub = await txExecute
-      .signAndSend(fromAcct, transactionResponseHandler)
-      .catch(transactionErrorHandler);
-
+    const unsub = await txExecute.signAndSend(fromAcct, transactionResponseHandler);
     setUnsub(() => unsub);
   };
 
@@ -417,6 +382,38 @@ const useDao = () => {
     if (typeof unsub === 'function') {
       unsub();
       setUnsub(null);
+    }
+
+    if (actionType === DaoCallables.ADD_MEMBERS) {
+      payload = ['@TODO']
+    }
+
+    if (actionType === DaoCallables.ADD_TASKS) {
+      payload = [...payload]
+    }
+
+    if (actionType === DaoCallables.CREATE_ORGANIZATION) {
+      payload = ['@TODO']
+    }
+
+    if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
+      payload = ['@TODO']
+    }
+
+    if (actionType === DaoCallables.UPDATE_ORGANIZATION) {
+      payload = ['@TODO']
+    }
+
+    if (actionType === DaoCallables.TRANSFER_OWNERSHIP) {
+      payload = ['@TODO']
+    }
+
+    if (actionType === DaoCallables.REMOVE_MEMBERS) {
+      payload = ['@TODO']
+    }
+
+    if (actionType === DaoCallables.REMOVE_TASKS) {
+      payload = [...payload]
     }
 
     createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
@@ -438,7 +435,6 @@ const useDao = () => {
     getApplicantsToOrganization,
     getOrganizationTasks,
     organizationTasks,
-    // addTaskToOrganization
   };
 };
 

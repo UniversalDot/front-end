@@ -12,14 +12,6 @@ export enum LoadingTypes {
   DAO = 'dao',
 };
 
-export const toastTypes = {
-  DEFAULT: '',
-  INFO: 'info',
-  SUCCESS: 'success',
-  WARNING: 'warn',
-  ERROR: 'error',
-};
-
 export enum Pallets {
   PROFILE = 'profile',
   TASK = 'task',
@@ -27,16 +19,16 @@ export enum Pallets {
 };
 
 export enum ProfileCallables {
-  PROFILES = 'profiles',
+  // Extrinsic:
   CREATE_PROFILE = 'createProfile',
   UPDATE_PROFILE = 'updateProfile',
   REMOVE_PROFILE = 'removeProfile',
+  // Query:
+  PROFILES = 'profiles',
 };
 
 export enum TaskCallables {
-  TASKS_OWNED = 'tasksOwned',
-  GET_TASK = 'tasks',
-  TASKS = 'tasks',
+  // Extrinsic:
   CREATE_TASK = 'createTask',
   START_TASK = 'startTask',
   COMPLETE_TASK = 'completeTask',
@@ -44,28 +36,14 @@ export enum TaskCallables {
   UPDATE_TASK = 'updateTask',
   ACCEPT_TASK = 'acceptTask',
   REJECT_TASK = 'rejectTask',
-};
-
-export const daoCallables = {
-  ADD_MEMBERS: 'addMembers',
-  ADD_TASKS: 'addTasks',
-  CREATE_ORGANIZATION: 'createOrganization',
-  CREATE_VISION: 'createVision',
-  DISSOLVE_ORGANIZATION: 'dissolveOrganization',
-  REMOVE_MEMBERS: 'removeMembers',
-  REMOVE_TASKS: 'removeTasks',
-  REMOVE_VISION: 'removeVision',
-  SIGN_VISION: 'signVision',
-  UNSIGN_VISION: 'unsignVision',
-  // QUERY callables:
-  MEMBER_OF: 'memberOf',
-  ORGANIZATION_COUNT: 'organizationCount',
-  VISION: 'vision',
-  VISION_COUNT: 'visionCount',
-  APPLICANTS_TO_ORGANIZATION: 'applicantsToOrganization',
+  // Query:
+  TASKS_OWNED = 'tasksOwned',
+  GET_TASK = 'tasks',
+  TASKS = 'tasks',
 };
 
 export enum DaoCallables {
+  // Extrinsic:
   ADD_MEMBERS = 'addMembers',
   ADD_TASKS = 'addTasks',
   CREATE_ORGANIZATION = 'createOrganization',
@@ -78,7 +56,7 @@ export enum DaoCallables {
   UNSIGN_VISION = 'unsignVision',
   TRANSFER_OWNERSHIP = 'transferOwnership',
   UPDATE_ORGANIZATION = 'updateOrganization',
-  // QUERY callables:
+  // Query:
   APPLICANTS_TO_ORGANIZATION = 'applicantsToOrganization',
   MEMBER_OF = 'memberOf',
   MEMBERS = 'members',

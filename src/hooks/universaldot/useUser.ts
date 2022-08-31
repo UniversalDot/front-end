@@ -8,9 +8,6 @@ const useUser = () => {
   const dispatch = useDispatch();
 
   const selectedKeyring = useSelector(state => state.account.selectedKeyring);
-  const selectedAccountBalance = useSelector(
-    state => state.account.selectedAccountBalance
-  );
   const keyringOptions = useSelector(state => state.account.keyringOptions);
 
   const setKeyringOptions = (keyringOptionsArray: any) => {
@@ -30,7 +27,6 @@ const useUser = () => {
 
   return {
     selectedKeyring,
-    selectedAccountBalance,
     setKeyringOptions,
     keyringOptions,
     setSelectedKeyring,
