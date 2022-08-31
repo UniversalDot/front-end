@@ -75,17 +75,17 @@ const Events = () => {
         <Box sx={{ flexGrow: 1 }}>
           {/* <Typography variant="subtitle1">Events</Typography> */}
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            You have 1111 unread events
+            You have {eventFeed.length} events
           </Typography>
         </Box>
 
-        {10000 > 0 && (
+        {/* {10000 > 0 && (
           <Tooltip title=" Mark all as read">
             <IconButton color="primary">
               <Iconify icon="eva:done-all-fill" width={20} height={20} />
             </IconButton>
           </Tooltip>
-        )}
+        )} */}
       </Box>
 
       <Divider sx={{ borderStyle: 'solid' }} />
@@ -111,7 +111,7 @@ const Events = () => {
           ))}
         </List>
 
-        <List
+        {/* <List
           disablePadding
           subheader={
             <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
@@ -122,7 +122,7 @@ const Events = () => {
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((event: any, index: any) => (
             <Event key={`e${index}`} title="test123" description="todo-test" />
           ))}
-        </List>
+        </List> */}
       </Scrollbar>
 
       <Divider sx={{ borderStyle: 'solid' }} />

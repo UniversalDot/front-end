@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  selectedAccountBalance: '',
   keyringOptions: [],
   selectedKeyring: {
     key: '',
@@ -17,9 +16,6 @@ const accountSlice = createSlice({
     setSelectedKeyringAction(state, action) {
       state.selectedKeyring = action.payload;
     },
-    setBalance(state, action) {
-      state.selectedAccountBalance = action.payload;
-    },
     setKeyringOptionsAction(state, action) {
       state.keyringOptions = action.payload;
     },
@@ -28,7 +24,6 @@ const accountSlice = createSlice({
 
 export const {
   setSelectedKeyringAction,
-  setBalance,
   setKeyringOptionsAction,
 } = accountSlice.actions;
 

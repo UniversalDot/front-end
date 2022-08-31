@@ -17,7 +17,8 @@ import {
   MessageTiming,
   ActionType,
   ProfilePayload,
-  ProfileDataSubstrate
+  ProfileDataSubstrate,
+  TransactionStatus
 } from '../../types';
 import createSnackbarMessage from '../../utils/createSnackbarMessage';
 import createLoadingMessage from '../../utils/createLoadingMessage';
@@ -29,7 +30,7 @@ const useProfile = () => {
 
   const { selectedKeyring } = useUser();
   const { setLoading } = useLoader();
-  const { transformParams } = useUtils();
+  const { transformParams, getErrorInfo } = useUtils();
 
   const profileData = useSelector(state => state.profile.data);
 
@@ -52,7 +53,7 @@ const useProfile = () => {
     [dispatch, setLoading]
   );
 
-  // @TODO: figure out how to make it simpler to check when API is availabile so it doesn't crash;
+  // @TODO: Figure out how to make it simpler to check when the API is availabile so the app doesn't crash;
   const getProfile = useCallback(() => {
     setLoading({ type: LoadingTypes.PROFILE, value: true, message: createLoadingMessage(LoadingTypes.PROFILE) });
 
@@ -103,21 +104,30 @@ const useProfile = () => {
       return fromAcct;
     };
 
-    const transactionResponseHandler = ({ status }: any) => {
-      if (status?.isInBlock) {
-        setLoading({ type: LoadingTypes.PROFILE, value: false, message: createLoadingMessage() });
-        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.PROFILE, actionType)
-      }
-    };
+    const transactionResponseHandler = (response: any) => {
+      let txFailed = false;
+      let failureText: string = '';
 
-    const transactionErrorHandler = (err: any) => {
-      // @TODO
-      console.log('Error handler message', err);
+      if (response.dispatchError) {
+        const { txFailed: txFailedResult, failureText: failureTextResult } = getErrorInfo(response, api)
+
+        txFailed = txFailedResult;
+        failureText = failureTextResult;
+      }
+
+      if (response.status?.isFinalized) {
+        // @TODO: check if I need to call anything;
+      }
+
+      if (response.status?.isInBlock) {
+        setLoading({ type: LoadingTypes.PROFILE, value: false, message: createLoadingMessage() });
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.PROFILE, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText)
+      }
     };
 
     const fromAcct = await getFromAcct();
 
-    // @TODO: verify how to do it correctly; use util or similar to this;
+    // @TODO: verify how to do it correctly; use an util or similar;
     const paramFieldsForTransformed = () => [
       { name: 'username', optional: false, type: 'Bytes' },
       { name: 'interests', optional: false, type: 'Bytes' },
@@ -154,10 +164,7 @@ const useProfile = () => {
       );
     }
 
-    const unsub = await txExecute
-      .signAndSend(fromAcct, transactionResponseHandler)
-      .catch(transactionErrorHandler);
-
+    const unsub = await txExecute.signAndSend(fromAcct, transactionResponseHandler);
     setUnsub(() => unsub);
   };
 

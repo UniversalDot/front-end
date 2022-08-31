@@ -42,14 +42,25 @@ export default function Router() {
         { path: 'tasks', element: <Tasks /> },
         { path: 'calendar', element: <Calendar /> },
         {
-          path: 'organization',
+          path: 'dao',
           children: [
             {
-              element: <Navigate to="/dashboard/organization/other-organization" replace />,
+              element: <Navigate to="/dashboard/dao/other-organization" replace />,
               index: true,
             },
             { path: 'other-organization', element: <OrganizationOther /> },
-            { path: 'my-organization', element: <OrganizationOwn /> },
+            {
+              path: 'my-organization',
+              children: [
+                {
+                  element: <Navigate to="/dashboard/dao/my-organization/organizations" replace />,
+                  index: true,
+                },
+                { path: 'organizations', element: <OrganizationOwn subPage="organizations" /> },
+                { path: 'members', element: <OrganizationOwn subPage="members" /> },
+                { path: 'tasks', element: <OrganizationOwn subPage="tasks" /> },
+              ],
+            },
           ],
         },
       ],
