@@ -352,15 +352,11 @@ const useDao = () => {
       let txFailed = false;
       let failureText: string = '';
 
-      console.log('response', response)
-
       if (response.status?.isFinalized) {
         // TODO: Maybe do a call to repopulate state with latest changes from the blockchain;
       }
 
       if (response.dispatchError) {
-        console.log('response.dispatchError', response.dispatchError)
-
         const { txFailed: txFailedResult, failureText: failureTextResult } = getErrorInfo(response, api)
 
         txFailed = txFailedResult;
