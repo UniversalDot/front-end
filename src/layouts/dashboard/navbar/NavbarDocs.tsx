@@ -22,8 +22,9 @@ export default function NavbarDocs() {
           <br /> Please check our docs
         </Typography>
       </div>
-
-      <Button variant="contained">Documentation</Button>
+      <a href="https://docs.universaldot.me/">
+        <Button variant="contained">Documentation</Button>
+      </a>
     </Stack>
   );
 }
