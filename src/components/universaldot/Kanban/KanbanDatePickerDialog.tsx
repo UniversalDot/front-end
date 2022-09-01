@@ -30,14 +30,14 @@ export default function KanbanDatePickerDialog({
           label="Start date"
           value={startTime}
           onChange={onChangeStartTime}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params:any) => <TextField {...params} />}
         />
 
         <DatePicker
           label="End date"
           value={endTime}
           onChange={onChangeEndTime}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params:any) => <TextField {...params} />}
         />
       </Stack>
 
