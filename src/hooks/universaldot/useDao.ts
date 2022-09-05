@@ -380,19 +380,19 @@ const useDao = () => {
     }
 
     if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
-      payload = ['@TODO']
+      payload = [payload]
     }
 
     if (actionType === DaoCallables.UPDATE_ORGANIZATION) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.TRANSFER_OWNERSHIP) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.REMOVE_MEMBERS) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.REMOVE_TASKS) {

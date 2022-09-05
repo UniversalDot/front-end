@@ -39,14 +39,6 @@ export default function Task({ id, taskData }: TaskProps) {
   const [data, setData] = useState<TaskType | null>(null);
 
   useEffect(() => {
-    // @TODO: this will be refactored in next version, won't be needed; see getAllOwnedTasks for more info;
-    // if (!taskData) {
-    //   const handleResponse = (dataFromResponse: any) =>
-    //     !dataFromResponse.isNone && setData({ taskId: id, ...dataFromResponse.toHuman() });
-
-    //   getTask(id, handleResponse);
-    // }
-
     if (taskData) {
       setData(taskData);
     }
