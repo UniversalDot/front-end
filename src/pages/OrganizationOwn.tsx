@@ -21,7 +21,7 @@ import {
   CreateTaskForm,
   AddTaskToOrganizationForm,
   RejectTaskForm,
-  OrganizationUpdateForm,
+  OrganizationCreateAndUpdateForm,
   OrganizationTransferOwnershipForm,
 } from '../components/universaldot/DAO';
 import { DaoCallables, TaskCallables, TaskStatusEnum } from '../types';
@@ -107,6 +107,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     | 'createTask'
     | 'updateTask'
     | 'rejectFeedback'
+    | 'createOrganization'
     | 'updateOrganization'
     | 'transferOwnershipOrganization'
   >('createTask');
@@ -405,15 +406,31 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           />
         )}
         {subPage === 'organizations' && (
-          <DAOLists
-            listType="myOrganization"
-            tabs={TAB_OPTIONS}
-            currentTab={currentTab}
-            onTabSwitch={onTabSwitch}
-            listHead={TABLE_HEAD_MY_ORG}
-            listData={listDataOwnOrganizations}
-            daoSubpage={subPage}
-          />
+          <Box>
+            <Box mb="2rem" display="flex" justifyContent="flex-end">
+              {' '}
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon={'eva:plus-fill'} />}
+                onClick={() => {
+                  setIsOpenModal(true);
+                  setModalType('createOrganization');
+                }}
+                style={{ marginRight: '1rem' }}
+              >
+                Create organization
+              </Button>
+            </Box>
+            <DAOLists
+              listType="myOrganization"
+              tabs={TAB_OPTIONS}
+              currentTab={currentTab}
+              onTabSwitch={onTabSwitch}
+              listHead={TABLE_HEAD_MY_ORG}
+              listData={listDataOwnOrganizations}
+              daoSubpage={subPage}
+            />
+          </Box>
         )}
         <DialogAnimate open={isOpenModal} onClose={() => setIsOpenModal(false)}>
           <DialogTitle>
@@ -423,6 +440,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               ? 'Update task'
               : modalType === 'rejectFeedback'
               ? 'Rejection feedback'
+              : modalType === 'createOrganization'
+              ? 'Create organization'
               : modalType === 'updateOrganization'
               ? 'Update organization'
               : modalType === 'transferOwnershipOrganization'
@@ -453,8 +472,14 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
                 taskId={taskIdToReject}
               />
             )}
+            {modalType === 'createOrganization' && (
+              <OrganizationCreateAndUpdateForm
+                form={organizationFormData || {}}
+                onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
+              />
+            )}
             {modalType === 'updateOrganization' && (
-              <OrganizationUpdateForm
+              <OrganizationCreateAndUpdateForm
                 form={organizationFormData || {}}
                 onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
                 organizationId={organizationIdInUse}

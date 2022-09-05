@@ -376,7 +376,7 @@ const useDao = () => {
     }
 
     if (actionType === DaoCallables.CREATE_ORGANIZATION) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {

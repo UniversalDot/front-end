@@ -45,10 +45,10 @@ type FormValuesProps = {
 type Props = {
   form: FormType;
   onCancel: VoidFunction;
-  organizationId: string;
+  organizationId?: string;
 };
 
-export default function OrganizationUpdateForm({ form, onCancel, organizationId }: Props) {
+export default function OrganizationCreateAndUpdateForm({ form, onCancel, organizationId }: Props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const { daoAction } = useDao();
@@ -73,9 +73,14 @@ export default function OrganizationUpdateForm({ form, onCancel, organizationId 
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      const payload = [organizationId, data.name, data.description, data.vision];
+      if (organizationId) {
+        const payload = [organizationId, data.name, data.description, data.vision];
+        daoAction(DaoCallables.UPDATE_ORGANIZATION, payload, enqueueSnackbar);
+      } else {
+        const payload = [data.name, data.description, data.vision];
+        daoAction(DaoCallables.CREATE_ORGANIZATION, payload, enqueueSnackbar);
+      }
 
-      daoAction(DaoCallables.UPDATE_ORGANIZATION, payload, enqueueSnackbar);
       onCancel();
       reset();
     } catch (error) {
@@ -101,7 +106,7 @@ export default function OrganizationUpdateForm({ form, onCancel, organizationId 
         </Button>
 
         <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-          Update organization
+          {organizationId ? 'Update organization' : 'Create organization'}
         </LoadingButton>
       </DialogActions>
     </FormProvider>
