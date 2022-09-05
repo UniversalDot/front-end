@@ -27,13 +27,19 @@ const ItemBlockStyle = styled((props: StackProps) => (
 export default function Tasks() {
   const { themeStretch } = useSettings();
 
-  const { getAllTaskEntries, tasks: allTasksReceived, resetAllTasks } = useTasks();
+  const {
+    // getOwnedTasks,
+    getAllTaskEntries,
+    tasks: allTasksReceived,
+    resetAllTasks,
+  } = useTasks();
 
   const { loadingTasks } = useLoader();
 
   useEffect(() => {
     if (!loadingTasks) {
       getAllTaskEntries();
+      // getOwnedTasks()
     }
     return () => {
       resetAllTasks();
