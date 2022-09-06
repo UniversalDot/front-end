@@ -35,21 +35,17 @@ const useTasks = () => {
 
   const resetAllTasks = useCallback(() => dispatch(resetTasks()), [dispatch]);
 
-  const queryPreparedResponseHandler = useCallback(
-    (result: any[]) => {
+  const getAllTaskEntries = useCallback(() => {
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
+
+    const queryPreparedResponseHandler = (result: any[]) => {
       setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
 
       if (result.length === 0) {
         dispatch(setTasks([]));
       }
-
       dispatch(setTasks(result));
-    },
-    [dispatch, setLoading]
-  );
-
-  const getAllTaskEntries = useCallback(() => {
-    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
+    }
 
     if (selectedKeyring.value) {
       const query = async () => {
@@ -73,7 +69,53 @@ const useTasks = () => {
     selectedKeyring.value,
     api,
     setLoading,
-    queryPreparedResponseHandler
+    dispatch
+  ]);
+
+  const getOwnedTasks = useCallback(() => {
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
+
+    const handleTasksOwedResponse = (tasksOwnedIds: any) => {
+      const tasksOwned = tasksOwnedIds.toHuman();
+      if (tasksOwned) {
+        const queryGetTask = async () => {
+          const handleGetTaskResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => ({
+              taskId: tasksOwnedIds[index],
+              ...resultOption.toHuman()
+            }))
+
+            if (resultsAsObjectsArray.length === 0) {
+              dispatch(setTasks([]));
+            }
+            dispatch(setTasks(resultsAsObjectsArray));
+          }
+
+          const unsub = await api.query[Pallets.TASK][TaskCallables.GET_TASK].multi(tasksOwned, (response: any) => {
+            handleGetTaskResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
+        };
+
+        queryGetTask();
+      }
+    }
+
+    if (selectedKeyring.value) {
+      const queryTasksOwned = async () => {
+        const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS_OWNED](selectedKeyring.value, (response: any) => handleTasksOwedResponse(response));
+        const cb = () => unsub;
+        cb();
+      };
+
+      queryTasksOwned();
+    }
+  }, [
+    selectedKeyring.value,
+    api,
+    setLoading,
+    dispatch
   ]);
 
   const signedTransaction = async (actionType: ActionType, taskPayload: TaskPayload, enqueueSnackbar: Function) => {
@@ -159,8 +201,8 @@ const useTasks = () => {
       }
 
       if (response.status?.isFinalized) {
-        // @TODO: check if I need to call getAllTaskEntries or getAllOwnedTasks here to repopulate with fresh data;
-        // getAllOwnedTasks();
+        // @TODO: check if I need to call getAllTaskEntries or getOwnedTasks here to repopulate with fresh data;
+        // getOwnedTasks();
         // getAllTaskEntries();
       }
 
@@ -232,63 +274,10 @@ const useTasks = () => {
     signedTransaction(actionType, taskPayload, enqueueSnackbar);
   };
 
-  // @TODO: not currently used; won't be needed in new version; see getAllOwnedTasks for more info;
-  // const getTask = useCallback(
-  //   (taskId, responseHandler) => {
-  //     const query = async () => {
-  //       const unsub = await api?.query[Pallets.TASK][TaskCallables.GET_TASK](
-  //         taskId,
-  //         responseHandler
-  //       );
-  //       const cb = () => unsub;
-  //       cb();
-  //     };
-
-  //     query();
-  //   },
-  //   [api]
-  // );
-
-  // @TODO: not currently used;
-  // const allOwnedTasksQueryResponseHandler = useCallback(
-  //   result => {
-  //     setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
-
-  //     if (result.isNone) {
-  //       dispatch(setTasks([]));
-  //     }
-
-  //     dispatch(setTasks(result.toHuman()));
-  //   },
-  //   [dispatch, setLoading]
-  // );
-
-  // @TODO: not currently used; when need to use it refactor it and take example from getMembersOfAnOrganization and its response handler function handleMembersOfAnOrganizationResponse;
-  // const getAllOwnedTasks = useCallback(() => {
-  //   setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
-
-  //   if (selectedKeyring.value) {
-  //     const query = async () => {
-  //       const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS_OWNED](
-  //         selectedKeyring.value,
-  //         allOwnedTasksQueryResponseHandler
-  //       );
-  //       const cb = () => unsub;
-  //       cb();
-  //     };
-
-  //     query();
-  //   }
-  // }, [
-  //   selectedKeyring.value,
-  //   api,
-  //   allOwnedTasksQueryResponseHandler,
-  //   setLoading,
-  // ]);
-
   return {
     taskAction,
     getAllTaskEntries,
+    getOwnedTasks,
     tasks,
     resetAllTasks,
   };

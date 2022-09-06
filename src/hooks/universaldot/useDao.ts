@@ -144,50 +144,37 @@ const useDao = () => {
     if (!membersResponse.isNone) {
       const membersOfOrganization: any[] = membersResponse.toHuman();
 
-      const query = async (memberProfileId: string) => {
-        let returnValue = undefined;
+      if (membersOfOrganization) {
+        const queryGetMemberProfile = async () => {
+          const handleGetProfileResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any) => resultOption.toHuman())
 
-        const unsub = await api?.query[Pallets.PROFILE][ProfileCallables.PROFILES](
-          memberProfileId,
-          (response: any) => {
-            if (response.toString().length > 0) {
-              returnValue = response.toHuman();
-            } else {
-              returnValue = 'empty'
+            if (resultsAsObjectsArray) {
+              createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
+              setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+
+              if (daoType === DaoCallables.MEMBERS) {
+                dispatch(
+                  setMembersOfSelectedOrganization(resultsAsObjectsArray)
+                );
+              }
+
+              if (daoType === DaoCallables.APPLICANTS_TO_ORGANIZATION) {
+                dispatch(
+                  setApplicantsToOrg(resultsAsObjectsArray)
+                );
+              }
             }
           }
-        );
 
-        const cb = () => unsub;
-        cb();
+          const unsub = await api.query[Pallets.PROFILE][ProfileCallables.PROFILES].multi(membersOfOrganization, (response: any) => {
+            handleGetProfileResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
+        };
 
-        while (true) {
-          await new Promise(r => setTimeout(r, 50));
-          if (returnValue) break;
-        }
-
-        return returnValue;
-      };
-
-      const membersAsObjects = await Promise.all(membersOfOrganization.map(memberProfileIdForQuery => query(memberProfileIdForQuery)));
-
-      if (membersAsObjects) {
-        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
-        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
-
-        const filteredObjects = membersAsObjects.filter((item) => item !== 'empty')
-
-        if (daoType === DaoCallables.MEMBERS) {
-          dispatch(
-            setMembersOfSelectedOrganization(filteredObjects)
-          );
-        }
-
-        if (daoType === DaoCallables.APPLICANTS_TO_ORGANIZATION) {
-          dispatch(
-            setApplicantsToOrg(filteredObjects)
-          );
-        }
+        queryGetMemberProfile();
       }
     }
   };
@@ -330,6 +317,18 @@ const useDao = () => {
       );
     }
 
+    if (actionType === DaoCallables.UPDATE_ORGANIZATION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.UPDATE_ORGANIZATION](
+        ...payload
+      );
+    }
+
+    if (actionType === DaoCallables.TRANSFER_OWNERSHIP) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.TRANSFER_OWNERSHIP](
+        ...payload
+      );
+    }
+
     if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.DISSOLVE_ORGANIZATION](
         ...payload
@@ -389,23 +388,23 @@ const useDao = () => {
     }
 
     if (actionType === DaoCallables.CREATE_ORGANIZATION) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
-      payload = ['@TODO']
+      payload = [payload]
     }
 
     if (actionType === DaoCallables.UPDATE_ORGANIZATION) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.TRANSFER_OWNERSHIP) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.REMOVE_MEMBERS) {
-      payload = ['@TODO']
+      payload = [...payload]
     }
 
     if (actionType === DaoCallables.REMOVE_TASKS) {

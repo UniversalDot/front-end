@@ -21,6 +21,8 @@ import {
   CreateTaskForm,
   AddTaskToOrganizationForm,
   RejectTaskForm,
+  OrganizationCreateAndUpdateForm,
+  OrganizationTransferOwnershipForm,
 } from '../components/universaldot/DAO';
 import { DaoCallables, TaskCallables, TaskStatusEnum } from '../types';
 import { useSnackbar } from 'notistack';
@@ -71,6 +73,16 @@ const defaultRejectTaskFormData = {
   feedback: '',
 };
 
+const defaultOrganizationFormData = {
+  name: '',
+  description: '',
+  vision: '',
+};
+
+const defaultOrganizationTransferOwnershipFormData = {
+  newOwnerId: '',
+};
+
 const TAB_OPTIONS = ['All'];
 
 export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
@@ -91,7 +103,13 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [modalType, setModalType] = useState<
-    'addToOrg' | 'createTask' | 'updateTask' | 'rejectFeedback'
+    | 'addToOrg'
+    | 'createTask'
+    | 'updateTask'
+    | 'rejectFeedback'
+    | 'createOrganization'
+    | 'updateOrganization'
+    | 'transferOwnershipOrganization'
   >('createTask');
   const [taskIdInEdit, setTaskIdInEdit] = useState<string>('');
   const [taskIdToReject, setTaskIdToReject] = useState<string>('');
@@ -99,6 +117,13 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const [taskFormData, setTaskFormData] = useState(defaultTaskFormData);
   const [addTaskToOrganizationFormData] = useState(defaultAddTaskToOrganizationFormData);
   const [rejectTaskFormData] = useState(defaultRejectTaskFormData);
+
+  const [organizationFormData, setOrganizationFormData] = useState(defaultOrganizationFormData);
+  const [organizationTransferOwnershipFormData] = useState(
+    defaultOrganizationTransferOwnershipFormData
+  );
+
+  const [organizationIdInUse, setOrganizationIdInUse] = useState<string>('');
 
   const { selectedKeyring } = useUser();
   const {
@@ -145,17 +170,30 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             id: DaoCallables.DISSOLVE_ORGANIZATION,
             label: 'Dissolve organization',
             cb: () =>
-              daoAction(DaoCallables.DISSOLVE_ORGANIZATION, '@TODO payload', enqueueSnackbar),
+              daoAction(DaoCallables.DISSOLVE_ORGANIZATION, ownOrganization.id, enqueueSnackbar),
           },
           {
             id: DaoCallables.UPDATE_ORGANIZATION,
             label: 'Update organization',
-            cb: () => daoAction(DaoCallables.UPDATE_ORGANIZATION, '@TODO payload', enqueueSnackbar),
+            cb: () => {
+              setIsOpenModal(true);
+              setModalType('updateOrganization');
+              setOrganizationIdInUse(ownOrganization.id);
+              setOrganizationFormData({
+                name: ownOrganization.name,
+                description: ownOrganization.description,
+                vision: ownOrganization.vision,
+              });
+            },
           },
           {
             id: DaoCallables.TRANSFER_OWNERSHIP,
             label: 'Transfer ownership',
-            cb: () => daoAction(DaoCallables.TRANSFER_OWNERSHIP, '@TODO payload', enqueueSnackbar),
+            cb: () => {
+              setIsOpenModal(true);
+              setOrganizationIdInUse(ownOrganization.id);
+              setModalType('transferOwnershipOrganization');
+            },
           },
         ],
       }));
@@ -165,21 +203,26 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   }, [ownOrganizations]);
 
   useEffect(() => {
-    if (membersOfTheSelectedOrganization) {
+    if (membersOfTheSelectedOrganization && organizationIdInUse) {
       const tableData = membersOfTheSelectedOrganization.map((member: any) => ({
         name: member.name,
         daoActions: [
           {
             id: DaoCallables.REMOVE_MEMBERS,
             label: 'Remove member',
-            cb: () => daoAction(DaoCallables.REMOVE_MEMBERS, '@TODO payload', enqueueSnackbar),
+            cb: () =>
+              daoAction(
+                DaoCallables.REMOVE_MEMBERS,
+                [organizationIdInUse, member.owner],
+                enqueueSnackbar
+              ),
           },
         ],
       }));
       setListDataMembers(tableData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [membersOfTheSelectedOrganization]);
+  }, [membersOfTheSelectedOrganization, organizationIdInUse]);
 
   useEffect(() => {
     if (organizationTasks) {
@@ -248,6 +291,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
       (joinedOrg: any) => joinedOrg.name === event.target.value
     ).id;
 
+    setOrganizationIdInUse(orgId);
+
     if (orgId) {
       if (subpage === 'members') {
         getMembersOfAnOrganization(orgId, DaoCallables.MEMBERS, enqueueSnackbar);
@@ -282,6 +327,10 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
   const rejectTaskCleanup = () => {
     setIsOpenModal(false);
     setTaskIdToReject('');
+  };
+  const organizationUpdateAndTransferOwnershipCleanup = () => {
+    setIsOpenModal(false);
+    setOrganizationIdInUse('');
   };
 
   return (
@@ -357,15 +406,31 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           />
         )}
         {subPage === 'organizations' && (
-          <DAOLists
-            listType="myOrganization"
-            tabs={TAB_OPTIONS}
-            currentTab={currentTab}
-            onTabSwitch={onTabSwitch}
-            listHead={TABLE_HEAD_MY_ORG}
-            listData={listDataOwnOrganizations}
-            daoSubpage={subPage}
-          />
+          <Box>
+            <Box mb="2rem" display="flex" justifyContent="flex-end">
+              {' '}
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon={'eva:plus-fill'} />}
+                onClick={() => {
+                  setIsOpenModal(true);
+                  setModalType('createOrganization');
+                }}
+                style={{ marginRight: '1rem' }}
+              >
+                Create organization
+              </Button>
+            </Box>
+            <DAOLists
+              listType="myOrganization"
+              tabs={TAB_OPTIONS}
+              currentTab={currentTab}
+              onTabSwitch={onTabSwitch}
+              listHead={TABLE_HEAD_MY_ORG}
+              listData={listDataOwnOrganizations}
+              daoSubpage={subPage}
+            />
+          </Box>
         )}
         <DialogAnimate open={isOpenModal} onClose={() => setIsOpenModal(false)}>
           <DialogTitle>
@@ -375,6 +440,12 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               ? 'Update task'
               : modalType === 'rejectFeedback'
               ? 'Rejection feedback'
+              : modalType === 'createOrganization'
+              ? 'Create organization'
+              : modalType === 'updateOrganization'
+              ? 'Update organization'
+              : modalType === 'transferOwnershipOrganization'
+              ? 'Transfer ownership of organization'
               : 'Add task to organization'}
           </DialogTitle>
           <Box p="1.5rem">
@@ -399,6 +470,26 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
                 form={rejectTaskFormData || {}}
                 onCancel={() => rejectTaskCleanup()}
                 taskId={taskIdToReject}
+              />
+            )}
+            {modalType === 'createOrganization' && (
+              <OrganizationCreateAndUpdateForm
+                form={organizationFormData || {}}
+                onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
+              />
+            )}
+            {modalType === 'updateOrganization' && (
+              <OrganizationCreateAndUpdateForm
+                form={organizationFormData || {}}
+                onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
+                organizationId={organizationIdInUse}
+              />
+            )}
+            {modalType === 'transferOwnershipOrganization' && (
+              <OrganizationTransferOwnershipForm
+                form={organizationTransferOwnershipFormData || {}}
+                onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
+                organizationId={organizationIdInUse}
               />
             )}
           </Box>

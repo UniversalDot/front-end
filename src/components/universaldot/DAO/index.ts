@@ -5,3 +5,5 @@ export { default as Kanban } from './Kanban';
 export { default as CreateTaskForm } from './CreateTaskForm';
 export { default as AddTaskToOrganizationForm } from './AddTaskToOrganizationForm';
 export { default as RejectTaskForm } from './RejectTaskForm';
+export { default as OrganizationCreateAndUpdateForm } from './OrganizationCreateAndUpdateForm';
+export { default as OrganizationTransferOwnershipForm } from './OrganizationTransferOwnershipForm';
