@@ -317,6 +317,18 @@ const useDao = () => {
       );
     }
 
+    if (actionType === DaoCallables.UPDATE_ORGANIZATION) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.UPDATE_ORGANIZATION](
+        ...payload
+      );
+    }
+
+    if (actionType === DaoCallables.TRANSFER_OWNERSHIP) {
+      txExecute = api.tx[Pallets.DAO][DaoCallables.TRANSFER_OWNERSHIP](
+        ...payload
+      );
+    }
+
     if (actionType === DaoCallables.DISSOLVE_ORGANIZATION) {
       txExecute = api.tx[Pallets.DAO][DaoCallables.DISSOLVE_ORGANIZATION](
         ...payload
