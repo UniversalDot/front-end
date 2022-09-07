@@ -31,7 +31,7 @@ jobs:
     # Install dependencies and build
     - name: Install dependencies and build
       run: |
-        npm install --legacy-peer-deps
+        npm ci --legacy-peer-deps
         npm run build
       env:
         CI: false
