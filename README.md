@@ -1,5 +1,6 @@
 # Universaldot WEB APP: The Front-End of the digital economy
 
+[![Check Set-Up & Build](https://github.com/UniversalDot/front-end/actions/workflows/check.yml/badge.svg)](https://github.com/UniversalDot/front-end/actions/workflows/check.yml)
 [![Deploy to 'hosting' branch](https://github.com/UniversalDot/front-end/actions/workflows/deploy.yml/badge.svg)](https://github.com/UniversalDot/front-end/actions/workflows/deploy.yml)
 
 ![Logo](https://github.com/UniversalDot/documents/blob/master/logo/rsz_jpg-02.jpg)
