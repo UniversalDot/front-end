@@ -35,21 +35,14 @@ export default function Task({ id, taskData }: TaskProps) {
 
   const [openMenu, setOpenMenuActions] = useState<HTMLElement | null>(null);
 
-  const { getTask, taskAction } = useTasks();
+  const { taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
 
   useEffect(() => {
-    if (id && !taskData) {
-      const handleResponse = (dataFromResponse: any) =>
-        !dataFromResponse.isNone && setData({ taskId: id, ...dataFromResponse.toHuman() });
-
-      getTask(id, handleResponse);
-    }
-
-    if (id && taskData) {
+    if (taskData) {
       setData(taskData);
     }
-  }, [id, getTask, taskData]);
+  }, [taskData]);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
     setOpenMenuActions(event.currentTarget);
@@ -106,17 +99,6 @@ export default function Task({ id, taskData }: TaskProps) {
             onClose={handleCloseMenu}
             actions={
               <>
-                {/* @TODO: this is only for creator of post */}
-                {/* <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.ACCEPT_TASK, id)}>
-                  <Iconify icon={'eva:checkmark-fill'} />
-                  Accept
-                </MenuItem>
-
-                <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.REJECT_TASK, id)}>
-                  <Iconify icon={'eva:close-circle-outline'} />
-                  Reject
-                </MenuItem> */}
-
                 <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.START_TASK, id)}>
                   <Iconify icon={'gis:flag-start-b-o'} />
                   Start
@@ -126,22 +108,6 @@ export default function Task({ id, taskData }: TaskProps) {
                   <Iconify icon={'carbon:task-complete'} />
                   Complete
                 </MenuItem>
-
-                {/* @TODO: this is only for creator of post */}
-                {/* <MenuItem onClick={() => handleOptionsOnClick(TaskCallables.UPDATE_TASK, id)}>
-                  <Iconify icon={'ic:baseline-update'} />
-                  Update
-                </MenuItem>
-
-                <Divider sx={{ borderStyle: 'dashed' }} />
-
-                <MenuItem
-                  sx={{ color: 'error.main' }}
-                  onClick={() => handleOptionsOnClick(TaskCallables.REMOVE_TASK, id)}
-                >
-                  <Iconify icon={'eva:trash-2-outline'} />
-                  Delete
-                </MenuItem> */}
               </>
             }
           />

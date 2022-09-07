@@ -5,17 +5,11 @@ import { web3FromSource } from '@polkadot/extension-dapp';
 import { useSubstrateState } from '../../substrate-lib';
 import {
   setTasks,
-  setTaskTitle,
-  setTaskSpecification,
-  setTaskBudget,
-  setTaskDeadline,
-  resetTask,
   resetTasks,
-  // setTaskIsEditMode,
-  setError,
 } from '../../redux/slices/tasksSlice';
 import { useUser } from './useUser';
 import { useLoader } from './useLoader';
+import { useUtils } from './useUtils';
 import {
   Pallets,
   TaskCallables,
@@ -35,149 +29,23 @@ const useTasks = () => {
 
   const { selectedKeyring } = useUser();
   const { setLoading } = useLoader();
+  const { getErrorInfo } = useUtils();
 
-  const taskValues = useSelector(state => state.tasks.task);
-  const isEditMode = useSelector(state => state.tasks.isEditMode);
   const tasks = useSelector(state => state.tasks.tasks);
-  const taskErrors = useSelector(state => state.tasks.errors);
 
   const resetAllTasks = useCallback(() => dispatch(resetTasks()), [dispatch]);
 
-  const populateTask = useCallback(
-    ({ key, value }) => {
-      // Validate input
-      if (key === 'budget' || key === 'deadline') {
-        if (!isNaN(value) && parseInt(value) < 0) {
-          dispatch(
-            setError({
-              input: key,
-              error: 'Negative numbers are not allowed',
-            })
-          );
-        } else if (value && isNaN(value)) {
-          dispatch(
-            setError({
-              input: key,
-              error: 'Enter a valid number',
-            })
-          );
-        } else {
-          dispatch(
-            setError({
-              input: key,
-              error: '',
-            })
-          );
-        }
-      }
+  const getAllTaskEntries = useCallback(() => {
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
 
-      if (key === 'title') {
-        dispatch(setTaskTitle(value));
-      }
-      if (key === 'specification') {
-        dispatch(setTaskSpecification(value));
-      }
-      if (key === 'budget') {
-        dispatch(setTaskBudget(value));
-      }
-      if (key === 'deadline') {
-        dispatch(setTaskDeadline(value));
-      }
-    },
-    [dispatch]
-  );
-
-  const getTask = useCallback(
-    (taskId, responseHandler) => {
-      const query = async () => {
-        const unsub = await api?.query[Pallets.TASK][TaskCallables.GET_TASK](
-          taskId,
-          responseHandler
-        );
-        const cb = () => unsub;
-        cb();
-      };
-
-      query();
-    },
-    [api]
-  );
-
-  // const getTaskToEdit = useCallback(
-  //   taskId => {
-  //     const queryResHandler = result => {
-  //       if (!result.isNone) {
-  //         dispatch(setTaskIsEditMode(true));
-  //         dispatch(setTaskSpecification(result.toHuman().specification));
-  //         dispatch(setTaskBudget(result.toHuman().budget));
-  //         dispatch(setTaskDeadline(result.toHuman().deadline));
-  //       }
-  //     };
-
-  //     const query = async () => {
-  //       const unsub = await api?.query[Pallets.TASK][TaskCallables.GET_TASK](
-  //         taskId,
-  //         queryResHandler
-  //       );
-  //       const cb = () => unsub;
-  //       cb();
-  //     };
-
-  //     query();
-  //   },
-  //   [api, dispatch]
-  // );
-
-  const queryResponseHandler = useCallback(
-    result => {
-      setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
-
-      if (result.isNone) {
-        dispatch(setTasks([]));
-      }
-
-      dispatch(setTasks(result.toHuman()));
-    },
-    [dispatch, setLoading]
-  );
-
-  const queryPreparedResponseHandler = useCallback(
-    (result: any[]) => {
+    const queryPreparedResponseHandler = (result: any[]) => {
       setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
 
       if (result.length === 0) {
         dispatch(setTasks([]));
       }
-
       dispatch(setTasks(result));
-    },
-    [dispatch, setLoading]
-  );
-
-  const getAllOwnedTasks = useCallback(() => {
-    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
-
-    if (selectedKeyring.value) {
-      const query = async () => {
-        const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS_OWNED](
-          selectedKeyring.value,
-          queryResponseHandler
-        );
-        const cb = () => unsub;
-        cb();
-      };
-
-      query();
     }
-  }, [
-    selectedKeyring.value,
-    api,
-    queryResponseHandler,
-    setLoading,
-  ]);
-
-  const getAllTaskEntries = useCallback(() => {
-    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
 
     if (selectedKeyring.value) {
       const query = async () => {
@@ -201,7 +69,53 @@ const useTasks = () => {
     selectedKeyring.value,
     api,
     setLoading,
-    queryPreparedResponseHandler
+    dispatch
+  ]);
+
+  const getOwnedTasks = useCallback(() => {
+    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
+
+    const handleTasksOwedResponse = (tasksOwnedIds: any) => {
+      const tasksOwned = tasksOwnedIds.toHuman();
+      if (tasksOwned) {
+        const queryGetTask = async () => {
+          const handleGetTaskResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => ({
+              taskId: tasksOwnedIds[index],
+              ...resultOption.toHuman()
+            }))
+
+            if (resultsAsObjectsArray.length === 0) {
+              dispatch(setTasks([]));
+            }
+            dispatch(setTasks(resultsAsObjectsArray));
+          }
+
+          const unsub = await api.query[Pallets.TASK][TaskCallables.GET_TASK].multi(tasksOwned, (response: any) => {
+            handleGetTaskResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
+        };
+
+        queryGetTask();
+      }
+    }
+
+    if (selectedKeyring.value) {
+      const queryTasksOwned = async () => {
+        const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS_OWNED](selectedKeyring.value, (response: any) => handleTasksOwedResponse(response));
+        const cb = () => unsub;
+        cb();
+      };
+
+      queryTasksOwned();
+    }
+  }, [
+    selectedKeyring.value,
+    api,
+    setLoading,
+    dispatch
   ]);
 
   const signedTransaction = async (actionType: ActionType, taskPayload: TaskPayload, enqueueSnackbar: Function) => {
@@ -231,53 +145,47 @@ const useTasks = () => {
 
     const fromAcct = await getFromAcct();
 
-    const transformedPayloadForCreate = [
-      taskPayload?.title || '',
-      taskPayload?.specification || '',
-      taskPayload?.budget || '',
-      taskPayload?.deadline || '',
-    ];
-
-    const transformedPayloadOnlyTaskId = [taskPayload];
-
-    // @TODO - do the payload for reject;
-    const transformedPayloadReject = [taskPayload, 'some feedback about the rejection'];
-
     let txExecute;
 
     if (actionType === TaskCallables.ACCEPT_TASK) {
       txExecute = api.tx[Pallets.TASK][actionType](
-        ...transformedPayloadOnlyTaskId
+        ...taskPayload
       );
     }
 
     if (actionType === TaskCallables.REJECT_TASK) {
       txExecute = api.tx[Pallets.TASK][actionType](
-        ...transformedPayloadReject
+        ...taskPayload
       );
     }
 
     if (actionType === TaskCallables.CREATE_TASK) {
       txExecute = api.tx[Pallets.TASK][actionType](
-        ...transformedPayloadForCreate
+        ...taskPayload
+      );
+    }
+
+    if (actionType === TaskCallables.UPDATE_TASK) {
+      txExecute = api.tx[Pallets.TASK][TaskCallables.UPDATE_TASK](
+        ...taskPayload
       );
     }
 
     if (actionType === TaskCallables.START_TASK) {
       txExecute = api.tx[Pallets.TASK][TaskCallables.START_TASK](
-        ...transformedPayloadOnlyTaskId
+        ...taskPayload
       );
     }
 
     if (actionType === TaskCallables.COMPLETE_TASK) {
       txExecute = api.tx[Pallets.TASK][TaskCallables.COMPLETE_TASK](
-        ...transformedPayloadOnlyTaskId
+        ...taskPayload
       );
     }
 
     if (actionType === TaskCallables.REMOVE_TASK) {
       txExecute = api.tx[Pallets.TASK][TaskCallables.REMOVE_TASK](
-        ...transformedPayloadOnlyTaskId
+        ...taskPayload
       );
     }
 
@@ -286,45 +194,26 @@ const useTasks = () => {
       let failureText: string = '';
 
       if (response.dispatchError) {
-        response.events
-          // find/filter for failed events
-          .filter(({ event }: any) =>
-            api.events.system.ExtrinsicFailed.is(event)
-          )
-          // we know that data for system.ExtrinsicFailed is
-          // (dispatchError, dispatchInfo)
-          .forEach(({ event: { data: [error] } }: any) => {
-            if (error.isModule) {
-              // for module errors, we have the section indexed, lookup
-              const decoded = api.registry.findMetaError(error.asModule)
-              const { docs, method, section } = decoded
-              // console.log(`${section}.${method}: ${docs.join(' ')}`)
+        const { txFailed: txFailedResult, failureText: failureTextResult } = getErrorInfo(response, api)
 
-              txFailed = true
-              failureText = `${docs.join(' ')}`
-            } else {
-              // Other, CannotLookup, BadOrigin, no extra info
-              // console.log(error.toString())
-              txFailed = true
-              failureText = error.toString();
-            }
-          })
+        txFailed = txFailedResult;
+        failureText = failureTextResult;
       }
 
       if (response.status?.isFinalized) {
-        // @TODO - do this only if tasks is not prepared variety (meaning not calling allTaskEntries)
-        // getAllOwnedTasks();
-        getAllTaskEntries();
+        // @TODO: check if I need to call getAllTaskEntries or getOwnedTasks here to repopulate with fresh data;
+        // getOwnedTasks();
+        // getAllTaskEntries();
       }
 
       if (response.status?.isInBlock) {
         setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
-        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.TASK, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText)
+
+        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.TASK, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText);
       }
     };
 
-    const unsub = await txExecute
-      .signAndSend(fromAcct, transactionResponseHandler);
+    const unsub = await txExecute.signAndSend(fromAcct, transactionResponseHandler);
 
     setUnsub(() => unsub);
   };
@@ -335,23 +224,62 @@ const useTasks = () => {
       setUnsub(null);
     }
 
+    // @TODO: Align all payloads to be similar in structure; 
+    if (actionType === TaskCallables.CREATE_TASK) {
+      taskPayload = [
+        taskPayload.title,
+        taskPayload.specification,
+        taskPayload.budget,
+        taskPayload.deadline,
+        taskPayload.attachments,
+        taskPayload.keywords
+      ];
+    }
+    if (actionType === TaskCallables.ACCEPT_TASK) {
+      taskPayload = [...taskPayload]
+    }
+
+    if (actionType === TaskCallables.REJECT_TASK) {
+      taskPayload = [...taskPayload]
+    }
+
+    if (actionType === TaskCallables.UPDATE_TASK) {
+      taskPayload = [
+        taskPayload.taskId,
+        taskPayload.title,
+        taskPayload.specification,
+        taskPayload.budget,
+        taskPayload.deadline,
+        taskPayload.attachments,
+        taskPayload.keywords
+      ]
+    }
+
+    if (actionType === TaskCallables.START_TASK) {
+      taskPayload = [taskPayload]
+    }
+
+    if (actionType === TaskCallables.COMPLETE_TASK) {
+      taskPayload = [taskPayload]
+    }
+
+    if (actionType === TaskCallables.REMOVE_TASK) {
+      taskPayload = [taskPayload]
+    }
+
     setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS, actionType) });
-    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.TASK, actionType)
+
+    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.TASK, actionType);
+
     signedTransaction(actionType, taskPayload, enqueueSnackbar);
-    dispatch(resetTask());
   };
 
   return {
-    getTask,
     taskAction,
-    populateTask,
-    taskValues,
-    isEditMode,
-    getAllOwnedTasks,
     getAllTaskEntries,
+    getOwnedTasks,
     tasks,
     resetAllTasks,
-    taskErrors,
   };
 };
 

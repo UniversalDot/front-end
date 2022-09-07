@@ -73,8 +73,43 @@ const useUtils = () => {
     }, []);
   };
 
+  const getErrorInfo = (apiResponse: any, api: any) => {
+    let txFailed = false;
+    let failureText: string = '';
+
+    apiResponse.events
+      // find/filter for failed events
+      .filter(({ event }: any) =>
+        api.events.system.ExtrinsicFailed.is(event)
+      )
+      // we know that data for system.ExtrinsicFailed is
+      // (dispatchError, dispatchInfo)
+      .forEach(({ event: { data: [error] } }: any) => {
+        if (error.isModule) {
+          // for module errors, we have the section indexed, lookup
+          const decoded = api.registry.findMetaError(error.asModule)
+          const { docs, method, section } = decoded
+          // console.log(`${section}.${method}: ${docs.join(' ')}`)
+
+          txFailed = true
+          failureText = `${docs.join(' ')}`
+        } else {
+          // Other, CannotLookup, BadOrigin, no extra info
+          // console.log(error.toString())
+          txFailed = true
+          failureText = error.toString();
+        }
+      })
+
+    return {
+      txFailed,
+      failureText
+    }
+  }
+
   return {
     transformParams,
+    getErrorInfo
   };
 };
 

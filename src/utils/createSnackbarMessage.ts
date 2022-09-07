@@ -1,4 +1,4 @@
-import { Pallets, ProfileCallables, TaskCallables, MessageTiming, ActionType, TransactionStatus } from "src/types";
+import { Pallets, ProfileCallables, TaskCallables, MessageTiming, ActionType, TransactionStatus, DaoCallables } from "src/types";
 
 export default function createSnackbarMessage(enqueueSnackbar: Function, messageTiming: MessageTiming, pallet: Pallets, actionType: ActionType, transactionStatus?: TransactionStatus, customMessage?: string) {
   if (pallet === Pallets.PROFILE) {
@@ -49,6 +49,10 @@ export default function createSnackbarMessage(enqueueSnackbar: Function, message
         enqueueSnackbar('Starting task...', { autoHideDuration: 5000 })
       }
 
+      if (actionType === TaskCallables.UPDATE_TASK) {
+        enqueueSnackbar('Updating task...', { autoHideDuration: 5000 })
+      }
+
       if (actionType === TaskCallables.COMPLETE_TASK) {
         enqueueSnackbar('Completing task...', { autoHideDuration: 5000 })
       }
@@ -83,6 +87,10 @@ export default function createSnackbarMessage(enqueueSnackbar: Function, message
         if (actionType === TaskCallables.REMOVE_TASK) {
           enqueueSnackbar('Task removed successfully!', { autoHideDuration: 5000 })
         }
+
+        if (actionType === TaskCallables.UPDATE_TASK) {
+          enqueueSnackbar('Task updated successfully!', { autoHideDuration: 5000 })
+        }
       }
 
       if (transactionStatus && transactionStatus === TransactionStatus.FAIL) {
@@ -109,6 +117,46 @@ export default function createSnackbarMessage(enqueueSnackbar: Function, message
         if (actionType === TaskCallables.REMOVE_TASK) {
           enqueueSnackbar(`Sorry, error occured: ${customMessage}`, { variant: 'error', autoHideDuration: 5000 })
         }
+
+        if (actionType === TaskCallables.UPDATE_TASK) {
+          enqueueSnackbar(`Sorry, error occured: ${customMessage}`, { variant: 'error', autoHideDuration: 5000 })
+        }
+      }
+    }
+  }
+
+  if (pallet === Pallets.DAO) {
+    if (messageTiming === MessageTiming.INIT) {
+      if (actionType === DaoCallables.ORGANIZATION_TASKS) {
+        enqueueSnackbar('Fetching organization tasks...', { autoHideDuration: 5000 })
+      }
+
+      if (actionType === DaoCallables.MEMBERS) {
+        enqueueSnackbar('Fetching organization members...', { autoHideDuration: 5000 })
+      }
+
+      if (actionType === DaoCallables.REMOVE_TASKS) {
+        enqueueSnackbar('Removing task from organization...', { autoHideDuration: 5000 })
+      }
+    }
+
+    if (messageTiming === MessageTiming.FINAL) {
+      if (actionType === DaoCallables.ORGANIZATION_TASKS) {
+        enqueueSnackbar('Organization tasks fetched successfully!', { autoHideDuration: 5000 })
+      }
+
+      if (actionType === DaoCallables.MEMBERS) {
+        enqueueSnackbar('Organization members fetched successfully!', { autoHideDuration: 5000 })
+      }
+
+      if (actionType === DaoCallables.REMOVE_TASKS) {
+        enqueueSnackbar('Task removed successfully!', { autoHideDuration: 5000 })
+      }
+    }
+
+    if (transactionStatus && transactionStatus === TransactionStatus.FAIL) {
+      if (actionType === DaoCallables.REMOVE_TASKS) {
+        enqueueSnackbar(`Sorry, error occured: ${customMessage}`, { variant: 'error', autoHideDuration: 5000 })
       }
     }
   }

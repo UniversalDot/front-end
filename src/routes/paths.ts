@@ -16,6 +16,9 @@ export const PATH_UNIVERSALDOT = {
   tasks: {
     root: path(ROOTS_DASHBOARD, '/tasks'),
   },
+  dao: {
+    root: path(ROOTS_DASHBOARD, '/dao'),
+  },
 };
 
 export const PATH_PAGE = {

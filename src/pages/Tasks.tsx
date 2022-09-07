@@ -4,17 +4,14 @@ import { styled } from '@mui/material/styles';
 import { Container, Typography, Stack, Grid, StackProps, Paper } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
-// routes
-// import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
 import Page from '../components/Page';
 import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
-import MyAvatar from 'src/components/MyAvatar';
 import Iconify from 'src/components/Iconify';
 // universaldot
 import Task from '../components/universaldot/Tasks/Task';
 import Events from '../components/universaldot/Events';
-//hooks
+// hooks universaldot
 import { useTasks, useLoader } from '../hooks/universaldot';
 import { TaskType } from 'src/types';
 
@@ -30,13 +27,19 @@ const ItemBlockStyle = styled((props: StackProps) => (
 export default function Tasks() {
   const { themeStretch } = useSettings();
 
-  const { getAllTaskEntries, tasks: allTasksReceived, resetAllTasks } = useTasks();
+  const {
+    // getOwnedTasks,
+    getAllTaskEntries,
+    tasks: allTasksReceived,
+    resetAllTasks,
+  } = useTasks();
 
   const { loadingTasks } = useLoader();
 
   useEffect(() => {
     if (!loadingTasks) {
       getAllTaskEntries();
+      // getOwnedTasks()
     }
     return () => {
       resetAllTasks();
@@ -44,7 +47,7 @@ export default function Tasks() {
     };
   }, [getAllTaskEntries, resetAllTasks, loadingTasks]);
 
-  // // For unprepared tasks;
+  // // NOTE: For unprepared tasks;
   // const tasks = useMemo(() => {
   //   if (allTasksReceived?.length === 0) {
   //     return <div>No tasks at the moment...</div>;
@@ -61,7 +64,7 @@ export default function Tasks() {
   //   );
   // }, [allTasksReceived]);
 
-  // For prepared task entries;
+  // NOTE: For prepared task entries;
   const tasks = useMemo(
     () =>
       allTasksReceived?.length > 0 ? (
@@ -79,14 +82,7 @@ export default function Tasks() {
   return (
     <Page title="Tasks">
       <Container maxWidth={themeStretch ? false : 'lg'}>
-        <HeaderBreadcrumbs
-          heading="Tasks"
-          // links={[
-          //   { name: 'Tasks', href: PATH_UNIVERSALDOT.tasks.root },
-          //   // { name: 'Subtext' },
-          // ]}
-        />
-        {/* <Timeline /> */}
+        <HeaderBreadcrumbs heading="Tasks" />
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 4 }} elevation={4}>

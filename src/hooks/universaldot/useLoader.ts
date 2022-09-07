@@ -6,6 +6,7 @@ const useLoader = () => {
   const dispatch = useDispatch();
   const loadingProfile = useSelector(state => state.loaders.profile);
   const loadingTasks = useSelector(state => state.loaders.profile);
+  const loadingDao = useSelector(state => state.loaders.dao);
   const message = useSelector(state => state.loaders.message);
 
   const setLoading = useCallback(
@@ -19,6 +20,7 @@ const useLoader = () => {
     message,
     loadingProfile,
     loadingTasks,
+    loadingDao,
     setLoading,
   };
 };
