@@ -1,0 +1,21 @@
+name: Check Set-Up & Build
+on:
+  push: # Run checks on push to any branch, for early notification of issues
+
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    steps:
+    # Checkout
+    - uses: actions/checkout@v3
+
+    # Use Node to install dependencies and build
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - name: Install dependencies and build
+      run: |
+        npm install --legacy-peer-deps
+        npm run build
+      env:
+        CI: false
