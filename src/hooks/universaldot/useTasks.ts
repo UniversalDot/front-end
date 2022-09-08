@@ -39,12 +39,11 @@ const useTasks = () => {
     setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS) });
 
     const queryPreparedResponseHandler = (result: any[]) => {
-      setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
-
       if (result.length === 0) {
         dispatch(setTasks([]));
       }
       dispatch(setTasks(result));
+      setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
     }
 
     if (selectedKeyring.value) {
@@ -203,7 +202,7 @@ const useTasks = () => {
       if (response.status?.isFinalized) {
         // @TODO: check if I need to call getAllTaskEntries or getOwnedTasks here to repopulate with fresh data;
         // getOwnedTasks();
-        // getAllTaskEntries();
+        getAllTaskEntries();
       }
 
       if (response.status?.isInBlock) {

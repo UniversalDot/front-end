@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 // @mui
 import { styled } from '@mui/material/styles';
 import { Container, Typography, Stack, Grid, StackProps, Paper } from '@mui/material';
@@ -36,15 +36,12 @@ export default function Tasks() {
   const { loadingTasks } = useLoader();
 
   useEffect(() => {
-    if (!loadingTasks) {
-      getAllTaskEntries();
-      // getOwnedTasks()
-    }
+    getAllTaskEntries();
     return () => {
       resetAllTasks();
       return;
     };
-  }, [getAllTaskEntries, resetAllTasks, loadingTasks]);
+  }, [getAllTaskEntries, resetAllTasks]);
 
   // // NOTE: For unprepared tasks;
   // const tasks = useMemo(() => {
@@ -63,21 +60,6 @@ export default function Tasks() {
   //   );
   // }, [allTasksReceived]);
 
-  // NOTE: For prepared task entries;
-  const tasks = useMemo(
-    () =>
-      allTasksReceived?.length > 0 ? (
-        <Stack spacing={3}>
-          {allTasksReceived?.map((task: TaskType, i: number) => (
-            <Task id={task.taskId} taskData={task} key={`task#${i}`} />
-          ))}
-        </Stack>
-      ) : (
-        <div>No tasks at the moment...</div>
-      ),
-    [allTasksReceived]
-  );
-
   return (
     <Page title="Tasks">
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -92,7 +74,15 @@ export default function Tasks() {
                   Upcoming Tasks
                 </Typography>
               </ItemBlockStyle>
-              {loadingTasks ? 'Loading tasks...' : tasks}
+              {loadingTasks && 'Loading tasks...'}
+              {!loadingTasks && allTasksReceived?.length > 0 && (
+                <Stack spacing={3}>
+                  {allTasksReceived?.map((task: TaskType, i: number) => (
+                    <Task id={task.taskId} taskData={task} key={`task#${i}`} />
+                  ))}
+                </Stack>
+              )}
+              {!loadingTasks && allTasksReceived?.length === 0 && 'No tasks...'}
             </Paper>
           </Grid>
         </Grid>
