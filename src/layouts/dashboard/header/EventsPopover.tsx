@@ -1,12 +1,11 @@
 import { noCase } from 'change-case';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import {
   Box,
   List,
   Badge,
   Button,
-  Avatar,
   Tooltip,
   Divider,
   IconButton,
@@ -16,22 +15,86 @@ import {
   ListItemAvatar,
   ListItemButton,
 } from '@mui/material';
-// utils
-import { fToNow } from '../../../utils/formatTime';
-// _mock_
-import { _notifications } from '../../../_mock';
 // components
 import Iconify from '../../../components/Iconify';
 import Scrollbar from '../../../components/Scrollbar';
 import MenuPopover from '../../../components/MenuPopover';
 import { IconButtonAnimate } from '../../../components/animate';
 
+import { useSubstrateState } from '../../../substrate-lib';
 // ----------------------------------------------------------------------
 
-export default function NotificationsPopover() {
-  const [notifications, setNotifications] = useState(_notifications);
+// Events to be filtered from feed
+const FILTERED_EVENTS = [
+  'system:ExtrinsicSuccess:: (phase={"ApplyExtrinsic":0})',
+  'system:ExtrinsicSuccess:: (phase={"ApplyExtrinsic":1})',
+];
 
-  const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
+const eventName = (ev: any) => `${ev.section}:${ev.method}`;
+const eventParams = (ev: any) => JSON.stringify(ev.data);
+
+type EventItemType = {
+  key: string;
+  title: string;
+  description: string;
+  avatar: string | null;
+  type: string | null;
+  createdAt: string | null;
+  isUnread: boolean;
+};
+
+export default function EventsPopover() {
+  const { api } = useSubstrateState();
+  const [eventFeed, setEventFeed] = useState<EventItemType[]>([]);
+
+  useEffect(() => {
+    let unsub: any = null;
+    let keyNum = 0;
+
+    if (api?.query?.system) {
+      const allEvents = async () => {
+        unsub = await api.query.system.events((events: any[]) => {
+          // loop through the Vec<EventRecord>
+          events.forEach((record) => {
+            // extract the phase, event and the event types
+            const { event, phase } = record;
+
+            // show what we are busy with
+            const evHuman = event.toHuman();
+            const evName = eventName(evHuman);
+            const evParams = eventParams(evHuman);
+            const evNamePhase = `${evName}::(phase=${phase.toString()})`;
+
+            if (FILTERED_EVENTS.includes(evNamePhase)) return;
+
+            setEventFeed((e: any) => [
+              // @TODO: Adapt the type for an event item:
+              {
+                key: keyNum,
+                title: evName,
+                description: evParams,
+                avatar: null,
+                type: null,
+                createdAt: 'Today',
+                isUnread: true,
+              },
+              ...e,
+            ]);
+
+            keyNum += 1;
+          });
+        });
+      };
+
+      allEvents();
+    }
+
+    return () => unsub && unsub();
+  }, [api?.query?.system]);
+
+  const totalUnread = eventFeed.filter(
+    (eventItem: EventItemType) => eventItem.isUnread === true
+  ).length;
 
   const [open, setOpen] = useState<HTMLElement | null>(null);
 
@@ -44,10 +107,10 @@ export default function NotificationsPopover() {
   };
 
   const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        isUnRead: false,
+    setEventFeed(
+      eventFeed.map((eventItem: EventItemType) => ({
+        ...eventItem,
+        isUnread: false,
       }))
     );
   };
@@ -59,7 +122,7 @@ export default function NotificationsPopover() {
         onClick={handleOpen}
         sx={{ width: 40, height: 40 }}
       >
-        <Badge badgeContent={totalUnRead} color="error">
+        <Badge badgeContent={totalUnread} color="error">
           <Iconify icon="eva:bell-fill" width={20} height={20} />
         </Badge>
       </IconButtonAnimate>
@@ -72,13 +135,13 @@ export default function NotificationsPopover() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', py: 2, px: 2.5 }}>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="subtitle1">Notifications</Typography>
+            <Typography variant="subtitle1">Events</Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              You have {totalUnRead} unread messages
+              You have {totalUnread} unread events
             </Typography>
           </Box>
 
-          {totalUnRead > 0 && (
+          {totalUnread > 0 && (
             <Tooltip title=" Mark all as read">
               <IconButton color="primary" onClick={handleMarkAllAsRead}>
                 <Iconify icon="eva:done-all-fill" width={20} height={20} />
@@ -98,12 +161,12 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(0, 2).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
+            {eventFeed.map((eventItem) => (
+              <EventItem key={eventItem.key} eventItem={eventItem} />
             ))}
           </List>
 
-          <List
+          {/* <List
             disablePadding
             subheader={
               <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
@@ -111,10 +174,10 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
+            {eventFeed.slice(1).map((eventItem) => (
+              <EventItem key={eventItem.key} eventItem={eventItem} />
             ))}
-          </List>
+          </List> */}
         </Scrollbar>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
@@ -131,18 +194,8 @@ export default function NotificationsPopover() {
 
 // ----------------------------------------------------------------------
 
-type NotificationItemProps = {
-  id: string;
-  title: string;
-  description: string;
-  avatar: string | null;
-  type: string;
-  createdAt: Date;
-  isUnRead: boolean;
-};
-
-function NotificationItem({ notification }: { notification: NotificationItemProps }) {
-  const { avatar, title } = renderContent(notification);
+function EventItem({ eventItem }: { eventItem: EventItemType }) {
+  const { title } = renderContent(eventItem);
 
   return (
     <ListItemButton
@@ -150,13 +203,14 @@ function NotificationItem({ notification }: { notification: NotificationItemProp
         py: 1.5,
         px: 2.5,
         mt: '1px',
-        ...(notification.isUnRead && {
+        ...(eventItem.isUnread && {
           bgcolor: 'action.selected',
         }),
       }}
     >
       <ListItemAvatar>
-        <Avatar sx={{ bgcolor: 'background.neutral' }}>{avatar}</Avatar>
+        {/* <Avatar sx={{ bgcolor: 'background.neutral' }}>{avatar}</Avatar> */}
+        <Iconify icon={'ic:baseline-event-repeat'} sx={{ bgcolor: 'background.neutral' }} />
       </ListItemAvatar>
       <ListItemText
         primary={title}
@@ -171,7 +225,7 @@ function NotificationItem({ notification }: { notification: NotificationItemProp
             }}
           >
             <Iconify icon="eva:clock-outline" sx={{ mr: 0.5, width: 16, height: 16 }} />
-            {fToNow(notification.createdAt)}
+            {eventItem.createdAt}
           </Typography>
         }
       />
@@ -181,62 +235,29 @@ function NotificationItem({ notification }: { notification: NotificationItemProp
 
 // ----------------------------------------------------------------------
 
-function renderContent(notification: NotificationItemProps) {
+function renderContent(eventItem: EventItemType) {
   const title = (
     <Typography variant="subtitle2">
-      {notification.title}
+      {eventItem.title}
       <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-        &nbsp; {noCase(notification.description)}
+        &nbsp; {noCase(eventItem.description)}
       </Typography>
     </Typography>
   );
 
-  if (notification.type === 'order_placed') {
+  if (eventItem.type === '@todoAddTypesAndIconsForTypesLaterOn') {
     return {
       avatar: (
         <img
-          alt={notification.title}
+          alt={eventItem.title}
           src="https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_package.svg"
         />
       ),
       title,
     };
   }
-  if (notification.type === 'order_shipped') {
-    return {
-      avatar: (
-        <img
-          alt={notification.title}
-          src="https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_shipping.svg"
-        />
-      ),
-      title,
-    };
-  }
-  if (notification.type === 'mail') {
-    return {
-      avatar: (
-        <img
-          alt={notification.title}
-          src="https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_mail.svg"
-        />
-      ),
-      title,
-    };
-  }
-  if (notification.type === 'chat_message') {
-    return {
-      avatar: (
-        <img
-          alt={notification.title}
-          src="https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_chat.svg"
-        />
-      ),
-      title,
-    };
-  }
   return {
-    avatar: notification.avatar ? <img alt={notification.title} src={notification.avatar} /> : null,
+    avatar: eventItem.avatar ? <img alt={eventItem.title} src={eventItem.avatar} /> : null,
     title,
   };
 }

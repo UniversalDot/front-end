@@ -15,7 +15,7 @@ import { IconButtonAnimate } from '../../../components/animate';
 //
 import Searchbar from './Searchbar';
 import LanguagePopover from './LanguagePopover';
-import NotificationsPopover from './NotificationsPopover';
+import EventsPopover from './EventsPopover';
 // universaldot
 import AccountsPopover from './universaldot/AccountsPopover';
 import AccountPopover from './universaldot/AccountPopover';
@@ -94,7 +94,7 @@ export default function DashboardHeader({
 
         <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1.5 }}>
           <LanguagePopover />
-          <NotificationsPopover />
+          <EventsPopover />
           <AccountsPopover />
           <AccountPopover />
         </Stack>

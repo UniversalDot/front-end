@@ -22,7 +22,7 @@ export default function NavbarDocs() {
           <br /> Please check our docs
         </Typography>
       </div>
-      <a href="https://docs.universaldot.me/">
+      <a href="https://docs.universaldot.me/" target="_blank" rel="noreferrer">
         <Button variant="contained">Documentation</Button>
       </a>
     </Stack>
