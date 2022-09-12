@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
-import { useSnackbar } from 'notistack';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,8 +8,7 @@ import { Box, Stack, Button, DialogActions } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import { FormProvider, RHFTextField } from '../../hook-form';
-import { useDao } from 'src/hooks/universaldot';
-import { DaoCallables } from 'src/types';
+import { Pallets, DaoCallables } from 'src/types';
 
 // ----------------------------------------------------------------------
 
@@ -46,13 +44,15 @@ type Props = {
   form: FormType;
   onCancel: VoidFunction;
   organizationId?: string;
+  actionCb: (palletType: Pallets, actionType: DaoCallables, payload: any) => void;
 };
 
-export default function OrganizationCreateAndUpdateForm({ form, onCancel, organizationId }: Props) {
-  const { enqueueSnackbar } = useSnackbar();
-
-  const { daoAction } = useDao();
-
+export default function OrganizationCreateAndUpdateForm({
+  form,
+  onCancel,
+  organizationId,
+  actionCb,
+}: Props) {
   const FormSchema = Yup.object().shape({
     name: Yup.string().max(255).required('Name is required'),
     description: Yup.string().max(255).required('Description is required'),
@@ -75,12 +75,11 @@ export default function OrganizationCreateAndUpdateForm({ form, onCancel, organi
     try {
       if (organizationId) {
         const payload = [organizationId, data.name, data.description, data.vision];
-        daoAction(DaoCallables.UPDATE_ORGANIZATION, payload, enqueueSnackbar);
+        actionCb(Pallets.DAO, DaoCallables.UPDATE_ORGANIZATION, payload);
       } else {
         const payload = [data.name, data.description, data.vision];
-        daoAction(DaoCallables.CREATE_ORGANIZATION, payload, enqueueSnackbar);
+        actionCb(Pallets.DAO, DaoCallables.CREATE_ORGANIZATION, payload);
       }
-
       onCancel();
       reset();
     } catch (error) {
