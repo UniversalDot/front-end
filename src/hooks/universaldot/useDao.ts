@@ -279,6 +279,7 @@ const useDao = () => {
     const getFromAcct = async () => {
       const {
         address,
+        // @TODO: Check this example: in my organizations if I refresh the page without going to Profile page and do some action such as update profile I get some undefined errors, possibly some other places can occur;
         meta: { source, isInjected },
       } = accountPair;
       let fromAcct;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 // @mui
 import { Container, Box, Button, DialogTitle } from '@mui/material';
 // hooks
@@ -24,7 +24,7 @@ import {
   OrganizationCreateAndUpdateForm,
   OrganizationTransferOwnershipForm,
 } from '../components/universaldot/DAO';
-import { DaoCallables, TaskCallables, TaskStatusEnum } from '../types';
+import { DaoCallables, Pallets, TaskCallables, TaskStatusEnum } from '../types';
 import { useSnackbar } from 'notistack';
 // ----------------------------------------------------------------------
 
@@ -333,6 +333,19 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     setOrganizationIdInUse('');
   };
 
+  const formActionCb = useCallback(
+    (palletType: Pallets, actionType: DaoCallables | TaskCallables, payload: any) => {
+      if (palletType === Pallets.DAO) {
+        daoAction(actionType, payload, enqueueSnackbar);
+      }
+
+      if (palletType === Pallets.TASK) {
+        taskAction(actionType, payload, enqueueSnackbar);
+      }
+    },
+    []
+  );
+
   return (
     <Page title="My organization">
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -450,19 +463,25 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           </DialogTitle>
           <Box p="1.5rem">
             {modalType === 'createTask' && (
-              <CreateTaskForm taskForm={taskFormData || {}} onCancel={() => createTaskCleanup()} />
+              <CreateTaskForm
+                taskForm={taskFormData || {}}
+                onCancel={() => createTaskCleanup()}
+                actionCb={formActionCb}
+              />
             )}
             {modalType === 'updateTask' && (
               <CreateTaskForm
                 taskForm={taskFormData || {}}
                 taskIdForEdit={taskIdInEdit}
                 onCancel={() => updateTaskCleanup()}
+                actionCb={formActionCb}
               />
             )}
             {modalType === 'addToOrg' && (
               <AddTaskToOrganizationForm
                 form={addTaskToOrganizationFormData || {}}
                 onCancel={() => addTaskToOrganizationCleanup()}
+                actionCb={formActionCb}
               />
             )}
             {modalType === 'rejectFeedback' && (
@@ -470,12 +489,14 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
                 form={rejectTaskFormData || {}}
                 onCancel={() => rejectTaskCleanup()}
                 taskId={taskIdToReject}
+                actionCb={formActionCb}
               />
             )}
             {modalType === 'createOrganization' && (
               <OrganizationCreateAndUpdateForm
                 form={organizationFormData || {}}
                 onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
+                actionCb={formActionCb}
               />
             )}
             {modalType === 'updateOrganization' && (
@@ -483,6 +504,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
                 form={organizationFormData || {}}
                 onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
                 organizationId={organizationIdInUse}
+                actionCb={formActionCb}
               />
             )}
             {modalType === 'transferOwnershipOrganization' && (
@@ -490,6 +512,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
                 form={organizationTransferOwnershipFormData || {}}
                 onCancel={() => organizationUpdateAndTransferOwnershipCleanup()}
                 organizationId={organizationIdInUse}
+                actionCb={formActionCb}
               />
             )}
           </Box>

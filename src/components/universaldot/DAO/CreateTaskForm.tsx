@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
-import { useSnackbar } from 'notistack';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -8,8 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Stack, Button, DialogActions } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { FormProvider, RHFTextField } from '../../hook-form';
-import { useTasks } from 'src/hooks/universaldot';
-import { TaskCallables } from 'src/types';
+import { Pallets, TaskCallables } from 'src/types';
 
 // ----------------------------------------------------------------------
 
@@ -54,13 +52,10 @@ type Props = {
   taskForm: TaskForm;
   taskIdForEdit?: string;
   onCancel: VoidFunction;
+  actionCb: (palletType: Pallets, actionType: TaskCallables, payload: any) => void;
 };
 
-export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel }: Props) {
-  const { enqueueSnackbar } = useSnackbar();
-
-  const { taskAction } = useTasks();
-
+export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, actionCb }: Props) {
   const TaskSchema = Yup.object().shape({
     title: Yup.string().max(255).required('Title is required'),
     specification: Yup.string().max(1000),
@@ -89,7 +84,7 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel }: Pr
         attachments: data.attachments,
         keywords: data.keywords,
       };
-      taskAction(TaskCallables.UPDATE_TASK, updatedTask, enqueueSnackbar);
+      actionCb(Pallets.TASK, TaskCallables.UPDATE_TASK, updatedTask);
     } else {
       const newTask = {
         title: data.title,
@@ -99,8 +94,7 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel }: Pr
         attachments: data.attachments,
         keywords: data.keywords,
       };
-      enqueueSnackbar('Create success!');
-      taskAction(TaskCallables.CREATE_TASK, newTask, enqueueSnackbar);
+      actionCb(Pallets.TASK, TaskCallables.CREATE_TASK, newTask);
     }
     onCancel();
     reset();

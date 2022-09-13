@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
-import { useSnackbar } from 'notistack';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,8 +8,7 @@ import { Box, Stack, Button, DialogActions } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import { FormProvider, RHFTextField } from '../../hook-form';
-import { useTasks } from 'src/hooks/universaldot';
-import { TaskCallables } from 'src/types';
+import { Pallets, TaskCallables } from 'src/types';
 
 // ----------------------------------------------------------------------
 
@@ -40,13 +38,10 @@ type Props = {
   form: RejectTaskFormType;
   onCancel: VoidFunction;
   taskId: string;
+  actionCb: (palletType: Pallets, actionType: TaskCallables, payload: any) => void;
 };
 
-export default function RejectTaskForm({ form, onCancel, taskId }: Props) {
-  const { enqueueSnackbar } = useSnackbar();
-
-  const { taskAction } = useTasks();
-
+export default function RejectTaskForm({ form, onCancel, taskId, actionCb }: Props) {
   const FormSchema = Yup.object().shape({
     feedback: Yup.string().max(255).required('Title is required'),
   });
@@ -66,8 +61,7 @@ export default function RejectTaskForm({ form, onCancel, taskId }: Props) {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       const payload = [taskId, data.feedback];
-
-      taskAction(TaskCallables.REJECT_TASK, payload, enqueueSnackbar);
+      actionCb(Pallets.TASK, TaskCallables.REJECT_TASK, payload);
       onCancel();
       reset();
     } catch (error) {

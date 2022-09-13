@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
-import { useSnackbar } from 'notistack';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,8 +8,7 @@ import { Box, Stack, Button, DialogActions } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import { FormProvider, RHFTextField } from '../../hook-form';
-import { useDao } from 'src/hooks/universaldot';
-import { DaoCallables } from 'src/types';
+import { Pallets, DaoCallables } from 'src/types';
 
 // ----------------------------------------------------------------------
 
@@ -42,15 +40,10 @@ type FormValuesProps = {
 type Props = {
   form: AddTaskToOrgForm;
   onCancel: VoidFunction;
+  actionCb: (palletType: Pallets, actionType: DaoCallables, payload: any) => void;
 };
 
-export default function AddTaskToOrganizationForm({ form, onCancel }: Props) {
-  const { enqueueSnackbar } = useSnackbar();
-
-  const { daoAction } = useDao();
-
-  const isCreating = Object.keys(form).length === 0;
-
+export default function AddTaskToOrganizationForm({ form, onCancel, actionCb }: Props) {
   const FormSchema = Yup.object().shape({
     organizationId: Yup.string().max(255).required('Title is required'),
     taskId: Yup.string().max(1000).required('Title is required'),
@@ -71,8 +64,7 @@ export default function AddTaskToOrganizationForm({ form, onCancel }: Props) {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       const payload = [data.organizationId, data.taskId];
-
-      daoAction(DaoCallables.ADD_TASKS, payload, enqueueSnackbar);
+      actionCb(Pallets.DAO, DaoCallables.ADD_TASKS, payload);
       onCancel();
       reset();
     } catch (error) {
