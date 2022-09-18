@@ -42,7 +42,13 @@ export default function ConfigurationProfile() {
   const [localInterests, setLocalInterests] = useState<string[]>([]);
 
   const { profileData, profileAction } = useProfile();
-  const { loadingProfile } = useLoader();
+  const { loadingProfileCreateProfile, loadingProfileUpdateProfile, loadingProfileRemoveProfile } =
+    useLoader();
+
+  const loadingProfile = useMemo(
+    () => loadingProfileCreateProfile || loadingProfileUpdateProfile || loadingProfileRemoveProfile,
+    [loadingProfileCreateProfile, loadingProfileUpdateProfile, loadingProfileRemoveProfile]
+  );
 
   const differencesExist: boolean = useMemo(() => {
     if (

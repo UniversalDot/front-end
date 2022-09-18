@@ -34,7 +34,7 @@ const useDao = () => {
   const [unsub, setUnsub] = useState<Function | null>(null);
 
   const { selectedKeyring } = useUser();
-  const { setLoading } = useLoader();
+  const { setLoading, setLoadingCallable } = useLoader();
   const { getErrorInfo } = useUtils();
 
   const joinedOrganizations = useSelector(
@@ -58,7 +58,6 @@ const useDao = () => {
 
   const handleOrganizationTasksResponse = async (organizationsTasks: any, actionType: ActionType, enqueueSnackbar: Function, organizationId: string) => {
     if (!organizationsTasks.isNone) {
-
       const orgTasks: any[] = organizationsTasks.toHuman();
 
       const query = async (taskId: string) => {
@@ -364,7 +363,29 @@ const useDao = () => {
       }
 
       if (response.status?.isInBlock) {
-        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage() });
+        if (actionType !== DaoCallables.ADD_MEMBERS &&
+          actionType !== DaoCallables.ADD_TASKS &&
+          actionType !== DaoCallables.CREATE_ORGANIZATION &&
+          actionType !== DaoCallables.DISSOLVE_ORGANIZATION &&
+          actionType !== DaoCallables.UPDATE_ORGANIZATION &&
+          actionType !== DaoCallables.TRANSFER_OWNERSHIP &&
+          actionType !== DaoCallables.REMOVE_MEMBERS &&
+          actionType !== DaoCallables.REMOVE_TASKS
+        ) {
+          setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage() });
+        }
+
+        if (actionType === DaoCallables.ADD_MEMBERS ||
+          actionType === DaoCallables.ADD_TASKS ||
+          actionType === DaoCallables.CREATE_ORGANIZATION ||
+          actionType === DaoCallables.DISSOLVE_ORGANIZATION ||
+          actionType === DaoCallables.UPDATE_ORGANIZATION ||
+          actionType === DaoCallables.TRANSFER_OWNERSHIP ||
+          actionType === DaoCallables.REMOVE_MEMBERS ||
+          actionType === DaoCallables.REMOVE_TASKS) {
+          setLoadingCallable({ type: LoadingTypes.DAO, callableType: actionType, value: false });
+        }
+
         createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText)
       }
 
@@ -412,9 +433,30 @@ const useDao = () => {
       payload = [...payload]
     }
 
-    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
+    if (actionType !== DaoCallables.ADD_MEMBERS &&
+      actionType !== DaoCallables.ADD_TASKS &&
+      actionType !== DaoCallables.CREATE_ORGANIZATION &&
+      actionType !== DaoCallables.DISSOLVE_ORGANIZATION &&
+      actionType !== DaoCallables.UPDATE_ORGANIZATION &&
+      actionType !== DaoCallables.TRANSFER_OWNERSHIP &&
+      actionType !== DaoCallables.REMOVE_MEMBERS &&
+      actionType !== DaoCallables.REMOVE_TASKS
+    ) {
+      setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+    }
 
-    setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+    if (actionType === DaoCallables.ADD_MEMBERS ||
+      actionType === DaoCallables.ADD_TASKS ||
+      actionType === DaoCallables.CREATE_ORGANIZATION ||
+      actionType === DaoCallables.DISSOLVE_ORGANIZATION ||
+      actionType === DaoCallables.UPDATE_ORGANIZATION ||
+      actionType === DaoCallables.TRANSFER_OWNERSHIP ||
+      actionType === DaoCallables.REMOVE_MEMBERS ||
+      actionType === DaoCallables.REMOVE_TASKS) {
+      setLoadingCallable({ type: LoadingTypes.DAO, callableType: actionType, value: true });
+    }
+
+    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
 
     signedTx(actionType, payload, enqueueSnackbar);
   };

@@ -28,7 +28,7 @@ const useTasks = () => {
   const [unsub, setUnsub] = useState<Function | null>(null);
 
   const { selectedKeyring } = useUser();
-  const { setLoading } = useLoader();
+  const { setLoading, setLoadingCallable } = useLoader();
   const { getErrorInfo } = useUtils();
 
   const tasks = useSelector(state => state.tasks.tasks);
@@ -206,7 +206,25 @@ const useTasks = () => {
       }
 
       if (response.status?.isInBlock) {
-        setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
+        if (actionType !== TaskCallables.CREATE_TASK &&
+          actionType !== TaskCallables.REJECT_TASK &&
+          actionType !== TaskCallables.UPDATE_TASK &&
+          actionType !== TaskCallables.START_TASK &&
+          actionType !== TaskCallables.COMPLETE_TASK &&
+          actionType !== TaskCallables.REMOVE_TASK
+        ) {
+          setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
+        }
+
+        if (actionType === TaskCallables.CREATE_TASK ||
+          actionType === TaskCallables.REJECT_TASK ||
+          actionType === TaskCallables.UPDATE_TASK ||
+          actionType === TaskCallables.START_TASK ||
+          actionType === TaskCallables.COMPLETE_TASK ||
+          actionType === TaskCallables.REMOVE_TASK
+        ) {
+          setLoadingCallable({ type: LoadingTypes.TASKS, callableType: actionType, value: false });
+        }
 
         createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.TASK, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText);
       }
@@ -266,7 +284,25 @@ const useTasks = () => {
       taskPayload = [taskPayload]
     }
 
-    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS, actionType) });
+    if (actionType !== TaskCallables.CREATE_TASK &&
+      actionType !== TaskCallables.REJECT_TASK &&
+      actionType !== TaskCallables.UPDATE_TASK &&
+      actionType !== TaskCallables.START_TASK &&
+      actionType !== TaskCallables.COMPLETE_TASK &&
+      actionType !== TaskCallables.REMOVE_TASK
+    ) {
+      setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS, actionType) });
+    }
+
+    if (actionType === TaskCallables.CREATE_TASK ||
+      actionType === TaskCallables.REJECT_TASK ||
+      actionType === TaskCallables.UPDATE_TASK ||
+      actionType === TaskCallables.START_TASK ||
+      actionType === TaskCallables.COMPLETE_TASK ||
+      actionType === TaskCallables.REMOVE_TASK
+    ) {
+      setLoadingCallable({ type: LoadingTypes.TASKS, callableType: actionType, value: true });
+    }
 
     createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.TASK, actionType);
 

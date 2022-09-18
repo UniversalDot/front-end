@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 // @mui
-import { Container, Box, Button, DialogTitle } from '@mui/material';
+import { Container, Box, Button, DialogTitle, Stack, LinearProgress } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
-import { useUser, useDao, useTasks } from '../hooks/universaldot';
+import { useUser, useDao, useTasks, useLoader } from '../hooks/universaldot';
 // routes
 import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
@@ -94,6 +94,17 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const { taskAction } = useTasks();
 
+  const {
+    loadingDaoAddMembers,
+    loadingDaoRemoveMembers,
+    loadingDaoAddTasks,
+    loadingDaoRemoveTasks,
+    loadingDaoCreateOrganization,
+    loadingDaoDissolveOrganization,
+    loadingDaoUpdateOrganization,
+    loadingDaoTransferOwnership,
+  } = useLoader();
+
   const [selectedOption, setSelectedOption] = useState('');
   const [selectOptions, setSelectOptions] = useState([]);
 
@@ -135,6 +146,28 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     getOrganizationTasks,
     organizationTasks,
   } = useDao();
+
+  const loadingDAO = useMemo(
+    () =>
+      loadingDaoAddMembers ||
+      loadingDaoRemoveMembers ||
+      loadingDaoAddTasks ||
+      loadingDaoRemoveTasks ||
+      loadingDaoCreateOrganization ||
+      loadingDaoDissolveOrganization ||
+      loadingDaoUpdateOrganization ||
+      loadingDaoTransferOwnership,
+    [
+      loadingDaoAddMembers,
+      loadingDaoRemoveMembers,
+      loadingDaoAddTasks,
+      loadingDaoRemoveTasks,
+      loadingDaoCreateOrganization,
+      loadingDaoDissolveOrganization,
+      loadingDaoUpdateOrganization,
+      loadingDaoTransferOwnership,
+    ]
+  );
 
   useEffect(() => {
     if (selectedKeyring.value) {
@@ -358,6 +391,11 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           ]}
         />
         {/* <DAOAnalytics /> */}
+        {/* {loadingDAO && (
+          <Stack sx={{ width: '100%', color: 'grey.500' }} spacing={2}>
+            <LinearProgress />
+          </Stack>
+        )} */}
         {selectOptions && subPage === 'members' && (
           <Select
             options={selectOptions}
