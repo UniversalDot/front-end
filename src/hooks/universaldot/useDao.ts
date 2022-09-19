@@ -27,6 +27,7 @@ import { useSelector, useDispatch } from '../../redux/store';
 
 import createSnackbarMessage from '../../utils/createSnackbarMessage';
 import createLoadingMessage from '../../utils/createLoadingMessage';
+import dayjs from 'dayjs';
 
 const useDao = () => {
   const dispatch = useDispatch();
@@ -66,7 +67,16 @@ const useDao = () => {
         const unsub = await api?.query[Pallets.TASK][TaskCallables.TASKS](
           taskId,
           (response: any) => {
-            returnValue = { id: taskId, organizationId: organizationId, ...response.toHuman() };
+            const deadlineWithoutCommas = Number(response.toHuman().deadline.split(',').join(''));
+            const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD/MM/YYYY') : deadlineWithoutCommas;
+
+            returnValue = {
+              id: taskId,
+              organizationId:
+                organizationId,
+              ...response.toHuman(),
+              deadline: deadlineFormatted,
+            };
           }
         );
 

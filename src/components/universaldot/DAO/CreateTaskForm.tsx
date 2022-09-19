@@ -1,13 +1,17 @@
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
 // form
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Stack, Button, DialogActions } from '@mui/material';
+import { Stack, Button, DialogActions, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { MobileDatePicker } from '@mui/x-date-pickers';
 import { FormProvider, RHFTextField } from '../../hook-form';
 import { Pallets, TaskCallables } from 'src/types';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 // ----------------------------------------------------------------------
 
@@ -20,7 +24,7 @@ type TaskForm = {
   keywords: string;
 };
 
-const getInitialValues = (taskForm: TaskForm | null) => {
+const getInitialValues = (taskForm: TaskForm | FormValuesProps | null) => {
   const _taskForm = {
     title: '',
     specification: '',
@@ -43,7 +47,7 @@ type FormValuesProps = {
   title: string;
   specification: string;
   budget: string;
-  deadline: string;
+  deadline: string | Date;
   attachments: string;
   keywords: string;
 };
@@ -56,6 +60,11 @@ type Props = {
 };
 
 export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, actionCb }: Props) {
+  const taskFormPrepared: FormValuesProps = {
+    ...taskForm,
+    deadline: dayjs(taskForm.deadline, 'DD-MM-YYYY').toDate(),
+  };
+
   const TaskSchema = Yup.object().shape({
     title: Yup.string().max(255).required('Title is required'),
     specification: Yup.string().max(1000),
@@ -63,7 +72,7 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, acti
 
   const methods = useForm({
     resolver: yupResolver(TaskSchema),
-    defaultValues: getInitialValues(taskForm),
+    defaultValues: getInitialValues(taskFormPrepared),
   });
 
   const {
@@ -71,26 +80,30 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, acti
     watch,
     handleSubmit,
     formState: { isSubmitting },
+    control,
   } = methods;
 
   const onSubmit = (data: FormValuesProps) => {
     if (taskIdForEdit) {
+      const deadlineDateUnix = dayjs(data.deadline).valueOf();
       const updatedTask = {
         taskId: taskIdForEdit,
         title: data.title,
         specification: data.specification,
         budget: data.budget,
-        deadline: data.deadline,
+        deadline: deadlineDateUnix,
         attachments: data.attachments,
         keywords: data.keywords,
       };
       actionCb(Pallets.TASK, TaskCallables.UPDATE_TASK, updatedTask);
     } else {
+      const deadlineDateUnix = dayjs(data.deadline).valueOf();
+
       const newTask = {
         title: data.title,
         specification: data.specification,
         budget: data.budget,
-        deadline: data.deadline,
+        deadline: deadlineDateUnix,
         attachments: data.attachments,
         keywords: data.keywords,
       };
@@ -112,7 +125,19 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, acti
 
         <RHFTextField name="budget" label="Budget" />
 
-        <RHFTextField name="deadline" label="Deadline" />
+        <Controller
+          name="deadline"
+          control={control}
+          render={({ field }) => (
+            <MobileDatePicker
+              {...field}
+              label="Deadline"
+              inputFormat="dd/MM/yyyy"
+              renderInput={(params: any) => <TextField {...params} fullWidth />}
+              disablePast
+            />
+          )}
+        />
 
         <RHFTextField name="attachments" label="Attachments" />
 
