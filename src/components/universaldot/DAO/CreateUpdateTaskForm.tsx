@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { Stack, Button, DialogActions, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { MobileDatePicker } from '@mui/x-date-pickers';
+import { MobileDateTimePicker } from '@mui/x-date-pickers';
 import { FormProvider, RHFTextField } from '../../hook-form';
 import { Pallets, TaskCallables } from 'src/types';
 import dayjs from 'dayjs';
@@ -59,10 +59,24 @@ type Props = {
   actionCb: (palletType: Pallets, actionType: TaskCallables, payload: any) => void;
 };
 
-export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, actionCb }: Props) {
-  const taskFormPrepared: FormValuesProps = {
+export default function CreateUpdateTaskForm({
+  taskForm,
+  taskIdForEdit,
+  onCancel,
+  actionCb,
+}: Props) {
+  const taskFormEdit: FormValuesProps = {
     ...taskForm,
-    deadline: dayjs(taskForm.deadline, 'DD-MM-YYYY').toDate(),
+    deadline: dayjs(taskForm.deadline, 'DD-MM-YYYY hh:mm a').toDate(),
+  };
+
+  const taskFormInit: FormValuesProps = {
+    title: '',
+    specification: '',
+    budget: '',
+    deadline: dayjs().toDate(),
+    attachments: '',
+    keywords: '',
   };
 
   const TaskSchema = Yup.object().shape({
@@ -72,7 +86,7 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, acti
 
   const methods = useForm({
     resolver: yupResolver(TaskSchema),
-    defaultValues: getInitialValues(taskFormPrepared),
+    defaultValues: taskIdForEdit ? getInitialValues(taskFormEdit) : getInitialValues(taskFormInit),
   });
 
   const {
@@ -129,10 +143,10 @@ export default function CreateTaskForm({ taskForm, taskIdForEdit, onCancel, acti
           name="deadline"
           control={control}
           render={({ field }) => (
-            <MobileDatePicker
+            <MobileDateTimePicker
               {...field}
               label="Deadline"
-              inputFormat="dd/MM/yyyy"
+              inputFormat="dd-MM-yyyy hh:mm a"
               renderInput={(params: any) => <TextField {...params} fullWidth />}
               disablePast
             />

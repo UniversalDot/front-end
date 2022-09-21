@@ -55,7 +55,7 @@ const useTasks = () => {
           let taskObject = entry[1].toHuman();
 
           const deadlineWithoutCommas = Number(taskObject.deadline.split(',').join(''));
-          const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD/MM/YYYY') : deadlineWithoutCommas;
+          const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD-MM-YYYY hh:mm a') : deadlineWithoutCommas;
 
           taskObject = {
             ...taskObject,
@@ -94,7 +94,7 @@ const useTasks = () => {
                 ...resultOption.toHuman()
               };
               const deadlineWithoutCommas = Number(taskObject.deadline.split(',').join(''));
-              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD/MM/YYYY') : deadlineWithoutCommas;
+              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD-MM-YYYY hh:mm a') : deadlineWithoutCommas;
 
               taskObject = {
                 deadline: deadlineFormatted,

@@ -18,7 +18,7 @@ import {
   // DAOAnalytics,
   Select,
   // Kanban,
-  CreateTaskForm,
+  CreateUpdateTaskForm,
   AddTaskToOrganizationForm,
   RejectTaskForm,
   OrganizationCreateAndUpdateForm,
@@ -103,6 +103,8 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     loadingDaoDissolveOrganization,
     loadingDaoUpdateOrganization,
     loadingDaoTransferOwnership,
+    loadingTasksCreateTask,
+    loadingTasksUpdateTask,
   } = useLoader();
 
   const [selectedOption, setSelectedOption] = useState('');
@@ -167,6 +169,11 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
       loadingDaoUpdateOrganization,
       loadingDaoTransferOwnership,
     ]
+  );
+
+  const loadingTaskCreateUpdate = useMemo(
+    () => loadingTasksCreateTask || loadingTasksUpdateTask,
+    [loadingTasksCreateTask, loadingTasksUpdateTask]
   );
 
   useEffect(() => {
@@ -452,7 +459,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             listHead={TABLE_HEAD_TASKS}
             listData={listDataTasks}
             daoSubpage={subPage}
-            loading={loadingDAO}
+            loading={loadingDAO || loadingTaskCreateUpdate}
           />
         )}
         {subPage === 'members' && (
@@ -513,14 +520,14 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           </DialogTitle>
           <Box p="1.5rem">
             {modalType === 'createTask' && (
-              <CreateTaskForm
+              <CreateUpdateTaskForm
                 taskForm={taskFormData || {}}
                 onCancel={() => createTaskCleanup()}
                 actionCb={formActionCb}
               />
             )}
             {modalType === 'updateTask' && (
-              <CreateTaskForm
+              <CreateUpdateTaskForm
                 taskForm={taskFormData || {}}
                 taskIdForEdit={taskIdInEdit}
                 onCancel={() => updateTaskCleanup()}

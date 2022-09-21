@@ -66,7 +66,7 @@ const useDao = () => {
           const handleGetOrganizationTasksResponse = (results: any) => {
             const resultsAsObjectsArray = results.map((resultOption: any, index: number) => {
               const deadlineWithoutCommas = Number(resultOption.toHuman().deadline.split(',').join(''));
-              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD/MM/YYYY') : deadlineWithoutCommas;
+              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD-MM-YYYY hh:mm a') : deadlineWithoutCommas;
               return {
                 id: orgTasks[index],
                 organizationId: organizationId,
