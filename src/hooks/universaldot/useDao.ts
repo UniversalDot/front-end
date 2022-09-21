@@ -61,93 +61,76 @@ const useDao = () => {
     if (!organizationsTasks.isNone) {
       const orgTasks: any[] = organizationsTasks.toHuman();
 
-      const query = async (taskId: string) => {
-        let returnValue = undefined;
+      if (orgTasks.length > 0) {
+        const queryGetOrganizationTasks = async () => {
+          const handleGetOrganizationTasksResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => {
+              const deadlineWithoutCommas = Number(resultOption.toHuman().deadline.split(',').join(''));
+              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD/MM/YYYY') : deadlineWithoutCommas;
+              return {
+                id: orgTasks[index],
+                organizationId: organizationId,
+                ...resultOption.toHuman(),
+                deadline: deadlineFormatted,
+              }
+            })
 
-        const unsub = await api?.query[Pallets.TASK][TaskCallables.TASKS](
-          taskId,
-          (response: any) => {
-            const deadlineWithoutCommas = Number(response.toHuman().deadline.split(',').join(''));
-            const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD/MM/YYYY') : deadlineWithoutCommas;
-
-            returnValue = {
-              id: taskId,
-              organizationId:
-                organizationId,
-              ...response.toHuman(),
-              deadline: deadlineFormatted,
-            };
+            createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
+            setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+            dispatch(
+              setOrganizationTasks(resultsAsObjectsArray)
+            );
           }
-        );
 
-        const cb = () => unsub;
-        cb();
-
-        while (true) {
-          await new Promise(r => setTimeout(r, 50));
-          if (returnValue) break;
+          const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS].multi(orgTasks, (response: any) => {
+            handleGetOrganizationTasksResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
         }
-
-        return returnValue;
-      };
-
-      const tasksAsObjects = await Promise.all(orgTasks.map(taskId => query(taskId)));
-
-      if (tasksAsObjects) {
-        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
-        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
-        dispatch(
-          setOrganizationTasks(tasksAsObjects)
-        );
+        queryGetOrganizationTasks()
       }
+
     }
   };
 
 
-  const handleOrganizationsResponse = async (joinedOrganizationsResponse: any, queryType: 'joined' | 'own', userKey: string) => {
+  const handleOrganizationsResponse = (joinedOrganizationsResponse: any, queryType: 'joined' | 'own', userKey: string) => {
     if (!joinedOrganizationsResponse.isNone) {
       const joinedOrgs: any[] = joinedOrganizationsResponse.toHuman();
 
-      const query = async (organizationId: string) => {
-        let returnValue = undefined;
+      if (joinedOrgs.length > 0) {
+        const queryGetOrganization = async () => {
+          const handleGetOrganizationsResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => ({
+              id: joinedOrgs[index],
+              ...resultOption.toHuman()
+            }))
 
-        const unsub = await api?.query[Pallets.DAO][DaoCallables.ORGANIZATIONS](
-          organizationId,
-          (response: any) => {
-            returnValue = { id: organizationId, ...response.toHuman() };
+            if (queryType === 'joined') {
+              dispatch(
+                setJoinedOrganizations(resultsAsObjectsArray)
+              );
+            }
+
+            if (queryType === 'own') {
+              const ownOrganizationsAsObjects = resultsAsObjectsArray.filter((organization: any) => organization.owner === userKey)
+              dispatch(
+                setOwnOrganizations(ownOrganizationsAsObjects)
+              );
+            }
           }
-        );
 
-        const cb = () => unsub;
-        cb();
-
-        while (true) {
-          await new Promise(r => setTimeout(r, 50));
-          if (returnValue) break;
+          const unsub = await api.query[Pallets.DAO][DaoCallables.ORGANIZATIONS].multi(joinedOrgs, (response: any) => {
+            handleGetOrganizationsResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
         }
-
-        return returnValue;
-      };
-
-      const organizationsAsObjects = await Promise.all(joinedOrgs.map(organizationId => query(organizationId)));
-
-      if (organizationsAsObjects) {
-        if (queryType === 'joined') {
-          dispatch(
-            setJoinedOrganizations(organizationsAsObjects)
-          );
-        }
-
-        if (queryType === 'own') {
-          const ownOrganizationsAsObjects = organizationsAsObjects.filter((organization: any) => organization.owner === userKey)
-          dispatch(
-            setOwnOrganizations(ownOrganizationsAsObjects)
-          );
-        }
-
+        queryGetOrganization()
       }
-    }
-  };
+    };
+  }
 
   const handleMembersOfAnOrganizationResponse = async (membersResponse: any, daoType: DaoCallables.MEMBERS | DaoCallables.APPLICANTS_TO_ORGANIZATION, actionType: ActionType, enqueueSnackbar: Function) => {
     if (!membersResponse.isNone) {
