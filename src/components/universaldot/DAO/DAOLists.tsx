@@ -14,14 +14,19 @@ import {
   TableContainer,
   TablePagination,
   FormControlLabel,
-  CircularProgress,
 } from '@mui/material';
 // hooks
 import useTable, { getComparator, emptyRows } from '../../../hooks/useTable';
 // components
 import Iconify from '../../Iconify';
 // import Scrollbar from '../../Scrollbar';
-import { TableNoData, TableEmptyRows, TableHeadCustom, TableSelectedActions } from '../../table';
+import {
+  TableNoData,
+  TableEmptyRows,
+  TableHeadCustom,
+  TableSelectedActions,
+  TableSpinner,
+} from '../../table';
 import TableRowExpandable from './TableRowExpandable';
 import TableRowGeneric from './TableRowGeneric';
 import TableToolbar from './TableToolbar';
@@ -134,22 +139,7 @@ export default function DAOLists({
         pointerEvents: loading ? 'none' : 'all',
       }}
     >
-      {loading && (
-        <Box
-          sx={{
-            position: 'absolute',
-            background: '#ffffffa1',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
+      {loading && <TableSpinner />}
       <Tabs
         allowScrollButtonsMobile
         variant="scrollable"

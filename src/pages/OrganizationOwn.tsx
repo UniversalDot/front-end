@@ -179,7 +179,6 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     () => () => {
       setSelectedOption('');
       setListDataMembers([]);
-      setListDataOwnOrganizations([]);
       setListDataTasks([]);
     },
     [subPage]
