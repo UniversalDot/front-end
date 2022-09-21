@@ -7,6 +7,7 @@ import ProfileAbout from './ProfileAbout';
 import ProfileSocialInfo from './ProfileSocialInfo';
 import { useProfile } from '../../../hooks/universaldot';
 import Widget from 'src/components/universaldot/Profile/Widget';
+import { Configuration } from 'src/components/universaldot/Profile';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -25,22 +26,29 @@ export default function Profile({ myProfile }: Props) {
       </Grid>
 
       <Grid item xs={12} md={8}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Widget
-              title="Reputation points"
-              total={profileData?.reputation || 'N/A'}
-              icon={<div />}
-            />
+        <Stack spacing={3}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Widget
+                title="Reputation points"
+                total={profileData?.reputation || 'N/A'}
+                icon={<div />}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Widget
+                title="Cryptocurrency"
+                total={`₿${profileData?.balance || 'N/A'}`}
+                icon={<div />}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Widget
-              title="Cryptocurrency"
-              total={`₿${profileData?.balance || 'N/A'}`}
-              icon={<div />}
-            />
+          <Grid container>
+            <Grid item xs={12}>
+              <Configuration />
+            </Grid>
           </Grid>
-        </Grid>
+        </Stack>
       </Grid>
     </Grid>
   );
