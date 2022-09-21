@@ -21,7 +21,7 @@ import Label from 'src/components/Label';
 //hooks
 import { useTasks } from 'src/hooks/universaldot';
 //types
-import { TaskCallables, TaskType, ActionType } from 'src/types';
+import { TaskCallables, TaskType, ActionType, TaskStatusEnum } from 'src/types';
 // ----------------------------------------------------------------------
 
 type TaskProps = {
@@ -37,6 +37,15 @@ export default function Task({ id, taskData }: TaskProps) {
 
   const { taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
+
+  const labelColor =
+    data?.status === TaskStatusEnum.CREATED
+      ? 'info'
+      : data?.status === TaskStatusEnum.IN_PROGRESS
+      ? 'warning'
+      : data?.status === TaskStatusEnum.COMPLETED
+      ? 'primary'
+      : 'secondary';
 
   useEffect(() => {
     if (taskData) {
@@ -70,7 +79,7 @@ export default function Task({ id, taskData }: TaskProps) {
             <Label
               variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
               // warning - error - success
-              color={'success'}
+              color={labelColor}
               sx={{ marginLeft: '1rem' }}
             >
               {data?.status}

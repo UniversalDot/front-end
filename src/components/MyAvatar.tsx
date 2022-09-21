@@ -7,7 +7,7 @@ import Avatar, { Props as AvatarProps } from './Avatar';
 
 // ----------------------------------------------------------------------
 
-export default function MyAvatar({ ...other }: AvatarProps) {
+export default function MyAvatar({ imageURL, ...other }: AvatarProps) {
   const { profileData } = useProfile();
 
   // const srcMock =
@@ -15,7 +15,7 @@ export default function MyAvatar({ ...other }: AvatarProps) {
 
   return (
     <Avatar
-      src={undefined}
+      src={imageURL || undefined}
       alt={profileData?.name || 'N/A'}
       // src={user?.photoURL}
       // color={user?.photoURL ? 'default' : createAvatar(user?.displayName).color}

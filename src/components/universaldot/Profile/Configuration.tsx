@@ -26,7 +26,7 @@ import { useProfile, useLoader } from '../../../hooks/universaldot';
 import { ProfileCallables } from '../../../types';
 import difference from 'lodash/difference';
 import { useSnackbar } from 'notistack';
-
+import MyAvatar from '../../MyAvatar';
 // ----------------------------------------------------------------------
 
 export default function ConfigurationProfile() {
@@ -359,11 +359,15 @@ export default function ConfigurationProfile() {
                       {localInterests.map((interest: string, i: number) => (
                         <Chip
                           key={`${interest}-${i}`}
+                          color="primary"
                           label={interest}
-                          size="small"
+                          size="medium"
                           sx={{ m: 0.5 }}
-                          variant="outlined"
+                          // variant="outlined"
                           onDelete={() => onRemoveInterest(interest)}
+                          avatar={
+                            <MyAvatar imageURL="https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_package.svg" />
+                          }
                         />
                       ))}
                     </Stack>

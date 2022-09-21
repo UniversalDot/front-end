@@ -86,7 +86,7 @@ export default function Profile() {
         <Card
           sx={{
             mb: 3,
-            height: 280,
+            height: 180,
             position: 'relative',
           }}
         >

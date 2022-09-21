@@ -32,14 +32,18 @@ export default function Profile({ myProfile }: Props) {
               <Widget
                 title="Reputation points"
                 total={profileData?.reputation || 'N/A'}
-                icon={<div />}
+                imageURL={
+                  'https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_package.svg'
+                }
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <Widget
                 title="Cryptocurrency"
                 total={`₿${profileData?.balance || 'N/A'}`}
-                icon={<div />}
+                imageURL={
+                  'https://minimal-assets-api-dev.vercel.app/assets/icons/ic_notification_package.svg'
+                }
               />
             </Grid>
           </Grid>
