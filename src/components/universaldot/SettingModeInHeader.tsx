@@ -131,6 +131,7 @@ export default function SettingModeInHeader() {
         />
       }
       label=""
+      sx={{ margin: 0 }}
     />
   );
 }
