@@ -263,6 +263,9 @@ const useDao = () => {
   );
 
   const signedTx = async (actionType: ActionType, payload: any, enqueueSnackbar: Function) => {
+    // @TODO: check why these below are undefined and fromAcct is undefined because of them; in Redux it appears it's present;
+    // @TODO: Example: in my organizations if I refresh the page without going to Profile page and do some action such as update profile I get some undefined errors, possibly occurs on other places;
+
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -271,7 +274,6 @@ const useDao = () => {
     const getFromAcct = async () => {
       const {
         address,
-        // @TODO: Check this example: in my organizations if I refresh the page without going to Profile page and do some action such as update profile I get some undefined errors, possibly some other places can occur;
         meta: { source, isInjected },
       } = accountPair;
       let fromAcct;

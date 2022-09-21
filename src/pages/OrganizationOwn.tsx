@@ -175,6 +175,16 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     }
   }, [selectedKeyring.value, getOwnOrganizations]);
 
+  useEffect(
+    () => () => {
+      setSelectedOption('');
+      setListDataMembers([]);
+      setListDataOwnOrganizations([]);
+      setListDataTasks([]);
+    },
+    [subPage]
+  );
+
   useEffect(() => {
     if (ownOrganizations) {
       const mappedOptions = ownOrganizations.map((ownOrganization: any) => ownOrganization.name);
@@ -443,6 +453,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             listHead={TABLE_HEAD_TASKS}
             listData={listDataTasks}
             daoSubpage={subPage}
+            loading={loadingDAO}
           />
         )}
         {subPage === 'members' && (
@@ -454,6 +465,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             listHead={TABLE_HEAD_VISIONS_MEMBERS}
             listData={listDataMembers}
             daoSubpage={subPage}
+            loading={loadingDAO}
           />
         )}
         {subPage === 'organizations' && (
@@ -480,6 +492,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               listHead={TABLE_HEAD_MY_ORG}
               listData={listDataOwnOrganizations}
               daoSubpage={subPage}
+              loading={loadingDAO}
             />
           </Box>
         )}

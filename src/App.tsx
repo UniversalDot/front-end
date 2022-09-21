@@ -21,7 +21,7 @@ export default function App() {
   const { keyring } = useSubstrateState();
   const { setKeyringOptions } = useUser();
 
-  const { loadingProfile, loadingTasks, loadingDao, message } = useLoader();
+  const { loadingProfile, message } = useLoader();
 
   useEffect(() => {
     getProfile();
@@ -48,7 +48,7 @@ export default function App() {
           <NotistackProvider>
             <ProgressBarStyle />
             <ScrollToTop />
-            <LoadingScreen show={loadingProfile || loadingTasks || loadingDao} message={message} />
+            <LoadingScreen show={loadingProfile} message={message} />
             <Router />
           </NotistackProvider>
         </ThemeSettings>

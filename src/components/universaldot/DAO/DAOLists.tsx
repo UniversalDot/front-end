@@ -14,6 +14,7 @@ import {
   TableContainer,
   TablePagination,
   FormControlLabel,
+  CircularProgress,
 } from '@mui/material';
 // hooks
 import useTable, { getComparator, emptyRows } from '../../../hooks/useTable';
@@ -43,6 +44,7 @@ type OrganizationsListProps = {
   listData: TableData;
   onTabSwitch: (event: React.SyntheticEvent<Element, Event>, tab: string) => void;
   daoSubpage?: 'organizations' | 'members' | 'tasks';
+  loading: boolean;
 };
 
 // ----------------------------------------------------------------------
@@ -55,6 +57,7 @@ export default function DAOLists({
   listData,
   onTabSwitch,
   daoSubpage,
+  loading,
 }: OrganizationsListProps) {
   const {
     dense,
@@ -125,7 +128,28 @@ export default function DAOLists({
     (!dataFiltered.length && !!currentTab);
 
   return (
-    <Card>
+    <Card
+      sx={{
+        position: 'relative',
+        pointerEvents: loading ? 'none' : 'all',
+      }}
+    >
+      {loading && (
+        <Box
+          sx={{
+            position: 'absolute',
+            background: '#ffffffa1',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       <Tabs
         allowScrollButtonsMobile
         variant="scrollable"

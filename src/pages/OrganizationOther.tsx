@@ -133,6 +133,7 @@ export default function OrganizationOther() {
           onTabSwitch={onTabSwitch}
           listHead={TABLE_HEAD_JOIN_REC_ORG}
           listData={listData}
+          loading={false}
         />
       </Container>
     </Page>
