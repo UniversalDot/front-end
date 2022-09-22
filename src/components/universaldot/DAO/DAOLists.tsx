@@ -20,7 +20,13 @@ import useTable, { getComparator, emptyRows } from '../../../hooks/useTable';
 // components
 import Iconify from '../../Iconify';
 // import Scrollbar from '../../Scrollbar';
-import { TableNoData, TableEmptyRows, TableHeadCustom, TableSelectedActions } from '../../table';
+import {
+  TableNoData,
+  TableEmptyRows,
+  TableHeadCustom,
+  TableSelectedActions,
+  TableSpinner,
+} from '../../table';
 import TableRowExpandable from './TableRowExpandable';
 import TableRowGeneric from './TableRowGeneric';
 import TableToolbar from './TableToolbar';
@@ -43,6 +49,7 @@ type OrganizationsListProps = {
   listData: TableData;
   onTabSwitch: (event: React.SyntheticEvent<Element, Event>, tab: string) => void;
   daoSubpage?: 'organizations' | 'members' | 'tasks';
+  loading: boolean;
 };
 
 // ----------------------------------------------------------------------
@@ -55,6 +62,7 @@ export default function DAOLists({
   listData,
   onTabSwitch,
   daoSubpage,
+  loading,
 }: OrganizationsListProps) {
   const {
     dense,
@@ -125,7 +133,13 @@ export default function DAOLists({
     (!dataFiltered.length && !!currentTab);
 
   return (
-    <Card>
+    <Card
+      sx={{
+        position: 'relative',
+        pointerEvents: loading ? 'none' : 'all',
+      }}
+    >
+      {loading && <TableSpinner />}
       <Tabs
         allowScrollButtonsMobile
         variant="scrollable"

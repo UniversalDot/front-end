@@ -29,7 +29,7 @@ const useProfile = () => {
   const [unsub, setUnsub] = useState<Function | null>(null);
 
   const { selectedKeyring } = useUser();
-  const { setLoading } = useLoader();
+  const { setLoading, setLoadingCallable } = useLoader();
   const { transformParams, getErrorInfo } = useUtils();
 
   const profileData = useSelector(state => state.profile.data);
@@ -120,7 +120,14 @@ const useProfile = () => {
       }
 
       if (response.status?.isInBlock) {
-        setLoading({ type: LoadingTypes.PROFILE, value: false, message: createLoadingMessage() });
+        if (actionType !== ProfileCallables.CREATE_PROFILE && actionType !== ProfileCallables.UPDATE_PROFILE && actionType !== ProfileCallables.REMOVE_PROFILE) {
+          setLoading({ type: LoadingTypes.PROFILE, value: false, message: createLoadingMessage() });
+        }
+
+        if (actionType === ProfileCallables.CREATE_PROFILE || actionType === ProfileCallables.UPDATE_PROFILE || actionType === ProfileCallables.REMOVE_PROFILE) {
+          setLoadingCallable({ type: LoadingTypes.PROFILE, callableType: actionType, value: false });
+        }
+
         createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.PROFILE, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText)
       }
     };
@@ -174,9 +181,16 @@ const useProfile = () => {
       setUnsub(null);
     }
 
+    if (actionType !== ProfileCallables.CREATE_PROFILE && actionType !== ProfileCallables.UPDATE_PROFILE && actionType !== ProfileCallables.REMOVE_PROFILE) {
+      setLoading({ type: LoadingTypes.PROFILE, value: true, message: createLoadingMessage(LoadingTypes.PROFILE, actionType) });
+    }
+
+    if (actionType === ProfileCallables.CREATE_PROFILE || actionType === ProfileCallables.UPDATE_PROFILE || actionType === ProfileCallables.REMOVE_PROFILE) {
+      setLoadingCallable({ type: LoadingTypes.PROFILE, callableType: actionType, value: true });
+    }
+
     createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.PROFILE, actionType)
 
-    setLoading({ type: LoadingTypes.PROFILE, value: true, message: createLoadingMessage(LoadingTypes.PROFILE, actionType) });
     signedTransaction(actionType, payload, enqueueSnackbar);
   };
 

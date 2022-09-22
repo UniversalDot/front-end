@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Avatar, Typography, ListItemText, ListItemAvatar, MenuItem } from '@mui/material';
@@ -8,7 +8,6 @@ import Scrollbar from '../../../../components/Scrollbar';
 import MenuPopover from '../../../../components/MenuPopover';
 import { IconButtonAnimate } from '../../../../components/animate';
 // universaldot
-import { useSubstrateState } from 'src/substrate-lib';
 import { useUser } from 'src/hooks/universaldot';
 
 // ----------------------------------------------------------------------
@@ -20,22 +19,7 @@ const ITEM_HEIGHT = 64;
 export default function AccountsPopover() {
   const [open, setOpen] = useState<HTMLElement | null>(null);
 
-  const { keyring } = useSubstrateState();
-
-  const { setKeyringOptions, keyringOptions, setSelectedKeyring, selectedKeyring } = useUser();
-
-  useEffect(() => {
-    // Get the list of accounts we possess the private key for.
-    if (keyring) {
-      const keyringOptions = keyring?.getPairs()?.map((account: any) => ({
-        key: account.address,
-        value: account.address,
-        text: account.meta.name.toUpperCase(),
-      }));
-      setKeyringOptions(keyringOptions);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyring]);
+  const { keyringOptions, setSelectedKeyring, selectedKeyring } = useUser();
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setOpen(event.currentTarget);

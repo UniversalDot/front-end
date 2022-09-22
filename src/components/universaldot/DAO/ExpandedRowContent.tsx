@@ -41,16 +41,17 @@ export default function ExpandedRowContent({
   const [selectedOption, setSelectedOption] = useState('');
   const [selectOptions, setSelectOptions] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (organizationId) {
-      getApplicantsToOrganization(
-        organizationId,
-        DaoCallables.APPLICANTS_TO_ORGANIZATION,
-        enqueueSnackbar
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId]);
+  // @TODO: refactor to separate component and call this only when clicking Add Members button in expanded row, and disable modal options and action until data is present;
+  // useEffect(() => {
+  //   if (organizationId) {
+  //     getApplicantsToOrganization(
+  //       organizationId,
+  //       DaoCallables.APPLICANTS_TO_ORGANIZATION,
+  //       enqueueSnackbar
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [organizationId]);
 
   useEffect(() => {
     if (applicantsToOrganization?.length > 0) {

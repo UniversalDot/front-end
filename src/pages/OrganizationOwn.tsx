@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 // @mui
-import { Container, Box, Button, DialogTitle } from '@mui/material';
+import { Container, Box, Button, DialogTitle, Stack, LinearProgress } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
-import { useUser, useDao, useTasks } from '../hooks/universaldot';
+import { useUser, useDao, useTasks, useLoader } from '../hooks/universaldot';
 // routes
 import { PATH_UNIVERSALDOT } from '../routes/paths';
 // components
@@ -18,7 +18,7 @@ import {
   // DAOAnalytics,
   Select,
   // Kanban,
-  CreateTaskForm,
+  CreateUpdateTaskForm,
   AddTaskToOrganizationForm,
   RejectTaskForm,
   OrganizationCreateAndUpdateForm,
@@ -94,6 +94,19 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
 
   const { taskAction } = useTasks();
 
+  const {
+    loadingDaoAddMembers,
+    loadingDaoRemoveMembers,
+    loadingDaoAddTasks,
+    loadingDaoRemoveTasks,
+    loadingDaoCreateOrganization,
+    loadingDaoDissolveOrganization,
+    loadingDaoUpdateOrganization,
+    loadingDaoTransferOwnership,
+    loadingTasksCreateTask,
+    loadingTasksUpdateTask,
+  } = useLoader();
+
   const [selectedOption, setSelectedOption] = useState('');
   const [selectOptions, setSelectOptions] = useState([]);
 
@@ -136,11 +149,47 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
     organizationTasks,
   } = useDao();
 
+  const loadingDAO = useMemo(
+    () =>
+      loadingDaoAddMembers ||
+      loadingDaoRemoveMembers ||
+      loadingDaoAddTasks ||
+      loadingDaoRemoveTasks ||
+      loadingDaoCreateOrganization ||
+      loadingDaoDissolveOrganization ||
+      loadingDaoUpdateOrganization ||
+      loadingDaoTransferOwnership,
+    [
+      loadingDaoAddMembers,
+      loadingDaoRemoveMembers,
+      loadingDaoAddTasks,
+      loadingDaoRemoveTasks,
+      loadingDaoCreateOrganization,
+      loadingDaoDissolveOrganization,
+      loadingDaoUpdateOrganization,
+      loadingDaoTransferOwnership,
+    ]
+  );
+
+  const loadingTaskCreateUpdate = useMemo(
+    () => loadingTasksCreateTask || loadingTasksUpdateTask,
+    [loadingTasksCreateTask, loadingTasksUpdateTask]
+  );
+
   useEffect(() => {
     if (selectedKeyring.value) {
       getOwnOrganizations(selectedKeyring.value);
     }
   }, [selectedKeyring.value, getOwnOrganizations]);
+
+  useEffect(
+    () => () => {
+      setSelectedOption('');
+      setListDataMembers([]);
+      setListDataTasks([]);
+    },
+    [subPage]
+  );
 
   useEffect(() => {
     if (ownOrganizations) {
@@ -358,6 +407,11 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           ]}
         />
         {/* <DAOAnalytics /> */}
+        {/* {loadingDAO && (
+          <Stack sx={{ width: '100%', color: 'grey.500' }} spacing={2}>
+            <LinearProgress />
+          </Stack>
+        )} */}
         {selectOptions && subPage === 'members' && (
           <Select
             options={selectOptions}
@@ -405,6 +459,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             listHead={TABLE_HEAD_TASKS}
             listData={listDataTasks}
             daoSubpage={subPage}
+            loading={loadingDAO || loadingTaskCreateUpdate}
           />
         )}
         {subPage === 'members' && (
@@ -416,6 +471,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
             listHead={TABLE_HEAD_VISIONS_MEMBERS}
             listData={listDataMembers}
             daoSubpage={subPage}
+            loading={loadingDAO}
           />
         )}
         {subPage === 'organizations' && (
@@ -442,6 +498,7 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
               listHead={TABLE_HEAD_MY_ORG}
               listData={listDataOwnOrganizations}
               daoSubpage={subPage}
+              loading={loadingDAO}
             />
           </Box>
         )}
@@ -463,14 +520,14 @@ export default function OrganizationOwn({ subPage }: OrganizationOwnProps) {
           </DialogTitle>
           <Box p="1.5rem">
             {modalType === 'createTask' && (
-              <CreateTaskForm
+              <CreateUpdateTaskForm
                 taskForm={taskFormData || {}}
                 onCancel={() => createTaskCleanup()}
                 actionCb={formActionCb}
               />
             )}
             {modalType === 'updateTask' && (
-              <CreateTaskForm
+              <CreateUpdateTaskForm
                 taskForm={taskFormData || {}}
                 taskIdForEdit={taskIdInEdit}
                 onCancel={() => updateTaskCleanup()}

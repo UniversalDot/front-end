@@ -27,6 +27,7 @@ import { useSelector, useDispatch } from '../../redux/store';
 
 import createSnackbarMessage from '../../utils/createSnackbarMessage';
 import createLoadingMessage from '../../utils/createLoadingMessage';
+import dayjs from 'dayjs';
 
 const useDao = () => {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const useDao = () => {
   const [unsub, setUnsub] = useState<Function | null>(null);
 
   const { selectedKeyring } = useUser();
-  const { setLoading } = useLoader();
+  const { setLoading, setLoadingCallable } = useLoader();
   const { getErrorInfo } = useUtils();
 
   const joinedOrganizations = useSelector(
@@ -58,87 +59,78 @@ const useDao = () => {
 
   const handleOrganizationTasksResponse = async (organizationsTasks: any, actionType: ActionType, enqueueSnackbar: Function, organizationId: string) => {
     if (!organizationsTasks.isNone) {
-
       const orgTasks: any[] = organizationsTasks.toHuman();
 
-      const query = async (taskId: string) => {
-        let returnValue = undefined;
+      if (orgTasks.length > 0) {
+        const queryGetOrganizationTasks = async () => {
+          const handleGetOrganizationTasksResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => {
+              const deadlineWithoutCommas = Number(resultOption.toHuman().deadline.split(',').join(''));
+              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD-MM-YYYY hh:mm a') : deadlineWithoutCommas;
+              return {
+                id: orgTasks[index],
+                organizationId: organizationId,
+                ...resultOption.toHuman(),
+                deadline: deadlineFormatted,
+              }
+            })
 
-        const unsub = await api?.query[Pallets.TASK][TaskCallables.TASKS](
-          taskId,
-          (response: any) => {
-            returnValue = { id: taskId, organizationId: organizationId, ...response.toHuman() };
+            createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
+            setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+            dispatch(
+              setOrganizationTasks(resultsAsObjectsArray)
+            );
           }
-        );
 
-        const cb = () => unsub;
-        cb();
-
-        while (true) {
-          await new Promise(r => setTimeout(r, 50));
-          if (returnValue) break;
+          const unsub = await api.query[Pallets.TASK][TaskCallables.TASKS].multi(orgTasks, (response: any) => {
+            handleGetOrganizationTasksResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
         }
-
-        return returnValue;
-      };
-
-      const tasksAsObjects = await Promise.all(orgTasks.map(taskId => query(taskId)));
-
-      if (tasksAsObjects) {
-        createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType)
-        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
-        dispatch(
-          setOrganizationTasks(tasksAsObjects)
-        );
+        queryGetOrganizationTasks()
       }
+
     }
   };
 
 
-  const handleOrganizationsResponse = async (joinedOrganizationsResponse: any, queryType: 'joined' | 'own', userKey: string) => {
+  const handleOrganizationsResponse = (joinedOrganizationsResponse: any, queryType: 'joined' | 'own', userKey: string) => {
     if (!joinedOrganizationsResponse.isNone) {
       const joinedOrgs: any[] = joinedOrganizationsResponse.toHuman();
 
-      const query = async (organizationId: string) => {
-        let returnValue = undefined;
+      if (joinedOrgs.length > 0) {
+        const queryGetOrganization = async () => {
+          const handleGetOrganizationsResponse = (results: any) => {
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => ({
+              id: joinedOrgs[index],
+              ...resultOption.toHuman()
+            }))
 
-        const unsub = await api?.query[Pallets.DAO][DaoCallables.ORGANIZATIONS](
-          organizationId,
-          (response: any) => {
-            returnValue = { id: organizationId, ...response.toHuman() };
+            if (queryType === 'joined') {
+              dispatch(
+                setJoinedOrganizations(resultsAsObjectsArray)
+              );
+            }
+
+            if (queryType === 'own') {
+              const ownOrganizationsAsObjects = resultsAsObjectsArray.filter((organization: any) => organization.owner === userKey)
+              dispatch(
+                setOwnOrganizations(ownOrganizationsAsObjects)
+              );
+            }
           }
-        );
 
-        const cb = () => unsub;
-        cb();
-
-        while (true) {
-          await new Promise(r => setTimeout(r, 50));
-          if (returnValue) break;
+          const unsub = await api.query[Pallets.DAO][DaoCallables.ORGANIZATIONS].multi(joinedOrgs, (response: any) => {
+            handleGetOrganizationsResponse(response)
+          });
+          const cb = () => unsub;
+          cb();
         }
-
-        return returnValue;
-      };
-
-      const organizationsAsObjects = await Promise.all(joinedOrgs.map(organizationId => query(organizationId)));
-
-      if (organizationsAsObjects) {
-        if (queryType === 'joined') {
-          dispatch(
-            setJoinedOrganizations(organizationsAsObjects)
-          );
-        }
-
-        if (queryType === 'own') {
-          const ownOrganizationsAsObjects = organizationsAsObjects.filter((organization: any) => organization.owner === userKey)
-          dispatch(
-            setOwnOrganizations(ownOrganizationsAsObjects)
-          );
-        }
-
+        queryGetOrganization()
       }
-    }
-  };
+    };
+  }
 
   const handleMembersOfAnOrganizationResponse = async (membersResponse: any, daoType: DaoCallables.MEMBERS | DaoCallables.APPLICANTS_TO_ORGANIZATION, actionType: ActionType, enqueueSnackbar: Function) => {
     if (!membersResponse.isNone) {
@@ -271,6 +263,9 @@ const useDao = () => {
   );
 
   const signedTx = async (actionType: ActionType, payload: any, enqueueSnackbar: Function) => {
+    // @TODO: check why these below are undefined and fromAcct is undefined because of them; in Redux it appears it's present;
+    // @TODO: Example: in my organizations if I refresh the page without going to Profile page and do some action such as update profile I get some undefined errors, possibly occurs on other places;
+
     const accountPair =
       selectedKeyring.value &&
       keyringState === 'READY' &&
@@ -279,7 +274,6 @@ const useDao = () => {
     const getFromAcct = async () => {
       const {
         address,
-        // @TODO: Check this example: in my organizations if I refresh the page without going to Profile page and do some action such as update profile I get some undefined errors, possibly some other places can occur;
         meta: { source, isInjected },
       } = accountPair;
       let fromAcct;
@@ -364,7 +358,29 @@ const useDao = () => {
       }
 
       if (response.status?.isInBlock) {
-        setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage() });
+        if (actionType !== DaoCallables.ADD_MEMBERS &&
+          actionType !== DaoCallables.ADD_TASKS &&
+          actionType !== DaoCallables.CREATE_ORGANIZATION &&
+          actionType !== DaoCallables.DISSOLVE_ORGANIZATION &&
+          actionType !== DaoCallables.UPDATE_ORGANIZATION &&
+          actionType !== DaoCallables.TRANSFER_OWNERSHIP &&
+          actionType !== DaoCallables.REMOVE_MEMBERS &&
+          actionType !== DaoCallables.REMOVE_TASKS
+        ) {
+          setLoading({ type: LoadingTypes.DAO, value: false, message: createLoadingMessage() });
+        }
+
+        if (actionType === DaoCallables.ADD_MEMBERS ||
+          actionType === DaoCallables.ADD_TASKS ||
+          actionType === DaoCallables.CREATE_ORGANIZATION ||
+          actionType === DaoCallables.DISSOLVE_ORGANIZATION ||
+          actionType === DaoCallables.UPDATE_ORGANIZATION ||
+          actionType === DaoCallables.TRANSFER_OWNERSHIP ||
+          actionType === DaoCallables.REMOVE_MEMBERS ||
+          actionType === DaoCallables.REMOVE_TASKS) {
+          setLoadingCallable({ type: LoadingTypes.DAO, callableType: actionType, value: false });
+        }
+
         createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.DAO, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText)
       }
 
@@ -412,9 +428,30 @@ const useDao = () => {
       payload = [...payload]
     }
 
-    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
+    if (actionType !== DaoCallables.ADD_MEMBERS &&
+      actionType !== DaoCallables.ADD_TASKS &&
+      actionType !== DaoCallables.CREATE_ORGANIZATION &&
+      actionType !== DaoCallables.DISSOLVE_ORGANIZATION &&
+      actionType !== DaoCallables.UPDATE_ORGANIZATION &&
+      actionType !== DaoCallables.TRANSFER_OWNERSHIP &&
+      actionType !== DaoCallables.REMOVE_MEMBERS &&
+      actionType !== DaoCallables.REMOVE_TASKS
+    ) {
+      setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+    }
 
-    setLoading({ type: LoadingTypes.DAO, value: true, message: createLoadingMessage(LoadingTypes.DAO, actionType) });
+    if (actionType === DaoCallables.ADD_MEMBERS ||
+      actionType === DaoCallables.ADD_TASKS ||
+      actionType === DaoCallables.CREATE_ORGANIZATION ||
+      actionType === DaoCallables.DISSOLVE_ORGANIZATION ||
+      actionType === DaoCallables.UPDATE_ORGANIZATION ||
+      actionType === DaoCallables.TRANSFER_OWNERSHIP ||
+      actionType === DaoCallables.REMOVE_MEMBERS ||
+      actionType === DaoCallables.REMOVE_TASKS) {
+      setLoadingCallable({ type: LoadingTypes.DAO, callableType: actionType, value: true });
+    }
+
+    createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.DAO, actionType)
 
     signedTx(actionType, payload, enqueueSnackbar);
   };

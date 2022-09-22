@@ -75,11 +75,11 @@ export default function ProfileCover({ myProfile }: Props) {
           <Typography sx={{ opacity: 0.72 }}>{position}</Typography>
         </Box>
       </InfoStyle>
-      <Image
+      {/* <Image
         alt="profile cover"
         src={cover}
         sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      />
+      /> */}
     </RootStyle>
   );
 }

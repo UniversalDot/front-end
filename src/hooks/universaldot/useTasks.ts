@@ -21,6 +21,7 @@ import {
 } from '../../types';
 import createSnackbarMessage from '../../utils/createSnackbarMessage';
 import createLoadingMessage from '../../utils/createLoadingMessage';
+import dayjs from 'dayjs';
 
 const useTasks = () => {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ const useTasks = () => {
   const [unsub, setUnsub] = useState<Function | null>(null);
 
   const { selectedKeyring } = useUser();
-  const { setLoading } = useLoader();
+  const { setLoading, setLoadingCallable } = useLoader();
   const { getErrorInfo } = useUtils();
 
   const tasks = useSelector(state => state.tasks.tasks);
@@ -51,7 +52,15 @@ const useTasks = () => {
         const allTaskEntries = (await api.query[Pallets.TASK][TaskCallables.TASKS].entries());
         const entriesPrepared = allTaskEntries.map((entry: any[]) => {
           const entryString = entry.toString();
-          const taskObject = entry[1].toHuman();
+          let taskObject = entry[1].toHuman();
+
+          const deadlineWithoutCommas = Number(taskObject.deadline.split(',').join(''));
+          const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD-MM-YYYY hh:mm a') : deadlineWithoutCommas;
+
+          taskObject = {
+            ...taskObject,
+            deadline: deadlineFormatted,
+          }
 
           return {
             taskId: `0x${entryString.split(',')[0].substring(82)}`,
@@ -79,10 +88,20 @@ const useTasks = () => {
       if (tasksOwned) {
         const queryGetTask = async () => {
           const handleGetTaskResponse = (results: any) => {
-            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => ({
-              taskId: tasksOwnedIds[index],
-              ...resultOption.toHuman()
-            }))
+            const resultsAsObjectsArray = results.map((resultOption: any, index: number) => {
+              let taskObject = {
+                taskId: tasksOwnedIds[index],
+                ...resultOption.toHuman()
+              };
+              const deadlineWithoutCommas = Number(taskObject.deadline.split(',').join(''));
+              const deadlineFormatted = dayjs(deadlineWithoutCommas).isValid() ? dayjs(deadlineWithoutCommas).format('DD-MM-YYYY hh:mm a') : deadlineWithoutCommas;
+
+              taskObject = {
+                deadline: deadlineFormatted,
+              }
+
+              return taskObject;
+            })
 
             if (resultsAsObjectsArray.length === 0) {
               dispatch(setTasks([]));
@@ -200,15 +219,35 @@ const useTasks = () => {
       }
 
       if (response.status?.isFinalized) {
-        // @TODO: check if I need to call getAllTaskEntries or getOwnedTasks here to repopulate with fresh data;
-        // getOwnedTasks();
-        getAllTaskEntries();
+
       }
 
       if (response.status?.isInBlock) {
-        setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
+        if (actionType !== TaskCallables.CREATE_TASK &&
+          actionType !== TaskCallables.REJECT_TASK &&
+          actionType !== TaskCallables.UPDATE_TASK &&
+          actionType !== TaskCallables.START_TASK &&
+          actionType !== TaskCallables.COMPLETE_TASK &&
+          actionType !== TaskCallables.REMOVE_TASK
+        ) {
+          setLoading({ type: LoadingTypes.TASKS, value: false, message: createLoadingMessage() });
+        }
+
+        if (actionType === TaskCallables.CREATE_TASK ||
+          actionType === TaskCallables.REJECT_TASK ||
+          actionType === TaskCallables.UPDATE_TASK ||
+          actionType === TaskCallables.START_TASK ||
+          actionType === TaskCallables.COMPLETE_TASK ||
+          actionType === TaskCallables.REMOVE_TASK
+        ) {
+          setLoadingCallable({ type: LoadingTypes.TASKS, callableType: actionType, value: false });
+        }
 
         createSnackbarMessage(enqueueSnackbar, MessageTiming.FINAL, Pallets.TASK, actionType, txFailed ? TransactionStatus.FAIL : TransactionStatus.SUCCESS, failureText);
+
+        // @TODO: check if I need to call getAllTaskEntries or getOwnedTasks here to repopulate with fresh data;
+        // getOwnedTasks();
+        getAllTaskEntries();
       }
     };
 
@@ -266,7 +305,25 @@ const useTasks = () => {
       taskPayload = [taskPayload]
     }
 
-    setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS, actionType) });
+    if (actionType !== TaskCallables.CREATE_TASK &&
+      actionType !== TaskCallables.REJECT_TASK &&
+      actionType !== TaskCallables.UPDATE_TASK &&
+      actionType !== TaskCallables.START_TASK &&
+      actionType !== TaskCallables.COMPLETE_TASK &&
+      actionType !== TaskCallables.REMOVE_TASK
+    ) {
+      setLoading({ type: LoadingTypes.TASKS, value: true, message: createLoadingMessage(LoadingTypes.TASKS, actionType) });
+    }
+
+    if (actionType === TaskCallables.CREATE_TASK ||
+      actionType === TaskCallables.REJECT_TASK ||
+      actionType === TaskCallables.UPDATE_TASK ||
+      actionType === TaskCallables.START_TASK ||
+      actionType === TaskCallables.COMPLETE_TASK ||
+      actionType === TaskCallables.REMOVE_TASK
+    ) {
+      setLoadingCallable({ type: LoadingTypes.TASKS, callableType: actionType, value: true });
+    }
 
     createSnackbarMessage(enqueueSnackbar, MessageTiming.INIT, Pallets.TASK, actionType);
 

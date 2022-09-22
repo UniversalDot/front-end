@@ -61,13 +61,22 @@ declare module '@mui/material' {
 }
 
 // SETUP COLORS
+// HYRES COLORS:
 const PRIMARY = {
-  lighter: '#C8FACD',
-  light: '#5BE584',
-  main: '#00AB55',
-  dark: '#007B55',
-  darker: '#005249',
+  lighter: '#90ffeb',
+  light: '#58e5b9',
+  main: '#00b289',
+  dark: '#00815c',
+  darker: '#005332',
 };
+// TEMPLATE ORIGINAL SETUP:
+// const PRIMARY = {
+//   lighter: '#C8FACD',
+//   light: '#5BE584',
+//   main: '#00AB55',
+//   dark: '#007B55',
+//   darker: '#005249',
+// };
 const SECONDARY = {
   lighter: '#D6E4FF',
   light: '#84A9FF',

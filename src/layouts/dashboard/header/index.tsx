@@ -16,6 +16,7 @@ import { IconButtonAnimate } from '../../../components/animate';
 import Searchbar from './Searchbar';
 import LanguagePopover from './LanguagePopover';
 import EventsPopover from './EventsPopover';
+import SettingModeInHeader from '../../../components/universaldot/SettingModeInHeader';
 // universaldot
 import AccountsPopover from './universaldot/AccountsPopover';
 import AccountPopover from './universaldot/AccountPopover';
@@ -93,6 +94,7 @@ export default function DashboardHeader({
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1.5 }}>
+          <SettingModeInHeader />
           <LanguagePopover />
           <EventsPopover />
           <AccountsPopover />

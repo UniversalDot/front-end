@@ -16,11 +16,7 @@ import Page from '../components/Page';
 import Iconify from '../components/Iconify';
 import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 // sections
-import {
-  Profile as ProfileView,
-  ProfileCover,
-  Configuration,
-} from '../components/universaldot/Profile';
+import { Profile as ProfileView, ProfileCover } from '../components/universaldot/Profile';
 // universaldot
 import { useProfile } from '../hooks/universaldot';
 
@@ -75,11 +71,6 @@ export default function Profile() {
       icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
       component: <ProfileView myProfile={myProfile} />,
     },
-    {
-      value: 'configuration',
-      icon: <Iconify icon={'eva:heart-fill'} width={20} height={20} />,
-      component: <Configuration />,
-    },
   ];
 
   return (
@@ -95,7 +86,7 @@ export default function Profile() {
         <Card
           sx={{
             mb: 3,
-            height: 280,
+            height: 180,
             position: 'relative',
           }}
         >
