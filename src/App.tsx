@@ -14,6 +14,7 @@ import LoadingScreen from './components/LoadingScreen';
 // universaldot imports
 import { useProfile, useUser, useLoader } from './hooks/universaldot';
 import { useSubstrateState } from './substrate-lib';
+import { useIpfsAPI } from './api';
 // ----------------------------------------------------------------------
 
 export default function App() {
@@ -40,6 +41,17 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyring]);
+
+  const ipfsAPI = useIpfsAPI();
+
+  useEffect(() => {
+    const fetchIpfsID = async () => {
+      const result = await ipfsAPI.id();
+      console.log('IPFS id: ', result);
+    };
+
+    fetchIpfsID();
+  }, [ipfsAPI]);
 
   return (
     <MotionLazyContainer>
