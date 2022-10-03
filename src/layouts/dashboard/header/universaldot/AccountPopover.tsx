@@ -60,7 +60,7 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src="https://www.slaveatanasov.com/static/e9052516b4c76a54f70d753d9b54b145/47498/sa_img.jpg"
+          src="https://react.semantic-ui.com/images/avatar/small/matthew.png"
           alt={selectedKeyring.text}
         />
       </IconButtonAnimate>
