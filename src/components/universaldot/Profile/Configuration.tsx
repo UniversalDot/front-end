@@ -247,6 +247,7 @@ export default function ConfigurationProfile() {
                           id="outlined-adornment-username"
                           type={'text'}
                           value={localUsername}
+                          data-cy="username"
                           onChange={(event) => onUsernameChange(event.target.value)}
                           // endAdornment={
                           //   profileData ? (
@@ -279,6 +280,7 @@ export default function ConfigurationProfile() {
                               color="primary"
                               aria-label="upload picture"
                               component="span"
+                              data-cy="edit-icon"
                               onClick={() => setUsernameEditEnabled(true)}
                               sx={{ marginLeft: theme.spacing(1) }}
                               disabled={usernameEditEnabled}
@@ -297,6 +299,7 @@ export default function ConfigurationProfile() {
                         id="outlined-available-hours"
                         type={'text'}
                         value={localAvailableHours}
+                        data-cy="hours"
                         onChange={(event) => onAvailableHoursChange(event.target.value)}
                         onKeyDown={onAvailableHoursBackspace}
                         label="Available hours per week"
@@ -384,6 +387,7 @@ export default function ConfigurationProfile() {
             <LoadingButton
               variant="contained"
               loading={loadingProfile}
+              data-cy="profile"
               disabled={
                 (profileData && !differencesExist) ||
                 (!profileData && localInterests.length === 0) ||
