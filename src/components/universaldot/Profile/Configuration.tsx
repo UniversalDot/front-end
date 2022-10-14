@@ -342,6 +342,7 @@ export default function ConfigurationProfile() {
                     <OutlinedInput
                       id="outlined-adornment-interest"
                       type={'text'}
+                      data-cy="interests"
                       value={interest}
                       onChange={(event) => setInterest(event.target.value)}
                       endAdornment={
@@ -350,6 +351,7 @@ export default function ConfigurationProfile() {
                             icon="ant-design:plus-outlined"
                             width={20}
                             height={20}
+                            data-cy="add-interest"
                             onClick={() => handleAddInterest()}
                           />
                         </InputAdornment>

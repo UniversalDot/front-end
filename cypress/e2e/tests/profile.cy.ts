@@ -1,4 +1,4 @@
-describe('general tests', () => {
+describe('Profile tests', () => {
 
   it('navigates to the testing endpoint', () => {
     cy.visit('http://localhost:3000')
@@ -48,24 +48,53 @@ describe('general tests', () => {
       .click()
   })
 
-  
+  //TODO: Bug found, enable after closing https://github.com/UniversalDot/front-end/issues/44
+  it('can create a profile', () => {
+    cy.visit('http://localhost:3000')
+
+    const username = 'JamesBond'
+    const hours = '40'
+    const info = "I am 007 Agent"
+    const interests = "Sofware Development"
+
+
+    cy.get('[data-cy="username"]')
+      .type(`${username}{enter}`, { delay: 50 })
+
+    cy.get('[data-cy="hours"]')
+      .type(`${hours}{enter}`, { delay: 100 })
+
+    cy.get('[data-cy="other-information"]')
+      .type(`${info}{enter}`, { delay: 100 })
+
+    cy.get('[data-cy="interests"]')
+      .type(`${interests}{enter}`, { delay: 100 })
+
+    cy.get('[data-cy="add-interest"]')
+      .click()
+
+    cy.get('[data-cy="profile"]')
+      .click()
+
+    cy.wait(5000)
+  })
 
   //TODO: Bug found, enable after closing https://github.com/UniversalDot/front-end/issues/44
-  // it('changes the username', () => {
-  //   cy.visit('http://localhost:3000')
+  it('changes the username', () => {
+    cy.visit('http://localhost:3000')
 
-  //   const username = 'JamesBond'
+    const username = 'JamesBond'
 
-  //   cy.get('[data-cy="edit-icon"]').click()
+    cy.get('[data-cy="edit-icon"]').click()
 
-  //   cy.get('[data-cy="username"]')
-  //     .clear()
-  //     .type(`${username}{enter}`, { delay: 50 })
-  //     .clear()
+    cy.get('[data-cy="username"]')
+      .clear()
+      .type(`${username}{enter}`, { delay: 50 })
+      .clear()
 
-  //   cy.get('[data-cy="profile"]')
-  //     .click()
-  // })
+    cy.get('[data-cy="profile"]')
+      .click()
+  })
 
   it('changes the available hours', () => {
     cy.visit('http://localhost:3000')
