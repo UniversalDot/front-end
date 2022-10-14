@@ -88,9 +88,8 @@ describe('Profile tests', () => {
     cy.get('[data-cy="edit-icon"]').click()
 
     cy.get('[data-cy="username"]')
-      .clear()
       .type(`${username}{enter}`, { delay: 50 })
-      .clear()
+
 
     cy.get('[data-cy="profile"]')
       .click()
@@ -118,6 +117,13 @@ describe('Profile tests', () => {
       .clear()
 
     cy.get('[data-cy="profile"]')
+      .click()
+  })
+
+  it('deletes the profile', () => {
+    cy.visit('http://localhost:3000')
+
+    cy.get('[data-cy="delete-profile"]')
       .click()
   })
 })

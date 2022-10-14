@@ -408,6 +408,7 @@ export default function ConfigurationProfile() {
               <Button
                 variant="contained"
                 color="error"
+                data-cy="delete-profile"
                 onClick={() => onActionButtonClick(ProfileCallables.REMOVE_PROFILE)}
                 disabled={loadingProfile}
               >
