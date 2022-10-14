@@ -33,6 +33,7 @@ export default function AccountsPopover() {
     <>
       <IconButtonAnimate
         color={open ? 'primary' : 'default'}
+        data-cy="accounts"
         onClick={handleOpen}
         sx={{
           width: 40,
@@ -69,6 +70,7 @@ export default function AccountsPopover() {
           {keyringOptions.map((account: any) => (
             <MenuItem
               key={account.key}
+              data-cy="selected-account"
               onClick={() => {
                 setSelectedKeyring(account);
                 handleClose();

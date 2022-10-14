@@ -44,6 +44,7 @@ export default function AccountPopover() {
     <>
       <IconButtonAnimate
         onClick={handleOpen}
+        data-cy="account"
         sx={{
           p: 0,
           ...(open && {

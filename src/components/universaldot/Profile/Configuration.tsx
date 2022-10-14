@@ -310,6 +310,7 @@ export default function ConfigurationProfile() {
                       <OutlinedInput
                         id="outlined-other-info"
                         type={'text'}
+                        data-cy="other-information"
                         value={localOtherInformation}
                         onChange={(event) => onOtherInformationChange(event.target.value)}
                         label="Other information"
