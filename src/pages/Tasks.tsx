@@ -70,7 +70,7 @@ export default function Tasks() {
               <ItemBlockStyle sx={{ minWidth: 120, marginBottom: '2rem' }}>
                 {/* <Image disabledEffect alt={country.name} src={country.flag} sx={{ width: 28, mr: 1 }} /> */}
                 <Iconify icon={'bi:list-task'} sx={{ marginRight: '1rem' }} />
-                <Typography variant="subtitle1" color="text.primary">
+                <Typography variant="subtitle1" color="text.primary" data-cy="upcoming-tasks">
                   Upcoming Tasks
                 </Typography>
               </ItemBlockStyle>
