@@ -120,6 +120,7 @@ export default function EventsPopover() {
       <IconButtonAnimate
         color={open ? 'primary' : 'default'}
         onClick={handleOpen}
+        data-cy="events"
         sx={{ width: 40, height: 40 }}
       >
         <Badge badgeContent={totalUnread} color="error">

@@ -247,6 +247,7 @@ export default function ConfigurationProfile() {
                           id="outlined-adornment-username"
                           type={'text'}
                           value={localUsername}
+                          data-cy="username"
                           onChange={(event) => onUsernameChange(event.target.value)}
                           // endAdornment={
                           //   profileData ? (
@@ -279,6 +280,7 @@ export default function ConfigurationProfile() {
                               color="primary"
                               aria-label="upload picture"
                               component="span"
+                              data-cy="edit-icon"
                               onClick={() => setUsernameEditEnabled(true)}
                               sx={{ marginLeft: theme.spacing(1) }}
                               disabled={usernameEditEnabled}
@@ -297,6 +299,7 @@ export default function ConfigurationProfile() {
                         id="outlined-available-hours"
                         type={'text'}
                         value={localAvailableHours}
+                        data-cy="hours"
                         onChange={(event) => onAvailableHoursChange(event.target.value)}
                         onKeyDown={onAvailableHoursBackspace}
                         label="Available hours per week"
@@ -307,6 +310,7 @@ export default function ConfigurationProfile() {
                       <OutlinedInput
                         id="outlined-other-info"
                         type={'text'}
+                        data-cy="other-information"
                         value={localOtherInformation}
                         onChange={(event) => onOtherInformationChange(event.target.value)}
                         label="Other information"
@@ -338,6 +342,7 @@ export default function ConfigurationProfile() {
                     <OutlinedInput
                       id="outlined-adornment-interest"
                       type={'text'}
+                      data-cy="interests"
                       value={interest}
                       onChange={(event) => setInterest(event.target.value)}
                       endAdornment={
@@ -346,6 +351,7 @@ export default function ConfigurationProfile() {
                             icon="ant-design:plus-outlined"
                             width={20}
                             height={20}
+                            data-cy="add-interest"
                             onClick={() => handleAddInterest()}
                           />
                         </InputAdornment>
@@ -384,6 +390,7 @@ export default function ConfigurationProfile() {
             <LoadingButton
               variant="contained"
               loading={loadingProfile}
+              data-cy="profile"
               disabled={
                 (profileData && !differencesExist) ||
                 (!profileData && localInterests.length === 0) ||
@@ -401,6 +408,7 @@ export default function ConfigurationProfile() {
               <Button
                 variant="contained"
                 color="error"
+                data-cy="delete-profile"
                 onClick={() => onActionButtonClick(ProfileCallables.REMOVE_PROFILE)}
                 disabled={loadingProfile}
               >

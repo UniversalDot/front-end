@@ -22,6 +22,7 @@ export default function ColorManyPicker({ colors, onChangeColor, sx, ...other }:
             size="small"
             value={color}
             color="default"
+            data-cy="switch-theme"
             onChange={() => onChangeColor(color)}
             icon={
               <IconColor

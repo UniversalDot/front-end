@@ -25,6 +25,7 @@ export default function LanguagePopover() {
     <>
       <IconButtonAnimate
         onClick={handleOpen}
+        data-cy="language"
         sx={{
           width: 40,
           height: 40,
