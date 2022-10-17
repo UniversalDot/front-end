@@ -2,7 +2,8 @@
 
 export const company = [
   'Lueilwitz and Sons',
-  'Gleichner, Mueller and Tromp',
+  'UniversalDot',
+  'Eindhoven University of Technology',
   'Nikolaus - Leuschke',
   'Hegmann, Kreiger and Bayer',
   'Grimes Inc',

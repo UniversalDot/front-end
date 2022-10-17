@@ -51,18 +51,17 @@ export default function Profile() {
   const myProfile: MyProfile = {
     id: _mock.id(1),
     cover: _mock.image.cover(1),
-    position: 'UI/UX Designer at DesignerHub',
-    quote:
-      'Tart I love sugar plum I love oat cake. Sweet roll caramels I love jujubes. Topping cake wafer..',
+    position: 'UI/UX Designer at UniversalDot',
+    quote: 'Building the decentralized web',
     country: _mock.address.country(1),
     email: _mock.email(1),
     company: _mock.company(1),
     school: _mock.company(2),
     role: 'UI/UX Designer',
-    facebookLink: `https://www.facebook.com/caitlyn.kerluke`,
-    instagramLink: `https://www.instagram.com/caitlyn.kerluke`,
-    linkedinLink: `https://www.linkedin.com/in/caitlyn.kerluke`,
-    twitterLink: `https://www.twitter.com/caitlyn.kerluke`,
+    facebookLink: `N/A`,
+    instagramLink: `N/A`,
+    linkedinLink: `https://www.linkedin.com/company/universaldot-foundation`,
+    twitterLink: `https://twitter.com/Universaldot_`,
   };
 
   const PROFILE_TABS = [
