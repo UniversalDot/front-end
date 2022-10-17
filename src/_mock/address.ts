@@ -45,6 +45,7 @@ export const fullAddress = [
 
 export const country = [
   'Kenya',
+  'The Netherlands',
   'Madagascar',
   'Netherlands Antilles',
   'Azerbaijan',

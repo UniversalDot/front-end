@@ -2,7 +2,7 @@
 
 export const email = [
   'nannie_abernathy70@yahoo.com',
-  'ashlynn_ohara62@gmail.com',
+  'info@universaldot.foundation',
   'milo.farrell@hotmail.com',
   'violet.ratke86@yahoo.com',
   'letha_lubowitz24@yahoo.com',
