@@ -1,9 +1,9 @@
-name: Bug Report
-description: File a bug report for universaldot.me Application
-title: "[Bug]: "
-labels: ["bug", "triage"]
-assignees:
-  - slaveatanasov
+name: "🐛 Bug Report"
+description: Create a new ticket for a bug.
+title: "🐛 [BUG] - <title>"
+labels: [
+  "bug"
+]
 body:
   - type: markdown
     attributes:
