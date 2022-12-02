@@ -2,7 +2,8 @@
 FROM ubuntu:22.04
 
 # Core dependencies
-RUN apt-get update && apt-get install -y curl sudo
+RUN apt-get update
+RUN apt-get install -y curl sudo
 
 # Install node 16
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
