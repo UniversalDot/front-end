@@ -22,6 +22,7 @@ RUN sudo apt-get install -y python3 g++ make python3-pip
 RUN npm ci --legacy-peer-deps
 # Build the app
 RUN npm run build
+
 # ==== RUN =======
 # Set the env to "production"
 ENV NODE_ENV production
