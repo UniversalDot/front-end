@@ -1,32 +1,45 @@
-# Use Ubuntu base image
-FROM ubuntu:22.04
+FROM ubuntu:20.04
+LABEL name="universaldot-front-end"
+LABEL maintainer="https://github.com/UniversalDot"
 
-# Core dependencies
-RUN apt-get update && apt-get install -y curl sudo
+ENV DEBIAN_FRONTEND=nonintercative
+ENV TZONE=Europe/Amsterdam
+# ENV LANG en_US.UTF-8
+# ENV LANGUAGE en_US:en
+# ENV LC_ALL en_US.UTF-8
+RUN ln -snf /usr/share/zoneinfo/$TZONE /etc/localtime && echo $TZONE > /etc/timezone
 
-# Install node 16
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-RUN sudo apt-get install -y nodejs
-RUN echo "NODE Version:" && node --version
-RUN echo "NPM Version:" && npm --version
+ARG NODEJS_MAJOR_VERSION=12
 
-# Set the working directory to /app inside the container
-WORKDIR /app
+RUN apt-get update && apt-get install curl -y &&\
+  curl --proto '=https' --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_${NODEJS_MAJOR_VERSION}.x | bash - &&\
+  apt-get install nodejs git -y
 
-# Copy app files
-COPY . .
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
+  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
+  apt-get update && apt-get install gcc g++ make gnupg2 yarn -y
 
-# ==== BUILD =====
-# Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
-RUN sudo apt-get install -y python3 g++ make python3-pip
-RUN npm ci --legacy-peer-deps
-# Build the app
-RUN npm run build
+RUN git clone -b develop --depth 1 https://github.com/UniversalDot/front-end.git substrate
+WORKDIR /substrate
+RUN npm install
 
-# ==== RUN =======
-# Set the env to "production"
-ENV NODE_ENV production
-# Expose the port on which the app will be running (3000 is the default that `serve` uses)
-EXPOSE 3000
-# Start the app
-CMD [ "npx", "serve", "build" ]
+COPY ./start.sh /substrate/start.sh
+RUN chmod 540 /substrate/start.sh
+RUN apt-get update -y \
+    && apt-get install -y telnet nano \
+    && apt-get clean
+# Image clean-up
+RUN apt-get autoremove -y
+RUN apt-get clean
+RUN apt-get autoclean
+
+# Creating non root user substrate
+RUN useradd -m substrate
+
+# Change permission
+RUN chown -R substrate:substrate /substrate
+RUN chmod g+s /substrate
+
+# Switch user
+USER substrate:substrate
+WORKDIR /substrate
