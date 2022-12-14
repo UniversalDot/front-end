@@ -162,3 +162,4 @@ Please make sure to update tests as appropriate.
 ## Maintainers
 
 [@SlaveAtanasov](https://github.com/slaveatanasov)
+[@Slave Mitev](https://github.com/smitev)
