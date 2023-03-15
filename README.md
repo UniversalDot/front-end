@@ -3,7 +3,7 @@
 [![Check Set-Up & Build](https://github.com/UniversalDot/front-end/actions/workflows/check.yml/badge.svg)](https://github.com/UniversalDot/front-end/actions/workflows/check.yml)
 [![Deploy to 'hosting' branch](https://github.com/UniversalDot/front-end/actions/workflows/deploy.yml/badge.svg)](https://github.com/UniversalDot/front-end/actions/workflows/deploy.yml)
 
-![Logo](https://github.com/UniversalDot/documents/blob/master/logo/rsz_jpg-02.jpg)
+![Logo](https://github.com/UniversalDot/documents/blob/master/logo/universaldot-logo/rsz_jpg-02.jpg)
 
 In the past, people have created organizations and corporations by obtaining legal status from a government or a state. In the future, organizations and corporations will be created digitally and will have global instead of local reach. UNIVERSALDOT Foundation provides the needed infrastructure for people to organize themselves by creating digital identities and tasks. We enable the creation of a new digital future.
 
