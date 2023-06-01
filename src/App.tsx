@@ -60,7 +60,7 @@ export default function App() {
           <NotistackProvider>
             <ProgressBarStyle />
             <ScrollToTop />
-            <LoadingScreen show={loadingProfile} message={message} />
+            {/* <LoadingScreen show={loadingProfile} message={message} /> */}
             <Router />
           </NotistackProvider>
         </ThemeSettings>

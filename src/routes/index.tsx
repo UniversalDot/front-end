@@ -40,6 +40,7 @@ export default function Router() {
         { element: <Navigate to="/dashboard/profile" replace />, index: true },
         { path: 'profile', element: <Profile /> },
         { path: 'tasks', element: <Tasks /> },
+        { path: 'upload', element: <Upload /> },
         { path: 'calendar', element: <Calendar /> },
         {
           path: 'dao',
@@ -78,6 +79,7 @@ export default function Router() {
 }
 
 // Dashboard
+const Upload = Loadable(lazy(() => import('../pages/Upload')));
 const Profile = Loadable(lazy(() => import('../pages/Profile')));
 const Tasks = Loadable(lazy(() => import('../pages/Tasks')));
 const Calendar = Loadable(lazy(() => import('../pages/Calendar')));
