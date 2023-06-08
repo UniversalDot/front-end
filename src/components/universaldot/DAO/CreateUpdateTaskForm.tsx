@@ -1,10 +1,14 @@
+import { ChangeEvent, useState } from 'react';
+
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
 // form
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Stack, Button, DialogActions, TextField } from '@mui/material';
+import { Stack, Button, DialogActions, TextField, LinearProgress, Box } from '@mui/material';
+
+import SvgIconStyle from 'src/components/SvgIconStyle';
 import { LoadingButton } from '@mui/lab';
 import { MobileDateTimePicker } from '@mui/x-date-pickers';
 import { FormProvider, RHFTextField } from '../../hook-form';
@@ -65,6 +69,11 @@ export default function CreateUpdateTaskForm({
   onCancel,
   actionCb,
 }: Props) {
+
+  const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
+  const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
+  const [filePath, setFilePath] = useState<string>('');
+
   const taskFormEdit: FormValuesProps = {
     ...taskForm,
     deadline: dayjs(taskForm.deadline, 'DD-MM-YYYY hh:mm a').toDate(),
@@ -96,6 +105,20 @@ export default function CreateUpdateTaskForm({
     formState: { isSubmitting },
     control,
   } = methods;
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      console.log('file: ', event.target.files[0].name);
+      setFilePath(event.target.files[0].name);
+      setIsFileUploaded(true);
+      setIsFileUploading(true);
+    }
+    event.persist();
+  }
+
+  const handleRemoveFile = () => {
+
+  }
 
   const onSubmit = (data: FormValuesProps) => {
     if (taskIdForEdit) {
@@ -153,7 +176,27 @@ export default function CreateUpdateTaskForm({
           )}
         />
 
-        <RHFTextField name="attachments" label="Attachments" />
+        <RHFTextField
+          name="attachments"
+          label="Attachments"
+          type="file"
+          onChange={handleFileChange}
+          InputLabelProps={{
+            shrink: true
+          }}
+          InputProps={{
+            endAdornment: isFileUploading &&
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <SvgIconStyle src={`/assets/icons/ic_close.svg`} sx={{ width: 15, height: 15, cursor: 'pointer'}} onClick={handleRemoveFile} />
+              </Box>
+          }}
+        />
+        {
+          isFileUploading && <LinearProgress />
+        }
+        {
+          isFileUploaded && <iframe src={filePath} loading="lazy" />
+        }
 
         <RHFTextField name="keywords" label="Keywords" />
       </Stack>
