@@ -1,7 +1,8 @@
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
+import { create } from 'ipfs-http-client';
 // form
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -15,6 +16,8 @@ import { FormProvider, RHFTextField } from '../../hook-form';
 import { Pallets, TaskCallables } from 'src/types';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+import windowInstance from 'src/window';
 dayjs.extend(customParseFormat);
 
 // ----------------------------------------------------------------------
@@ -63,6 +66,11 @@ type Props = {
   actionCb: (palletType: Pallets, actionType: TaskCallables, payload: any) => void;
 };
 
+const { IPFS_URL } = windowInstance.env;
+const VERSION_PATH = '/api/v0';
+
+const ipfs = create({ url: `${IPFS_URL}${VERSION_PATH}` });
+
 export default function CreateUpdateTaskForm({
   taskForm,
   taskIdForEdit,
@@ -73,6 +81,7 @@ export default function CreateUpdateTaskForm({
   const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
   const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
   const [filePath, setFilePath] = useState<string>('');
+  const [file, setFile] = useState<File | undefined>();
 
   const taskFormEdit: FormValuesProps = {
     ...taskForm,
@@ -106,18 +115,22 @@ export default function CreateUpdateTaskForm({
     control,
   } = methods;
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      console.log('file: ', event.target.files[0].name);
-      setFilePath(event.target.files[0].name);
+      setFile(event.target.files[0]);
+      setFilePath(URL.createObjectURL(event.target.files[0]));
       setIsFileUploaded(true);
       setIsFileUploading(true);
+      const { cid } = await ipfs.add(event.target.files[0]);
+      setIsFileUploading(false);
+      alert("cid: " + cid);
     }
-    event.persist();
   }
 
   const handleRemoveFile = () => {
-
+    setFilePath("");
+    setIsFileUploaded(false);
+    setFile(undefined);
   }
 
   const onSubmit = (data: FormValuesProps) => {
@@ -179,15 +192,16 @@ export default function CreateUpdateTaskForm({
         <RHFTextField
           name="attachments"
           label="Attachments"
-          type="file"
+          type={!file? "file": "text"}
+          value={file?.name ?? ""}
           onChange={handleFileChange}
           InputLabelProps={{
             shrink: true
           }}
           InputProps={{
-            endAdornment: isFileUploading &&
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <SvgIconStyle src={`/assets/icons/ic_close.svg`} sx={{ width: 15, height: 15, cursor: 'pointer'}} onClick={handleRemoveFile} />
+            endAdornment: !isFileUploading && isFileUploaded &&
+              <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={handleRemoveFile}>
+                <SvgIconStyle src={`/assets/icons/ic_close.svg`} sx={{ width: 15, height: 15, cursor: 'pointer'}} />
               </Box>
           }}
         />
