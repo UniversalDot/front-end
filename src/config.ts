@@ -7,6 +7,7 @@ import { SettingsValueProps } from './components/settings/type';
 // ----------------------------------------------------------------------
 
 export const HOST_API = process.env.REACT_APP_HOST_API_KEY || '';
+export const API_VERSION = process.env.VERSION_PATH || '';
 
 // LAYOUT
 // ----------------------------------------------------------------------
