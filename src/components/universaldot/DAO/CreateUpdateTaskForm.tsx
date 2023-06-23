@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import * as Yup from 'yup';
 import merge from 'lodash/merge';
-import { create } from 'ipfs-http-client';
+import { useIpfsAPI } from 'src/api';
 // form
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -16,11 +16,6 @@ import { FormProvider, RHFTextField } from '../../hook-form';
 import { Pallets, TaskCallables } from 'src/types';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-
-import windowInstance from 'src/window';
-import { API_VERSION as vsa } from '../../../config';
-
-// console.log("config_url: ", vsa);
 
 dayjs.extend(customParseFormat);
 
@@ -70,18 +65,12 @@ type Props = {
   actionCb: (palletType: Pallets, actionType: TaskCallables, payload: any) => void;
 };
 
-const { IPFS_URL } = windowInstance.env;
-const VERSION_PATH = "/api/v0";
-
-const ipfs = create({ url: `${IPFS_URL}${VERSION_PATH}` });
-
 export default function CreateUpdateTaskForm({
   taskForm,
   taskIdForEdit,
   onCancel,
   actionCb,
 }: Props) {
-  // console.log("config_url1: ", vsa);
 
   const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
   const [isFileUploaded, setIsFileUploaded] = useState<boolean>(false);
@@ -89,6 +78,8 @@ export default function CreateUpdateTaskForm({
   const [file, setFile] = useState<File | undefined>();
   const [fileNames, setFileNames] = useState<string>('');
   const [cids, setCids] = useState<string[]>([]);
+
+  const ipfs = useIpfsAPI();
 
   const taskFormEdit: FormValuesProps = {
     ...taskForm,
@@ -150,7 +141,7 @@ export default function CreateUpdateTaskForm({
       setCids(CIDArray);
       setIsFileUploading(false);
       setIsFileUploaded(true);
-    }  
+    }
   }
 
   const handleRemoveFile = () => {

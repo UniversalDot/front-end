@@ -12,7 +12,10 @@ import {
   Stack,
   MenuItem,
   Divider,
+  Button
 } from '@mui/material';
+
+import CloudDownloadRoundedIcon from '@mui/icons-material/CloudDownloadRounded';
 // components
 import MyAvatar from 'src/components/MyAvatar';
 import Iconify from 'src/components/Iconify';
@@ -22,6 +25,9 @@ import Label from 'src/components/Label';
 import { useTasks } from 'src/hooks/universaldot';
 //types
 import { TaskCallables, TaskType, ActionType, TaskStatusEnum } from 'src/types';
+
+import windowInstance from 'src/window';
+const { IPFS_URL } = windowInstance.env;
 // ----------------------------------------------------------------------
 
 type TaskProps = {
@@ -37,6 +43,7 @@ export default function Task({ id, taskData }: TaskProps) {
 
   const { taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
+  const [attachments, setAttachments] = useState<string[]>([]);
 
   const labelColor =
     data?.status === TaskStatusEnum.CREATED
@@ -49,6 +56,11 @@ export default function Task({ id, taskData }: TaskProps) {
 
   useEffect(() => {
     if (taskData) {
+      if(taskData?.attachments !== 'None' && taskData?.attachments !== '') {
+        setAttachments(JSON.parse(taskData?.attachments));
+      } else {
+        setAttachments([]);
+      }
       setData(taskData);
     }
   }, [taskData]);
@@ -65,6 +77,13 @@ export default function Task({ id, taskData }: TaskProps) {
     taskAction(actionType, taskId, enqueueSnackbar);
     handleCloseMenu();
   };
+
+  const onDownload = (cid: string) => {
+    const link = document.createElement("a");
+    link.download = '';
+    link.href = `${IPFS_URL}/${cid}`;
+    link.click();
+  }
 
   return (
     <Card>
@@ -147,7 +166,23 @@ export default function Task({ id, taskData }: TaskProps) {
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Attachments
           </Typography>
-          <Typography variant="body2">{data?.attachments}</Typography>
+          <Typography variant="body2">
+            {
+              attachments.length !== 0 && (
+                <>
+                  {
+                    attachments.map((cid: string, index: number) => {
+                      return (
+                        <Button onClick={() => onDownload(cid)} key={index} sx={{ ml: 1 }} variant="contained" color="primary">
+                          <CloudDownloadRoundedIcon />
+                        </Button>
+                      )
+                    })
+                  }
+                </>
+              )
+            }
+          </Typography>
         </Stack>
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
