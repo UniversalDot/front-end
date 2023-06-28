@@ -80,7 +80,7 @@ export default function CreateUpdateTaskForm({
   const [cids, setCids] = useState<string[]>([]);
 
   const ipfs = useIpfsAPI();
-
+  
   const taskFormEdit: FormValuesProps = {
     ...taskForm,
     deadline: dayjs(taskForm.deadline, 'DD-MM-YYYY hh:mm a').toDate(),
@@ -127,6 +127,7 @@ export default function CreateUpdateTaskForm({
       let filename_string = '';
       for (const file of files) {
         const { cid } = await ipfs.add(file);
+        alert(cid);
         URLArray.push(URL.createObjectURL(file));
         CIDArray.push(cid.toString());
         if(i === fileCount) {

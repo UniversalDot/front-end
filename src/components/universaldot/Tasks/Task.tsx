@@ -27,7 +27,11 @@ import { useTasks } from 'src/hooks/universaldot';
 import { TaskCallables, TaskType, ActionType, TaskStatusEnum } from 'src/types';
 
 import windowInstance from 'src/window';
-const { IPFS_URL } = windowInstance.env;
+
+// import IPFS from "ipfs";
+// import { PromiseValue } from "type-fest";
+
+const IPFS_URL = 'https://ipfs.io/ipfs/';
 // ----------------------------------------------------------------------
 
 type TaskProps = {
@@ -78,12 +82,22 @@ export default function Task({ id, taskData }: TaskProps) {
     handleCloseMenu();
   };
 
-  const onDownload = (cid: string) => {
-    const link = document.createElement("a");
-    link.download = '';
-    link.href = `${IPFS_URL}/${cid}`;
-    link.click();
-  }
+  const downloadFileFromIPFS = (cid: string, fileName: string) => {
+    const ipfsGatewayURL = `https://ipfs.io/ipfs/${cid}`;
+    fetch(ipfsGatewayURL)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = '';
+        link.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error downloading file from IPFS:", error);
+      });
+  };
 
   return (
     <Card>
@@ -173,9 +187,9 @@ export default function Task({ id, taskData }: TaskProps) {
                   {
                     attachments.map((cid: string, index: number) => {
                       return (
-                        <Button onClick={() => onDownload(cid)} key={index} sx={{ ml: 1 }} variant="contained" color="primary">
-                          <CloudDownloadRoundedIcon />
-                        </Button>
+                        <IconButton onClick={() => downloadFileFromIPFS(cid, 'test.txt')} key={index} sx={{ ml: 1 }} aria-label="CloudDownloadRoundedIcon" size="small" color="primary">
+                          <CloudDownloadRoundedIcon fontSize="small"/>
+                        </IconButton>
                       )
                     })
                   }
