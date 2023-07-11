@@ -127,7 +127,7 @@ export default function CreateUpdateTaskForm({
       let filename_string = '';
       for (const file of files) {
         const { cid } = await ipfs.add(file);
-        alert(cid);
+        console.log(cid);
         URLArray.push(URL.createObjectURL(file));
         CIDArray.push(cid.toString());
         if(i === fileCount) {
