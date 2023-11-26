@@ -53,6 +53,7 @@
     "@fullcalendar/timeline": "^5.11.0",
     "@hookform/resolvers": "^2.8.8",
     "@iconify/react": "^3.2.1",
+    "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.76",
     "@mui/material": "^5.6.0",
     "@polkadot/api": "^7.10.1",
@@ -73,7 +74,8 @@
     "dayjs": "^1.11.5",
     "framer-motion": "^6.2.9",
     "history": "^5.3.0",
-    "ipfs-http-client": "^58.0.0",
+    "ipfs-api": "^26.1.2",
+    "ipfs-http-client": "^60.0.1",
     "lodash": "^4.17.21",
     "node-polyfill-webpack-plugin": "^2.0.0",
     "notistack": "^2.0.5",
@@ -105,6 +107,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.9",
     "@babel/eslint-parser": "^7.17.0",
+    "@cypress/webpack-preprocessor": "^5.17.1",
     "@types/lodash": "^4.14.182",
     "@types/nprogress": "^0.2.0",
     "@types/numeral": "^2.0.2",
@@ -115,7 +118,8 @@
     "@types/react-redux": "^7.1.23",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
-    "cypress": "^10.10.0",
+    "cypress": "^10.11.0",
+    "cypress-react-unit-test": "^4.17.2",
     "eslint": "^8.9.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "^16.1.0",
@@ -133,6 +137,8 @@
     "http-proxy-middleware": "^2.0.6",
     "prettier": "^2.5.1",
     "react-app-rewired": "^2.2.1",
-    "typescript": "^4.5.5"
+    "ts-loader": "^9.4.4",
+    "typescript": "^4.5.5",
+    "webpack": "^5.88.0"
   }
 }

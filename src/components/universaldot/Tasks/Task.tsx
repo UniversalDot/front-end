@@ -12,7 +12,10 @@ import {
   Stack,
   MenuItem,
   Divider,
+  Button
 } from '@mui/material';
+
+import CloudDownloadRoundedIcon from '@mui/icons-material/CloudDownloadRounded';
 // components
 import MyAvatar from 'src/components/MyAvatar';
 import Iconify from 'src/components/Iconify';
@@ -22,6 +25,13 @@ import Label from 'src/components/Label';
 import { useTasks } from 'src/hooks/universaldot';
 //types
 import { TaskCallables, TaskType, ActionType, TaskStatusEnum } from 'src/types';
+
+import windowInstance from 'src/window';
+
+// import IPFS from "ipfs";
+// import { PromiseValue } from "type-fest";
+
+const IPFS_URL = 'https://ipfs.io/ipfs/';
 // ----------------------------------------------------------------------
 
 type TaskProps = {
@@ -37,6 +47,7 @@ export default function Task({ id, taskData }: TaskProps) {
 
   const { taskAction } = useTasks();
   const [data, setData] = useState<TaskType | null>(null);
+  const [attachments, setAttachments] = useState<string[]>([]);
 
   const labelColor =
     data?.status === TaskStatusEnum.CREATED
@@ -49,6 +60,11 @@ export default function Task({ id, taskData }: TaskProps) {
 
   useEffect(() => {
     if (taskData) {
+      if(taskData?.attachments !== 'None' && taskData?.attachments !== '') {
+        setAttachments(JSON.parse(taskData?.attachments));
+      } else {
+        setAttachments([]);
+      }
       setData(taskData);
     }
   }, [taskData]);
@@ -64,6 +80,23 @@ export default function Task({ id, taskData }: TaskProps) {
   const handleOptionsOnClick = (actionType: ActionType, taskId: string) => {
     taskAction(actionType, taskId, enqueueSnackbar);
     handleCloseMenu();
+  };
+
+  const downloadFileFromIPFS = (cid: string, fileName: string) => {
+    const ipfsGatewayURL = `https://ipfs.io/ipfs/${cid}`;
+    fetch(ipfsGatewayURL)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = '';
+        link.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error downloading file from IPFS:", error);
+      });
   };
 
   return (
@@ -147,7 +180,23 @@ export default function Task({ id, taskData }: TaskProps) {
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Attachments
           </Typography>
-          <Typography variant="body2">{data?.attachments}</Typography>
+          <Typography variant="body2">
+            {
+              attachments.length !== 0 && (
+                <>
+                  {
+                    attachments.map((cid: string, index: number) => {
+                      return (
+                        <IconButton onClick={() => downloadFileFromIPFS(cid, 'test.txt')} key={index} sx={{ ml: 1 }} aria-label="CloudDownloadRoundedIcon" size="small" color="primary">
+                          <CloudDownloadRoundedIcon fontSize="small"/>
+                        </IconButton>
+                      )
+                    })
+                  }
+                </>
+              )
+            }
+          </Typography>
         </Stack>
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>

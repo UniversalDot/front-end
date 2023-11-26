@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 // @mui
-import { Container, Box, Button, DialogTitle, Stack, LinearProgress } from '@mui/material';
+import { Container, Box, Button, DialogTitle, Stack } from '@mui/material';
 // hooks
 import useSettings from '../hooks/useSettings';
 import useTabs from '../hooks/useTabs';
